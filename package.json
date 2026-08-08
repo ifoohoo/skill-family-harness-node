@@ -5,7 +5,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node/issues"
   },
   "dependencies": {
-    "skill-family-contracts": "0.1.1"
+    "skill-family-contracts": "0.1.2"
   },
   "description": "Thin Node.js mechanism runtime for Skill Family engineering contracts.",
   "engines": {
@@ -27,7 +27,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node.git"
   },
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "scripts": {
     "check": "node --input-type=module -e \"import('./src/index.mjs').then(() => console.log('smoke ok')).catch(e => { console.error(e); process.exit(1) })\"",
     "test": "node --input-type=module -e \"import('./src/index.mjs').then(() => console.log('smoke ok')).catch(e => { console.error(e); process.exit(1) })\""
