@@ -7,8 +7,18 @@ Git 写操作的授权边界见仓库内文档站的生命周期指南（`docs/g
 拓扑说明：本工作区仓永久 private，是唯一开发真源；三个 public 仓
 （`skill-family-contracts`、`skill-family-harness-node`、
 `skill-family-engineering-kit`）是版本化发布镜像，不承载完整开发历史与
-测试，也不接受直接 PR 或 issue。本指南描述的是私有工作区内经授权的开发
-流程；消费坐标与发布状态唯一见 `docs/status/current.md`。
+测试。本指南描述的是私有工作区内经授权的开发流程；消费坐标与发布状态
+唯一见 `docs/status/current.md`。
+
+## Bug 报告与 Issue
+
+普通 bug 报告欢迎通过各 public 发布镜像仓的 GitHub Issues 提交（例如
+`https://github.com/ifoohoo/skill-family-engineering-kit/issues`）。提交
+bug 报告时请尽量提供：受影响包与版本、最小复现步骤、预期与实际行为。
+
+**未经事先讨论的 Pull Request 不予接受。** 如果你希望贡献代码，请先
+通过 Issue 讨论变更的动机与范围，获得维护者确认后再提交 PR。这是为了
+避免重复劳动、确保变更与本项目的架构裁决和发布合同一致。
 
 ## 本地安装
 

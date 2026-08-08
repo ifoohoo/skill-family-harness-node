@@ -39,7 +39,7 @@ Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时
 3. 符号链接逃逸：末位组件是指向根外的符号链接（或断链）→ `symlink-escape`。
 4. 真实路径逃逸：任一中间符号链接链的规范化结果离开根 → `realpath-escape`。
 
-比较基于 `realpath` 之后的规范根，避免 macOS `/var → /private/var` 一类系统级符号链接造成误判。
+比较是基于 `realpath` 之后的规范根，避免 macOS `/var → /private/var` 一类系统级符号链接造成误判。
 
 ## 测试
 
@@ -49,14 +49,28 @@ Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时
 
 ```sh
 npm install skill-family-harness-node
+npm info skill-family-harness-node --help
 ```
 
 ## 最小示例
 
 ```js
-// release-skill: harness runtime validation
+// 从空目录运行：npm install skill-family-harness-node
 import { validateContractDocument } from "skill-family-harness-node";
-const result = validateContractDocument(doc, { schemaId: "project-manifest" });
+
+const document = {
+  schemaVersion: 1,
+  kind: "skill-family.project-manifest",
+  project: { id: "my-project", name: "My Project", description: "Example" },
+  contracts: { version: "1.0.0", profile: "generic" },
+  managedFiles: ["package.json"],
+  updatedAt: "2026-01-01T00:00:00Z",
+};
+
+const result = validateContractDocument(document, {
+  schemaId: "https://contracts.skill-family.example/v1/project-manifest.json",
+});
+if (!result.valid) console.error(result.errorCode);
 ```
 
 ## 故障诊断
