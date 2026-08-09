@@ -48,14 +48,14 @@ Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时
 ## 安装
 
 ```sh
-npm install skill-family-harness-node
+npm install skill-family-harness-node@0.1.3
 npm info skill-family-harness-node --help
 ```
 
 ## 最小示例
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node
+// 从空目录运行：npm install skill-family-harness-node@0.1.3
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

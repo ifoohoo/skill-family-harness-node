@@ -12,15 +12,10 @@
 ## 报告漏洞
 
 请勿通过公开 issue 直接披露未修复的安全漏洞。private workspace 仓永久
-private，不是公开报告渠道；请通过以下渠道私下报告：
-
-1. **首选**：通过任一 public 发布镜像仓（例如
-   `https://github.com/ifoohoo/skill-family-engineering-kit`）在 GitHub 上使用
-   **Private vulnerability reporting**（仓库 Security 页签的
-   "Report a vulnerability"）；
-2. **备选**：如上述通道不可用，请通过邮件联系仓库维护者
-   （`ifoohoo` GitHub 组织的 `security` 团队，或仓库 `README.md` 中列出的
-   维护者邮箱）。
+private，不是公开报告渠道；请通过任一 public 发布镜像仓（例如
+`https://github.com/ifoohoo/skill-family-engineering-kit`）在 GitHub 上使用
+**Private vulnerability reporting**（仓库 Security 页签的
+"Report a vulnerability"）私下报告。
 
 报告时请尽量提供：
 
