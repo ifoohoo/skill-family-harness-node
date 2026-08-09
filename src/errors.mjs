@@ -41,6 +41,22 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   UNSUPPORTED_POLICY: "unsupported-policy",
   EXECUTION_FAILED: "execution-failed",
   INVALID_RESULT: "invalid-result",
+  STORE_CLOSED: "store-closed",
+  STORE_LOCKED: "store-locked",
+  LOCK_CORRUPT: "lock-corrupt",
+  LOCK_RECOVERY_REFUSED: "lock-recovery-refused",
+  UNSAFE_STATE_ENTRY: "unsafe-state-entry",
+  EVENT_SCHEMA_INVALID: "event-schema-invalid",
+  DUPLICATE_SEQUENCE: "duplicate-sequence",
+  IDEMPOTENCY_CONFLICT: "idempotency-conflict",
+  CHAIN_BROKEN: "chain-broken",
+  SNAPSHOT_MISMATCH: "snapshot-mismatch",
+  HOST_CONTRACT_INVALID: "host-contract-invalid",
+  HOST_BUILD_FAILED: "host-build-failed",
+  HOST_PROBE_FAILED: "host-probe-failed",
+  UNTRUSTED_EXECUTABLE: "untrusted-executable",
+  PORTABLE_PATH_COLLISION: "portable-path-collision",
+  MANIFEST_MISMATCH: "manifest-mismatch",
 });
 
 /**

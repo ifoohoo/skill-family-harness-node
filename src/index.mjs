@@ -17,6 +17,9 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "temporary-workspace",
   "resource-closure",
   "operation-envelope",
+  "host-adapter-mechanism",
+  "report-rendering",
+  "durable-state-store",
 ]);
 
 export const HARNESS_EXCLUSIONS = Object.freeze([
@@ -50,3 +53,51 @@ export {
 } from "./validation.mjs";
 
 export { parseRequest, processRequest } from "./request.mjs";
+
+// Generic host mechanism. Concrete host profiles and audited driver vectors
+// are injected by downstream orchestration; the harness never imports them.
+export {
+  normalizeAdapterSource,
+  buildAdapterClosure,
+  verifyAdapterBuildManifest,
+  materializeAdapterBuild,
+  probeVersionVector,
+} from "./host.mjs";
+
+// Deterministic report layer (FND-ADR-005): validate -> render -> bind -> check.
+// Pure functions only: no clock, no environment, no network, no model calls.
+export {
+  REPORT_RENDERER_NAME,
+  REPORT_RENDERER_VERSION,
+  SUPPORTED_REPORT_LOCALES,
+  EXECUTION_STATUSES,
+  RESULT_STATE_EXECUTION_STATUSES,
+  REPORT_AUDIENCES,
+  REPORT_STYLE_RULES,
+  validateReportModel,
+  renderReportMarkdown,
+  computeResultDigest,
+  computeModelDigest,
+  digestReport,
+  buildBinding,
+  verifyBinding,
+  checkReport,
+  collectStyleWarnings,
+} from "./report.mjs";
+
+// Durable state mechanism only. Event meaning and reducer transitions remain
+// consumer-owned; the harness owns ordering, integrity, fencing and recovery.
+export {
+  STATE_GENESIS_DIGEST,
+  openStateStore,
+  inspectStateStoreLock,
+  recoverStateStoreLock,
+  appendEvent,
+  readEvents,
+  readSnapshot,
+  writeSnapshot,
+  verifyStateStore,
+  rebuildSnapshot,
+  closeStateStore,
+  close,
+} from "./state-store.mjs";
