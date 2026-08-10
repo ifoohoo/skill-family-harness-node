@@ -1,77 +1,52 @@
 <!-- release-skill:safe-first-command -->
 <!-- release-skill:external-write-boundary -->
+> 简体中文版：[README.zh-CN.md](./README.zh-CN.md)
 
 # skill-family-harness-node
 
-Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
+<!-- release-skill:release-version: 0.2.1 -->
 
-## 边界
+The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
-- 消费 `skill-family-contracts`（工作区依赖），复用其方言路由的 Ajv validator、Kernel Protocol、冻结错误码与 fixture；不复制协议定义，不重新解释 Schema。
-- 只实现机制：Schema 校验、原子写、路径收容、临时工作区、资源闭包、operation-request → operation-result 管道、业务中立的事件日志与派生快照。
-- 明确排除：业务语义、任务编排、Git 写入、模型调用、远程网络、发布状态。见 `HARNESS_EXCLUSIONS`。
+<!-- release-skill:managed:start id=latest-release -->
+**0.2.1** (2026-08-10)
 
-## 公共 API
+This release adds candidate Quickstart Profile exchange helpers and makes the package release documentation available in English and Simplified Chinese.
 
-| 导出 | 职责 |
-| --- | --- |
-| `HARNESS_CAPABILITIES` / `HARNESS_EXCLUSIONS` | 能力与排除清单（冻结常量）。 |
-| `HarnessError` / `HARNESS_ERROR_KINDS` / `mechanismError` | 机制失败统一携带注册错误码 `SFC2004`，`details.kind` 给出稳定细分。 |
-| `validateContractDocument` / `getValidator` / `resolveSchemaContext` / `validatorCacheSize` | 按 Schema 方言路由并缓存 validator；复用 Contracts 的 Ajv 实例与 dialect/policy 语义。 |
-| `classifyPathInput` / `resolveContained` / `readFileContained` | 路径收容：拦截路径越界、符号链接逃逸、真实路径逃逸。 |
-| `writeFileAtomic` | 原子写：失败不留半成品（临时文件 + fsync + rename）。 |
-| `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | 自动清理的临时工作区，异常路径也清理。 |
-| `digestBytes` / `computeResourceClosure` / `closureContains` | 资源闭包与确定性 sha256 摘要。 |
-| `parseRequest` / `processRequest` | 解析 `operation-request`，输出终态 `operation-result`。 |
-| `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | 消费经 Contracts 验证的 report model，确定性渲染中性 Markdown 并校验来源/结果/报告绑定；不解释业务输出。 |
-| `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | 通用文本 source closure、manifest 全摘要复验和目标集合原子落盘；具体 Profile/driver 不在 Harness。 |
-| `probeVersionVector` | 默认禁用 spawn 的版本探测机制；显式启用时只执行绝对、无 symlink 的受审计向量，不使用 PATH/shell。 |
-| `openStateStore` / `appendEvent` / `readEvents` / `verifyStateStore` / `closeStateStore` | 严格单写者的 append-only 事件存储；事件目录是唯一状态权威，`chain-head.json` 只是缓存。 |
-| `readSnapshot` / `writeSnapshot` / `rebuildSnapshot` | 原子派生快照与完整事件重建；坏事件不能被旧快照掩盖，坏快照可被重建忽略。 |
-| `inspectStateStoreLock` / `recoverStateStoreLock` | 只读锁诊断与显式恢复；恢复必须对观测到的 owner + fencing 做精确匹配。 |
+**Added**
 
-## 状态存储的锁与恢复边界
+- Adds candidate helpers that create and revalidate observation Resources, build Tasks, wrap Results, and fail closed when a Result does not bind the exact Task and correlation fields.
+- Adds complete English and Simplified Chinese package documentation, including an agent quick-reference section.
 
-- 锁使用 exclusive create，第二写者立即收到 `store-locked`；不排队，也不按时间、PID 或租约过期偷锁。
-- `inspectStateStoreLock` 不创建任何文件，只返回 `owner`、单调 `fencing`、`ageMs` 和恢复中标记。`ageMs` 仅供诊断，从不参与正确性判断。
-- 崩溃遗留锁只能由调用方在 Foundation 之外确认旧写者已经终止后，调用 `recoverStateStoreLock`，同时提交精确匹配的 `expectedOwner`、`expectedFencing` 与 `confirmOwnerTerminated: true`。不匹配或缺少确认均失败关闭。
-- 恢复产生更大的 fencing。旧 handle 每次 append 都重新核对 owner、fencing 和 acquisition id；事件最终发布使用同目录临时普通文件、fsync 和 exclusive link，绝不覆盖既有 sequence。
-- append、snapshot、close 与 recovery 由短期 `writer-mutation.lock` 串行化；恢复不能越过已经持有 mutation guard 的权威写入。
-- 如果恢复进程自身在持有 `writer-recovery.lock` 时崩溃，系统保持可诊断的锁死状态，不自动删除该 guard。它需要新的外部取证与人工处置；当前 API 不声称解决不可信调用方谎报“旧写者已终止”的场景。
-- state root、`events/`、`snapshots/`、事件和快照拒绝 symlink、硬链接、FIFO、设备与其它非普通条目。payload 必须是纯 JSON，且 `eventType + payloadSchemaVersion` 必须命中调用方在 open/recover 时冻结的 Schema 对。
+**Changed**
 
-## 稳定错误码
+- Manages the current README and CHANGELOG release sections from one bilingual, versioned notes source.
+- Distributes the project NOTICE separately from the Apache-2.0 LICENSE.
 
-全部复用 Contracts 冻结登记表，不新增未登记码。机制失败统一为 `SFC2004`（EXECUTION_FAILED），`details.kind` 取 `HARNESS_ERROR_KINDS` 中的稳定值，例如 `path-traversal`、`symlink-escape`、`realpath-escape`、`atomic-write-failed`、`missing-resource`、`workspace-disposed`。
+**Upgrade Notes**
 
-新增一个全新的 SFC 码属于 Contracts 变更（登记表在 contracts 包内），超出本包写集；因此用「`SFC2004` + 稳定 `details.kind`」组合保持对外语义稳定。
+The candidate helpers do not alter the stable Harness API or add lifecycle, retry, orchestration, model-call, network, or Git-write semantics.
+<!-- release-skill:managed:end id=latest-release -->
 
-## 路径收容模型
+## Problem It Solves
 
-`resolveContained(root, rel)` 是所有文件系统访问的唯一入口，按序拒绝：
+Contracts defines "what should be", and the Harness turns that into "can be safely reused" mechanisms at the Node runtime. If multiple skill-family projects each implement path containment, atomic writes, resource closure, report rendering, host integration, and the state base independently, you get inconsistent security boundaries and behavioral drift. The Harness consolidates these business-neutral mechanisms into one default implementation, which callers pick up as needed.
 
-1. 输入分级（`classifyPathInput`，纯函数可测）：拒绝绝对路径、Windows 盘符/UNC 路径、POSIX 上的反斜杠路径、空输入、NUL 字节。
-2. 词法收容：`path.resolve` 后离开根 → `path-traversal`。
-3. 符号链接逃逸：末位组件是指向根外的符号链接（或断链）→ `symlink-escape`。
-4. 真实路径逃逸：任一中间符号链接链的规范化结果离开根 → `realpath-escape`。
+## Core Mental Model
 
-比较是基于 `realpath` 之后的规范根，避免 macOS `/var → /private/var` 一类系统级符号链接造成误判。
+The Harness consumes `skill-family-contracts` (a workspace dependency), reusing its dialect-routed Ajv validator, Kernel Protocol, frozen error codes, and fixtures; it does not copy protocol definitions or re-interpret the Schema. It only implements mechanisms: Schema validation, atomic writes, path containment, temporary workspaces, resource closure, the operation-request → operation-result pipeline, and business-neutral event logging with derived snapshots. Explicitly excluded: business semantics, task orchestration, Git writes, model calls, remote networking, and publish state. See `HARNESS_EXCLUSIONS`.
 
-## 测试
-
-`node --test` 覆盖：Contracts fixture 全量回放、安全反例、原子性失败路径、临时工作区、闭包确定性、报告事实绑定与 Markdown 注入、宿主 manifest/路径/命令信任，以及状态存储的崩溃、并发、损坏、fencing、显式恢复、symlink、硬链接与 FIFO 反例。
-
-## 安装
+## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.2.0
+npm install skill-family-harness-node@0.2.1
 npm info skill-family-harness-node --help
 ```
 
-## 最小示例
+The minimal example shows validating a contract document inside Node:
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.2.0
+// Run from an empty directory: npm install skill-family-harness-node@0.2.1
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -89,6 +64,158 @@ const result = validateContractDocument(document, {
 if (!result.valid) console.error(result.errorCode);
 ```
 
-## 故障诊断
+The code above shows the basic `validateContractDocument` call; it reuses the Contracts validator and caches instances keyed by schema, without recompiling.
 
-机制失败统一抛出 `SFC2004`（EXECUTION_FAILED），`details.kind` 给出稳定细分（如 `path-traversal`、`atomic-write-failed`）。如失败，检查 root 路径是否正确且目标文件未被锁定。
+## Candidate Quickstart Profile
+
+Use the candidate subpath to construct an observation-backed Task, wrap its terminal Result, and verify that both documents bind the exact observation bytes and correlation fields:
+
+```js
+import {
+  createQuickstartTask,
+  wrapQuickstartResult,
+  verifyQuickstartExchange,
+} from "skill-family-harness-node/candidate/quickstart-profile";
+```
+
+This mechanism is intended for early integration trials of the candidate Contracts profile. It does not perform a domain audit, choose a method, retry work, or own lifecycle state. The subpath is public but **not stable** and may change or be removed in a later minor release; pin the exact package version and do not expose it through a stable consumer API.
+
+## Typical Use Cases
+
+- Need to safely read/write contained paths inside Node: use path containment and atomic write.
+- Need to normalize resources into a recomputable closure or generate a digest: use resource closure.
+- Need to generate a human report from a machine result: use report model/render/binding/check.
+- Need to persist an event log with derived snapshots: use state-store (event meaning is owned by the caller).
+
+## Boundaries
+
+- Consumes `skill-family-contracts`, reusing its dialect-routed Ajv validator, Kernel Protocol, frozen error codes, and fixtures; does not copy protocol definitions or re-interpret the Schema.
+- Only implements mechanisms: Schema validation, atomic writes, path containment, temporary workspaces, resource closure, the operation-request → operation-result pipeline, and business-neutral event logging with derived snapshots.
+- Explicitly excluded: business semantics, task orchestration, Git writes, model calls, remote networking, and publish state. See `HARNESS_EXCLUSIONS`.
+
+## Public API
+
+| Export | Responsibility |
+| --- | --- |
+| `HARNESS_CAPABILITIES` / `HARNESS_EXCLUSIONS` | Capability and exclusion lists (frozen constants). |
+| `HarnessError` / `HARNESS_ERROR_KINDS` / `mechanismError` | Mechanism failures uniformly carry the registered error code `SFC2004`; `details.kind` gives a stable subcategory. |
+| `validateContractDocument` / `getValidator` / `resolveSchemaContext` / `validatorCacheSize` | Routes and caches validators by Schema dialect; reuses Contracts' Ajv instances and dialect/policy semantics. |
+| `classifyPathInput` / `resolveContained` / `readFileContained` | Path containment: intercepts path overruns, symlink escapes, and realpath escapes. |
+| `writeFileAtomic` | Atomic write: leaves no half-written artifact on failure (temp file + fsync + rename). |
+| `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | Auto-cleanup temporary workspace, cleaned up even on exception paths. |
+| `digestBytes` / `computeResourceClosure` / `closureContains` | Resource closure and deterministic sha256 digest. |
+| `parseRequest` / `processRequest` | Parse `operation-request`, output terminal `operation-result`. |
+| `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | Consume a Contracts-validated report model, deterministically render neutral Markdown, and verify source/result/report binding; does not interpret business output. |
+| `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | Generic text-source closure, full-manifest digest re-verification, and atomic landing of the target set; specific Profile/driver is not in the Harness. |
+| `probeVersionVector` | A version-probe mechanism that disables spawn by default; when explicitly enabled, executes only absolute, symlink-free, audited vectors, using no PATH/shell. |
+| `openStateStore` / `appendEvent` / `readEvents` / `verifyStateStore` / `closeStateStore` | Strict single-writer append-only event store; the event directory is the sole state authority, `chain-head.json` is only a cache. |
+| `readSnapshot` / `writeSnapshot` / `rebuildSnapshot` | Atomic derived snapshots and full-event rebuild; a bad event cannot be masked by an old snapshot, and a bad snapshot can be ignored by rebuild. |
+| `inspectStateStoreLock` / `recoverStateStoreLock` | Read-only lock diagnostics and explicit recovery; recovery must precisely match the observed owner + fencing. |
+
+## State Store Lock and Recovery Boundaries
+
+- The lock uses exclusive create; a second writer immediately receives `store-locked`; it does not queue, nor steals the lock by time, PID, or lease expiry.
+- `inspectStateStoreLock` creates no file, only returns `owner`, monotonic `fencing`, `ageMs`, and an in-recovery flag. `ageMs` is for diagnostics only and never participates in correctness decisions.
+- A crash-left lock can only be recovered by the caller, after confirming outside Foundation that the old writer has terminated, by calling `recoverStateStoreLock` while submitting the precisely matching `expectedOwner`, `expectedFencing`, and `confirmOwnerTerminated: true`. A mismatch or missing confirmation fails closed.
+- Recovery produces a larger fencing. The old handle re-checks owner, fencing, and acquisition id on every append; final event publication uses a same-directory temporary regular file, fsync, and exclusive link, never overwriting an existing sequence.
+- Append, snapshot, close, and recovery are serialized by a short-lived `writer-mutation.lock`; recovery cannot cross an authoritative write that already holds the mutation guard.
+- If the recovering process itself crashes while holding `writer-recovery.lock`, the system stays in a diagnosable deadlock state and does not auto-delete that guard. It requires fresh external forensics and manual handling; the current API does not claim to solve the scenario where an untrusted caller falsely reports "old writer terminated".
+- The state root, `events/`, `snapshots/`, events, and snapshots reject symlinks, hard links, FIFOs, devices, and other non-regular entries. Payload must be pure JSON, and `eventType + payloadSchemaVersion` must hit the Schema pair frozen by the caller at open/recover.
+
+## Stable Error Codes
+
+All reuse the Contracts frozen registry; no unregistered codes are added. Mechanism failures are uniformly `SFC2004` (EXECUTION_FAILED), and `details.kind` takes a stable value from `HARNESS_ERROR_KINDS`, such as `path-traversal`, `symlink-escape`, `realpath-escape`, `atomic-write-failed`, `missing-resource`, `workspace-disposed`.
+
+Adding an entirely new SFC code is a Contracts change (the registry is inside the contracts package) and is outside this package's write set; therefore the combination "`SFC2004` + stable `details.kind`" keeps external semantics stable.
+
+## Path Containment Model
+
+`resolveContained(root, rel)` is the single entry point for all filesystem access, rejecting in order:
+
+1. Input classification (`classifyPathInput`, a pure testable function): rejects absolute paths, Windows drive/UNC paths, backslash paths on POSIX, empty input, and NUL bytes.
+2. Lexical containment: after `path.resolve`, leaving the root → `path-traversal`.
+3. Symlink escape: the final component is a symlink (or dangling link) pointing outside the root → `symlink-escape`.
+4. Realpath escape: any intermediate symlink chain's normalized result leaves the root → `realpath-escape`.
+
+Comparison is based on the canonical root after `realpath`, avoiding misjudgment from system-level symlinks such as macOS `/var → /private/var`.
+
+## Testing
+
+`node --test` covers: full Contracts fixture replay, security negative cases, atomic-failure paths, temporary workspaces, closure determinism, report fact binding and Markdown injection, host manifest/path/command trust, and state-store crashes, concurrency, corruption, fencing, explicit recovery, symlinks, hard links, and FIFO negative cases.
+
+## Troubleshooting
+
+Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.kind` giving a stable subcategory (e.g., `path-traversal`, `atomic-write-failed`). If it fails, check that the root path is correct and the target file is not locked.
+
+## Further Documentation
+
+- Architecture boundaries and routing: [Architecture](https://ifoohoo.github.io/skill-family-engineering-kit/architecture/), [Agent architecture routing](https://ifoohoo.github.io/skill-family-engineering-kit/agents/architecture-routing/)
+- Capability catalog: [capability-catalog.json](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json)
+- Side-effect matrix: [Failure and side-effect matrix](https://ifoohoo.github.io/skill-family-engineering-kit/reference/failure-and-side-effect-matrix/)
+
+<!-- agent-quick-reference:start -->
+## Agent Quick Reference
+
+### Use when
+
+- You need to validate contracts inside Node, safely read/write contained paths, compute resource closures, or render deterministic reports.
+- You need to persist an event log with derived snapshots, or normalize host adapter sources.
+- You need to trial the non-stable Quickstart exchange and verify its observation/task/result binding.
+
+### Do not use when
+
+- You need to put file-selection business rules into the Foundation (business rules are owned by the caller).
+- You need host apply/install/update/uninstall, a full Qoder driver, or binary adapter source (explicitly unsupported).
+- You need domain audit semantics, retry orchestration, or a compatibility-frozen Quickstart API.
+
+### Capability selection
+
+- `foundation.harness.contract-validation`: contract validation and validator caching inside Node.
+- `foundation.harness.path-containment`: path classification and contained resolution, rejecting the three escape types.
+- `foundation.harness.atomic-write`: atomic write within contained paths, rolling back on failure.
+- `foundation.harness.temporary-workspace`: auto-cleanup temporary workspace.
+- `foundation.harness.resource-closure`: deterministic resource closure and sha256 digest.
+- `foundation.harness.request-processing`: operation-request → terminal operation-result.
+- `foundation.harness.report`: report-model validation/render/binding/check.
+- `foundation.harness.host-adapter`: adapter source closure/build/materialize and version probe.
+- `foundation.harness.state-store`: append-only events, hash chain, snapshots, and lock recovery.
+- `foundation.harness.errors`: mechanism error types and stable error classes.
+- `foundation.harness.quickstart-profile-candidate`: exact-version observation/task/result construction and binding verification.
+
+### Required inputs
+
+- The contained root directory (the boundary for path containment).
+- The document, resource, or event payload to validate/write.
+
+### Outputs and evidence
+
+- Validation result, contained absolute path, atomically written file, closure digest, terminal result, report text, events/snapshots.
+- Evidence: `packages/skill-family-harness-node/test/validation.test.mjs`, `atomic.test.mjs`, `containment.test.mjs`, `closure.test.mjs`, `report.test.mjs`, `state-store.test.mjs`.
+
+### Side effects
+
+- Read-only filesystem access (path/atomic/workspace/state-store read and write within contained paths).
+- `HARNESS_EXCLUSIONS` explicitly excludes release-state, remote-network-access, business-semantics, workflow-orchestration, model-calls, git-writes.
+
+### Failure semantics
+
+- Mechanism failures are uniformly `SFC2004`, with `details.kind` as a stable subcategory (e.g., `path-traversal`, `atomic-write-failed`).
+- Residual state after failure: atomic write rolls back the temp file; a broken state-store hash chain throws, and old snapshots can be ignored by rebuild.
+
+### Architectural invariants
+
+- Event meaning and reducer transitions remain consumer-owned; state-store only provides the base.
+- Only text adapter source (utf8) is supported; binary projection is not supported.
+
+### Route elsewhere when
+
+- Business state machine / terminal states: route to loop-agent.
+- Host apply: explicitly unsupported.
+- Domain audit semantics: route to a standalone audit consumer.
+
+### Machine-readable sources
+
+- Public capability catalog: [`capability-catalog.json`](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json) (`foundation.harness.*` entries).
+- Package-local source: `src/*.mjs`.
+- Package-local candidate source: `candidate/quickstart-profile.mjs`; public import: `skill-family-harness-node/candidate/quickstart-profile`.
+<!-- agent-quick-reference:end -->
