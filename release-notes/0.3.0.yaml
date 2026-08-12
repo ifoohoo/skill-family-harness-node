@@ -1,0 +1,23 @@
+version: 0.3.0
+date: 2026-08-12
+locales:
+  en:
+    summary: This source candidate updates the Quickstart Profile harness to verify v2 Task and Result exchanges without taking ownership of consumer semantics.
+    changes:
+      added:
+        - Recomputes real bytes for path-backed outputs and evidence, and rejects duplicate Resource ids across observations, outputs, and evidence.
+        - Verifies operation identity, Task digest, every run/stage/attempt field, and the exact evidence binding set.
+      changed:
+        - Replaces the incompatible 0.2.1 candidate surface; consumers that still require v1 must remain pinned to exactly 0.2.1.
+        - Leaves method selection, retry policy, and domain result interpretation to the consumer.
+    upgradeNotes: Version 0.3.0 is a local, unpublished source candidate. Pin the candidate subpath to an exact package version and update v1 exchange producers before adopting it.
+  zh-CN:
+    summary: 本源码候选版把 Quickstart Profile Harness 更新为 v2 Task/Result 交换校验，同时不接管消费者语义。
+    changes:
+      added:
+        - 对 path-backed output 与 evidence 重算真实字节摘要，并拒绝 observation、output、evidence 之间重复的 Resource id。
+        - 逐项复验 operation 身份、Task digest、run/stage/attempt 字段和 evidence 精确绑定集合。
+      changed:
+        - 替换与 0.2.1 不兼容的 candidate 面；仍依赖 v1 的消费者必须继续精确锁定 0.2.1。
+        - 方法选择、重试策略与领域结果解释继续归消费者所有。
+    upgradeNotes: 0.3.0 当前只是本地、未发布的源码候选。candidate 子路径必须精确锁定包版本，采用前需更新 v1 交换生产方。

@@ -4,28 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.2.1 -->
+<!-- release-skill:release-version: 0.3.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.2.1** (2026-08-10)
+**0.3.0** (2026-08-12)
 
-This release adds candidate Quickstart Profile exchange helpers and makes the package release documentation available in English and Simplified Chinese.
+This source candidate updates the Quickstart Profile harness to verify v2 Task and Result exchanges without taking ownership of consumer semantics.
 
 **Added**
 
-- Adds candidate helpers that create and revalidate observation Resources, build Tasks, wrap Results, and fail closed when a Result does not bind the exact Task and correlation fields.
-- Adds complete English and Simplified Chinese package documentation, including an agent quick-reference section.
+- Recomputes real bytes for path-backed outputs and evidence, and rejects duplicate Resource ids across observations, outputs, and evidence.
+- Verifies operation identity, Task digest, every run/stage/attempt field, and the exact evidence binding set.
 
 **Changed**
 
-- Manages the current README and CHANGELOG release sections from one bilingual, versioned notes source.
-- Distributes the project NOTICE separately from the Apache-2.0 LICENSE.
+- Replaces the incompatible 0.2.1 candidate surface; consumers that still require v1 must remain pinned to exactly 0.2.1.
+- Leaves method selection, retry policy, and domain result interpretation to the consumer.
 
 **Upgrade Notes**
 
-The candidate helpers do not alter the stable Harness API or add lifecycle, retry, orchestration, model-call, network, or Git-write semantics.
+Version 0.3.0 is a local, unpublished source candidate. Pin the candidate subpath to an exact package version and update v1 exchange producers before adopting it.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +39,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.2.1
+npm install skill-family-harness-node@0.3.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.2.1
+// Run from an empty directory: npm install skill-family-harness-node@0.3.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -78,7 +78,9 @@ import {
 } from "skill-family-harness-node/candidate/quickstart-profile";
 ```
 
-This mechanism is intended for early integration trials of the candidate Contracts profile. It does not perform a domain audit, choose a method, retry work, or own lifecycle state. The subpath is public but **not stable** and may change or be removed in a later minor release; pin the exact package version and do not expose it through a stable consumer API.
+The v2 mechanism recomputes the bytes of every path-backed output and evidence Resource. It also rejects duplicate Resource ids, correlation drift, a changed Task digest, and incomplete or mismatched evidence bindings. It does not perform a domain audit, choose a method, retry work, or own lifecycle state.
+
+The subpath is public but **not stable** and may change or be removed in a later minor release. Pin exactly `0.3.0` for v2; integrations that still produce candidate v1 exchanges must stay pinned to exactly `0.2.1`.
 
 ## Typical Use Cases
 

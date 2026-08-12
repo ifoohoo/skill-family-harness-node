@@ -5,28 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.2.1 -->
+<!-- release-skill:release-version: 0.3.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.2.1** (2026-08-10)
+**0.3.0** (2026-08-12)
 
-本版新增 Quickstart Profile 候选交换辅助函数，并为包发布文档提供完整英文版与简体中文版。
+本源码候选版把 Quickstart Profile Harness 更新为 v2 Task/Result 交换校验，同时不接管消费者语义。
 
 **新增**
 
-- 新增候选辅助函数，用于创建并复验 observation Resource、构造 Task、封装 Result，并在 Result 未精确绑定 Task 与关联字段时失败关闭。
-- 新增完整的英文与简体中文包文档，并补充智能体快速参考章节。
+- 对 path-backed output 与 evidence 重算真实字节摘要，并拒绝 observation、output、evidence 之间重复的 Resource id。
+- 逐项复验 operation 身份、Task digest、run/stage/attempt 字段和 evidence 精确绑定集合。
 
 **变更**
 
-- 使用同一份双语版本化说明源管理当前 README 与 CHANGELOG 的发布区域。
-- 项目 NOTICE 与 Apache-2.0 LICENSE 分开分发。
+- 替换与 0.2.1 不兼容的 candidate 面；仍依赖 v1 的消费者必须继续精确锁定 0.2.1。
+- 方法选择、重试策略与领域结果解释继续归消费者所有。
 
 **升级说明**
 
-候选辅助函数不改变稳定 Harness API，也不引入生命周期、重试、编排、模型调用、网络或 Git 写入语义。
+0.3.0 当前只是本地、未发布的源码候选。candidate 子路径必须精确锁定包版本，采用前需更新 v1 交换生产方。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -40,14 +40,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.2.1
+npm install skill-family-harness-node@0.3.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.2.1
+// 从空目录运行：npm install skill-family-harness-node@0.3.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -79,7 +79,9 @@ import {
 } from "skill-family-harness-node/candidate/quickstart-profile";
 ```
 
-以上机制用于 candidate Contracts Profile 的早期接入试验。它不执行领域审计，不选择 method，不编排重试，也不拥有生命周期状态。该子路径公开但**不稳定**，后续小版本可以修改或移除；调用方需要锁定精确包版本，并避免通过自身稳定 API 再导出。
+v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字节摘要，并拒绝重复 Resource id、correlation 漂移、Task digest 变化，以及缺失或错配的 evidence binding。它不执行领域审计，不选择 method，不编排重试，也不拥有生命周期状态。
+
+该子路径公开但**不稳定**，后续小版本可以修改或移除。使用 v2 时应精确锁定 `0.3.0`；仍生产 candidate v1 交换的接入必须继续精确锁定 `0.2.1`。
 
 ## 典型使用场景
 
