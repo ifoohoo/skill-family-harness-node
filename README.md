@@ -4,28 +4,30 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.3.0 -->
+<!-- release-skill:release-version: 0.4.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.3.0** (2026-08-12)
+**0.4.0** (2026-08-16)
 
-This source candidate updates the Quickstart Profile harness to verify v2 Task and Result exchanges without taking ownership of consumer semantics.
+This release adds five finite-closed-semantics mechanisms and a token-lock primitive to the stable Harness surface (FND-ADR-009), grows HARNESS_CAPABILITIES from 9 to 16 entries, and ships the rename-directory-no-replace native-prebuild candidate.
 
 **Added**
 
-- Recomputes real bytes for path-backed outputs and evidence, and rejects duplicate Resource ids across observations, outputs, and evidence.
-- Verifies operation identity, Task digest, every run/stage/attempt field, and the exact evidence binding set.
+- Adds five finite-closed-semantics mechanisms (FND-ADR-009), namely frozen-baseline materialization with contentGuard, the generic read chokepoint, strategy-driven surface scanning, deterministic token upper-bound estimation, and the generic upper-bound guard.
+- Adds the token-lock primitive for exclusive token-file publication and digest verification.
+- Grows HARNESS_CAPABILITIES from 9 to 16 entries for the new mechanisms.
+- Adds the rename-directory-no-replace candidate, a native-prebuild addon proving no-replace directory renames on darwin-arm64, darwin-x64, linux-arm64-gnu, and linux-x64-gnu, with a release receipt and SBOM.
 
 **Changed**
 
-- Replaces the incompatible 0.2.1 candidate surface; consumers that still require v1 must remain pinned to exactly 0.2.1.
+- Keeps the Quickstart Profile v2 Task/Result exchange verification delivered in 0.3.0, including real-byte recomputation for path-backed outputs and evidence, duplicate Resource id rejection, and exact evidence binding verification.
 - Leaves method selection, retry policy, and domain result interpretation to the consumer.
 
 **Upgrade Notes**
 
-Version 0.3.0 is a local, unpublished source candidate. Pin the candidate subpath to an exact package version and update v1 exchange producers before adopting it.
+Version 0.4.0 is released on npm and the public mirror. Pin the candidate subpath to exactly 0.4.0; mechanism imports use the stable capability names published in HARNESS_CAPABILITIES.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +41,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.3.0
+npm install skill-family-harness-node@0.4.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.3.0
+// Run from an empty directory: npm install skill-family-harness-node@0.4.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -80,7 +82,7 @@ import {
 
 The v2 mechanism recomputes the bytes of every path-backed output and evidence Resource. It also rejects duplicate Resource ids, correlation drift, a changed Task digest, and incomplete or mismatched evidence bindings. It does not perform a domain audit, choose a method, retry work, or own lifecycle state.
 
-The subpath is public but **not stable** and may change or be removed in a later minor release. Pin exactly `0.3.0` for v2; integrations that still produce candidate v1 exchanges must stay pinned to exactly `0.2.1`.
+The subpath is public but **not stable** and may change or be removed in a later minor release. Pin exactly `0.4.0` for v2; integrations that still produce candidate v1 exchanges must stay pinned to exactly `0.2.1`.
 
 ## Typical Use Cases
 

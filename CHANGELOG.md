@@ -1,5 +1,28 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.4.0 locale=en baseline=sha256:72d3fe048ced8eb44a84fabe6f1fdd2eb0c938b4f6bb98740474f72aec04d873 -->
+## [0.4.0] - 2026-08-16
+
+This release adds five finite-closed-semantics mechanisms and a token-lock primitive to the stable Harness surface (FND-ADR-009), grows HARNESS_CAPABILITIES from 9 to 16 entries, and ships the rename-directory-no-replace native-prebuild candidate.
+
+### Added
+
+- Adds five finite-closed-semantics mechanisms (FND-ADR-009), namely frozen-baseline materialization with contentGuard, the generic read chokepoint, strategy-driven surface scanning, deterministic token upper-bound estimation, and the generic upper-bound guard.
+- Adds the token-lock primitive for exclusive token-file publication and digest verification.
+- Grows HARNESS_CAPABILITIES from 9 to 16 entries for the new mechanisms.
+- Adds the rename-directory-no-replace candidate, a native-prebuild addon proving no-replace directory renames on darwin-arm64, darwin-x64, linux-arm64-gnu, and linux-x64-gnu, with a release receipt and SBOM.
+
+### Changed
+
+- Keeps the Quickstart Profile v2 Task/Result exchange verification delivered in 0.3.0, including real-byte recomputation for path-backed outputs and evidence, duplicate Resource id rejection, and exact evidence binding verification.
+- Leaves method selection, retry policy, and domain result interpretation to the consumer.
+
+### Upgrade Notes
+
+Version 0.4.0 is released on npm and the public mirror. Pin the candidate subpath to exactly 0.4.0; mechanism imports use the stable capability names published in HARNESS_CAPABILITIES.
+<!-- release-skill:changelog:end version=0.4.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.3.0 locale=en baseline=sha256:7afef97792b4714abbd0412dcb7ea76ca66260ef9f8dd2191131b7c3f8539813 -->
 ## [0.3.0] - 2026-08-12
 

@@ -782,8 +782,20 @@ export async function recoverStateStoreLock(root, {
   }
 }
 
-export async function appendEvent(store, event) {
+/**
+ * Appends one event to the authoritative ledger.
+ *
+ * Optional `beforeCommit({ record, events, store })` runs inside the writer
+ * mutation, after ordering/digest/schema validation and before the
+ * authoritative write. If it throws, the event is not written and the
+ * mutation guard is released — the fail-closed hook powers consumer-side
+ * derived checks such as the usage upper bound (budget-guard.mjs).
+ */
+export async function appendEvent(store, event, { beforeCommit } = {}) {
   if (!event || typeof event !== "object" || Array.isArray(event)) throw new TypeError("event must be a plain object");
+  if (beforeCommit !== undefined && typeof beforeCommit !== "function") {
+    throw new TypeError("beforeCommit must be a function or undefined");
+  }
   assertJsonValue(event, new Set(), "event");
   return withWriterMutation(store, "append-event", async (guard) => {
     const scan = await scanEvents(store);
@@ -830,6 +842,11 @@ export async function appendEvent(store, event) {
     record.recordDigest = recordDigest(record);
     const checked = validateContractDocument(record, { schemaId: EVENT_SCHEMA_ID });
     if (!checked.valid) throw failure(HARNESS_ERROR_KINDS.EVENT_SCHEMA_INVALID, "event envelope is invalid", { errors: checked.errors });
+    if (beforeCommit !== undefined) {
+      await beforeCommit({ record, events: scan.records, store });
+      // A throwing beforeCommit (e.g. upper-bound-exceeded) fails the whole
+      // append: no event file is created, no head is advanced.
+    }
     await runTestHook(store, "beforeAuthoritativeEventWrite");
     await assertMutationGuard(guard);
     await assertWriter(store);

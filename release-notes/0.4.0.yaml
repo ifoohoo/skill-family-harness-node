@@ -1,0 +1,27 @@
+version: 0.4.0
+date: 2026-08-16
+locales:
+  en:
+    summary: This release adds five finite-closed-semantics mechanisms and a token-lock primitive to the stable Harness surface (FND-ADR-009), grows HARNESS_CAPABILITIES from 9 to 16 entries, and ships the rename-directory-no-replace native-prebuild candidate.
+    changes:
+      added:
+        - Adds five finite-closed-semantics mechanisms (FND-ADR-009), namely frozen-baseline materialization with contentGuard, the generic read chokepoint, strategy-driven surface scanning, deterministic token upper-bound estimation, and the generic upper-bound guard.
+        - Adds the token-lock primitive for exclusive token-file publication and digest verification.
+        - Grows HARNESS_CAPABILITIES from 9 to 16 entries for the new mechanisms.
+        - Adds the rename-directory-no-replace candidate, a native-prebuild addon proving no-replace directory renames on darwin-arm64, darwin-x64, linux-arm64-gnu, and linux-x64-gnu, with a release receipt and SBOM.
+      changed:
+        - Keeps the Quickstart Profile v2 Task/Result exchange verification delivered in 0.3.0, including real-byte recomputation for path-backed outputs and evidence, duplicate Resource id rejection, and exact evidence binding verification.
+        - Leaves method selection, retry policy, and domain result interpretation to the consumer.
+    upgradeNotes: Version 0.4.0 is released on npm and the public mirror. Pin the candidate subpath to exactly 0.4.0; mechanism imports use the stable capability names published in HARNESS_CAPABILITIES.
+  zh-CN:
+    summary: 本版在稳定 Harness 面上新增五项有限封闭语义机制与 token-lock 原语（FND-ADR-009），HARNESS_CAPABILITIES 从 9 项增至 16 项，并随附 rename-directory-no-replace 原生预编译候选。
+    changes:
+      added:
+        - 新增五项有限封闭语义机制（FND-ADR-009）：冻结基线物化 + contentGuard、通用只读 chokepoint、策略化表面扫描、确定性 token 上界估算与通用上限守卫。
+        - 新增 token-lock 原语：独占 token 文件发布与摘要复验。
+        - HARNESS_CAPABILITIES 从 9 项增至 16 项，覆盖上述新机制。
+        - 新增 rename-directory-no-replace 候选：覆盖 darwin-arm64、darwin-x64、linux-arm64-gnu、linux-x64-gnu 的原生预编译 no-replace 目录改名 addon，附带发布 receipt 与 SBOM。
+      changed:
+        - 保持 0.3.0 交付的 Quickstart Profile v2 Task/Result 交换校验：path-backed output 与 evidence 重算真实字节、拒绝重复 Resource id、evidence 精确绑定逐项复验。
+        - 方法选择、重试策略与领域结果解释继续归消费者所有。
+    upgradeNotes: 0.4.0 已发布到 npm 与 public 镜像仓。candidate 子路径必须精确锁定 0.4.0；机制导入使用 HARNESS_CAPABILITIES 公布的稳定能力名。

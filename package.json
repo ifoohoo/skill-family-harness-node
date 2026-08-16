@@ -5,7 +5,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node/issues"
   },
   "dependencies": {
-    "skill-family-contracts": "0.3.0"
+    "skill-family-contracts": "0.4.0"
   },
   "description": "Thin Node.js mechanism runtime for Skill Family engineering contracts.",
   "engines": {
@@ -14,7 +14,8 @@
   },
   "exports": {
     ".": "./src/index.mjs",
-    "./candidate/quickstart-profile": "./candidate/quickstart-profile.mjs"
+    "./candidate/quickstart-profile": "./candidate/quickstart-profile.mjs",
+    "./candidate/rename-directory-no-replace": "./candidate/rename-directory-no-replace/rename-directory-no-replace.mjs"
   },
   "files": [
     "src",
@@ -38,7 +39,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node.git"
   },
   "type": "module",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "check": "node --test",
     "test": "node --test"

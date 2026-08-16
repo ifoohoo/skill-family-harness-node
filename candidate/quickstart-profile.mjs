@@ -2,10 +2,17 @@ import { canonicalJson, digestDocument, isRegisteredErrorCode } from "skill-fami
 import {
   QUICKSTART_PROTOCOL,
   findNonJsonValue,
+  validateConsumerSchemaInventoryDocument,
+  validateHarnessSurfaceDetectorDocument,
+  validateHarnessSurfaceInventoryDocument,
   validateQuickstartProfileDocument,
 } from "skill-family-contracts/candidate/quickstart-profile";
+import { lstat, readdir, readFile, realpath } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { computeResourceClosure, digestBytes } from "../src/closure.mjs";
 import { HARNESS_ERROR_KINDS, HarnessError, mechanismError } from "../src/errors.mjs";
+import { resolveContained } from "../src/paths.mjs";
 
 /**
  * Candidate quickstart profile v2 mechanisms (unstable).
@@ -20,6 +27,516 @@ const QUICKSTART_OPERATION = "execute-method";
 const RESULT_STATES = Object.freeze(["succeeded", "failed", "rejected"]);
 const CORRELATION_FIELDS = Object.freeze(["run", "stage", "attempt"]);
 const ERROR_ENTRY_FIELDS = new Set(["code", "message", "path", "details"]);
+const FOUNDATION_PROJECTION_FILE = "foundation-projection.json";
+const MANAGED_CLI_NAMES = Object.freeze(["adoption-cli.mjs", "mechanisms-cli.mjs"]);
+const SHA256_PATTERN = /^[0-9a-f]{64}$/;
+
+function assertSupportedBundleRuntime(runtimeVersion) {
+  const match = /^(?:v)?(\d+)\.(\d+)\.(\d+)$/.exec(runtimeVersion ?? "");
+  const [major, minor, patchVersion] = match ? match.slice(1).map(Number) : [];
+  if (
+    major !== 22 ||
+    minor < 22 ||
+    (minor === 22 && patchVersion < 2)
+  ) {
+    throw new TypeError(
+      `verifyManagedBundleIdentity: Node.js runtime must satisfy >=22.22.2 <23; received ${String(runtimeVersion)}`,
+    );
+  }
+}
+
+function assertManagedPayloadPath(value) {
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    value.includes("\\") ||
+    path.posix.isAbsolute(value) ||
+    path.posix.normalize(value) !== value ||
+    value.split("/").some((segment) => segment === "." || segment === ".." || segment.length === 0)
+  ) {
+    throw new TypeError(`verifyManagedBundleIdentity: invalid managed payload path: ${String(value)}`);
+  }
+  return value;
+}
+
+async function listManagedBundleFiles(bundleRoot) {
+  const files = [];
+  async function walk(absDir, prefix) {
+    const entries = await readdir(absDir, { withFileTypes: true });
+    entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of entries) {
+      const relPath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absPath = path.join(absDir, entry.name);
+      if (entry.isSymbolicLink()) {
+        throw new TypeError(`verifyManagedBundleIdentity: managed Bundle contains a symbolic link: ${relPath}`);
+      }
+      if (entry.isDirectory()) await walk(absPath, relPath);
+      else if (entry.isFile() && relPath !== FOUNDATION_PROJECTION_FILE) files.push(relPath);
+      else if (!entry.isFile()) {
+        throw new TypeError(`verifyManagedBundleIdentity: unsupported managed Bundle member: ${relPath}`);
+      }
+    }
+  }
+  await walk(bundleRoot, "");
+  return files.sort();
+}
+
+/**
+ * Self-verifies one managed Quickstart Bundle CLI from its own file URL.
+ *
+ * The CLI path is supplied only by the trusted CLI module through
+ * `import.meta.url`; stdin callers cannot select a path, module or export.
+ * The check binds the complete neighboring payload, this CLI's bytes, and the
+ * exact Node runtime before any fixed operation is dispatched.
+ */
+export async function verifyManagedBundleIdentity({
+  cliUrl,
+  cliName,
+  runtimeVersion = process.version,
+  runtimeExecPath = process.execPath,
+} = {}) {
+  if (!MANAGED_CLI_NAMES.includes(cliName)) {
+    throw new TypeError(`verifyManagedBundleIdentity: unknown managed CLI: ${String(cliName)}`);
+  }
+  assertSupportedBundleRuntime(runtimeVersion);
+  if (typeof cliUrl !== "string" || !cliUrl.startsWith("file:")) {
+    throw new TypeError("verifyManagedBundleIdentity: cliUrl must be the trusted CLI file URL");
+  }
+  const cliPath = await realpath(fileURLToPath(cliUrl));
+  if (path.basename(cliPath) !== cliName || !(await lstat(cliPath)).isFile()) {
+    throw new TypeError("verifyManagedBundleIdentity: CLI identity does not match its managed path");
+  }
+  const bundleRoot = path.dirname(cliPath);
+  const provenancePath = path.join(bundleRoot, FOUNDATION_PROJECTION_FILE);
+  const provenanceStat = await lstat(provenancePath);
+  if (!provenanceStat.isFile() || provenanceStat.isSymbolicLink()) {
+    throw new TypeError("verifyManagedBundleIdentity: neighboring projection provenance must be a regular file");
+  }
+  const provenanceBytes = await readFile(provenancePath);
+  let provenance;
+  try {
+    provenance = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(provenanceBytes));
+  } catch {
+    throw new TypeError("verifyManagedBundleIdentity: neighboring projection provenance is not valid UTF-8 JSON");
+  }
+  if (
+    provenance?.schemaVersion !== 1 ||
+    provenance?.kind !== "skill-family.foundation-projection" ||
+    provenance?.payload?.digestAlgorithm !== "sha256" ||
+    !Array.isArray(provenance.payload.files) ||
+    !SHA256_PATTERN.test(provenance.payload.digest ?? "")
+  ) {
+    throw new TypeError("verifyManagedBundleIdentity: neighboring projection provenance has an invalid identity");
+  }
+  const declaredPaths = [];
+  const declaredDigests = new Map();
+  for (const record of provenance.payload.files) {
+    if (
+      record === null ||
+      typeof record !== "object" ||
+      Array.isArray(record) ||
+      Object.keys(record).sort().join(",") !== "path,sha256" ||
+      !SHA256_PATTERN.test(record.sha256 ?? "")
+    ) {
+      throw new TypeError("verifyManagedBundleIdentity: projection payload contains an invalid member record");
+    }
+    const relPath = assertManagedPayloadPath(record.path);
+    if (declaredDigests.has(relPath)) {
+      throw new TypeError(`verifyManagedBundleIdentity: duplicate projection payload member: ${relPath}`);
+    }
+    declaredPaths.push(relPath);
+    declaredDigests.set(relPath, record.sha256);
+  }
+  const sortedDeclaredPaths = [...declaredPaths].sort();
+  if (canonicalJson(declaredPaths) !== canonicalJson(sortedDeclaredPaths)) {
+    throw new TypeError("verifyManagedBundleIdentity: projection payload members are not canonically ordered");
+  }
+  const actualPaths = await listManagedBundleFiles(bundleRoot);
+  if (canonicalJson(actualPaths) !== canonicalJson(sortedDeclaredPaths)) {
+    throw new TypeError("verifyManagedBundleIdentity: projection payload is not the complete neighboring file set");
+  }
+  for (const relPath of actualPaths) {
+    const memberPath = path.join(bundleRoot, relPath);
+    const memberStat = await lstat(memberPath);
+    if (!memberStat.isFile() || memberStat.isSymbolicLink()) {
+      throw new TypeError(`verifyManagedBundleIdentity: projection payload member is not a regular file: ${relPath}`);
+    }
+    const actualDigest = digestBytes(await readFile(memberPath));
+    if (actualDigest !== declaredDigests.get(relPath)) {
+      throw new TypeError(`verifyManagedBundleIdentity: projection payload member digest mismatch: ${relPath}`);
+    }
+  }
+  if (!declaredDigests.has(cliName)) {
+    throw new TypeError(`verifyManagedBundleIdentity: projection payload does not manage ${cliName}`);
+  }
+  if (digestDocument(provenance.payload.files) !== provenance.payload.digest) {
+    throw new TypeError("verifyManagedBundleIdentity: projection payload digest mismatch");
+  }
+  const runtimePath = await realpath(runtimeExecPath);
+  if (!path.isAbsolute(runtimePath) || !(await lstat(runtimePath)).isFile()) {
+    throw new TypeError("verifyManagedBundleIdentity: Node.js runtime identity is not an absolute regular file");
+  }
+  return {
+    valid: true,
+    cli: {
+      name: cliName,
+      path: cliPath,
+      sha256: declaredDigests.get(cliName),
+    },
+    runtime: {
+      name: "node",
+      version: runtimeVersion.startsWith("v") ? runtimeVersion : `v${runtimeVersion}`,
+      execPath: runtimePath,
+    },
+    projection: {
+      kind: provenance.kind,
+      profile: structuredClone(provenance.profile),
+      provenanceSha256: digestBytes(provenanceBytes),
+      payloadDigest: provenance.payload.digest,
+    },
+  };
+}
+
+function invalidInventory(message, details = {}) {
+  return mechanismError(
+    HARNESS_ERROR_KINDS.INVALID_RESULT,
+    message,
+    { category: "consumer-schema-inventory", ...details },
+  );
+}
+
+async function discoverSchemaFiles(root, relDir) {
+  const rootReal = await realpath(root);
+  const start = await resolveContained(rootReal, relDir);
+  const found = [];
+  async function walk(absDir, prefix) {
+    const entries = await readdir(absDir, { withFileTypes: true });
+    entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of entries) {
+      const relPath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absPath = path.join(absDir, entry.name);
+      if (entry.isSymbolicLink()) {
+        throw invalidInventory("consumer schema roots must not contain symbolic links", { path: relPath });
+      }
+      if (entry.isDirectory()) await walk(absPath, relPath);
+      else if (entry.isFile() && entry.name.endsWith(".schema.json")) found.push(relPath);
+    }
+  }
+  await walk(start, relDir);
+  return found;
+}
+
+/**
+ * Proves that an inventory accounts for every local *.schema.json under its
+ * declared roots, binds each entry to the file's real $id, and partitions the
+ * set into Foundation Bundle inputs or explicitly retained consumer assets.
+ */
+export async function verifyConsumerSchemaInventory({ root, inventory } = {}) {
+  const outcome = validateConsumerSchemaInventoryDocument(inventory);
+  if (!outcome.valid) {
+    throw invalidInventory("consumer schema inventory violates its candidate contract", {
+      findings: outcome.errors,
+    });
+  }
+  const normalized = outcome.data;
+  const discovered = [];
+  for (const schemaRoot of [...normalized.schemaRoots].sort()) {
+    discovered.push(...await discoverSchemaFiles(root, schemaRoot));
+  }
+  discovered.sort();
+  if (new Set(discovered).size !== discovered.length) {
+    throw invalidInventory("consumer schema roots overlap", { discovered });
+  }
+  const records = [...normalized.schemas].sort((a, b) => (a.path < b.path ? -1 : 1));
+  const declared = records.map((record) => record.path);
+  if (new Set(declared).size !== declared.length) {
+    throw invalidInventory("consumer schema inventory contains a duplicate path", { declared });
+  }
+  const missing = discovered.filter((file) => !declared.includes(file));
+  const stale = declared.filter((file) => !discovered.includes(file));
+  if (missing.length > 0 || stale.length > 0) {
+    throw invalidInventory("consumer schema inventory is not a complete local inventory", { missing, stale });
+  }
+  const ids = new Set();
+  for (const record of records) {
+    let document;
+    try {
+      document = JSON.parse(await readFile(await resolveContained(root, record.path), "utf8"));
+    } catch (cause) {
+      throw invalidInventory("consumer schema cannot be read as JSON", {
+        path: record.path,
+        cause: cause?.code ?? cause?.name,
+      });
+    }
+    if (document.$id !== record.$id) {
+      throw invalidInventory("consumer schema inventory $id does not match the local file", {
+        path: record.path,
+        declared: record.$id,
+        actual: document.$id,
+      });
+    }
+    if (ids.has(record.$id)) {
+      throw invalidInventory("consumer schema inventory contains a duplicate $id", { $id: record.$id });
+    }
+    ids.add(record.$id);
+  }
+  return {
+    valid: true,
+    schemaPaths: declared,
+    bundleSchemaPaths: records
+      .filter((record) => record.disposition === "foundation-bundle")
+      .map((record) => record.path),
+    retainedSchemas: records
+      .filter((record) => record.disposition === "consumer-retained")
+      .map((record) => structuredClone(record)),
+  };
+}
+
+const DETECTOR_ID_PATTERN = /^[a-z][a-z0-9.-]*$/;
+const SURFACE_TYPE_PATTERN = /^[a-z][a-z0-9-]*$/;
+
+function normalizeSurfaceDetectors(detectors) {
+  if (!Array.isArray(detectors) || detectors.length === 0) {
+    throw new TypeError("scanHarnessSurfaceInventory: detectors must be a non-empty array");
+  }
+  const explicitDocument = {
+    schemaVersion: 1,
+    kind: "skill-family.harness-surface-detectors",
+    detectors: detectors.filter((detector) => detector?.match !== undefined),
+  };
+  if (explicitDocument.detectors.length > 0) {
+    const outcome = validateHarnessSurfaceDetectorDocument(explicitDocument);
+    if (!outcome.valid) {
+      throw invalidInventory("explicit Harness surface detectors violate their contract", {
+        findings: outcome.errors,
+      });
+    }
+  }
+  const normalized = detectors.map((detector) => {
+    if (
+      detector === null || typeof detector !== "object" || Array.isArray(detector) ||
+      !DETECTOR_ID_PATTERN.test(detector.detectorId ?? "") ||
+      !SURFACE_TYPE_PATTERN.test(detector.surfaceType ?? "")
+    ) {
+      throw new TypeError("scanHarnessSurfaceInventory: detectorId and surfaceType must be stable identifiers");
+    }
+    const usesExplicit = detector.match !== undefined;
+    const usesLegacy = detector.pathSuffixes !== undefined || detector.pathFragments !== undefined;
+    if (usesExplicit && usesLegacy) {
+      throw invalidInventory("Harness surface detector cannot mix explicit and legacy match fields", {
+        detectorId: detector.detectorId,
+      });
+    }
+    const pathSuffixes = detector.pathSuffixes ?? [];
+    const pathFragments = detector.pathFragments ?? [];
+    if (
+      !Array.isArray(pathSuffixes) || !Array.isArray(pathFragments) ||
+      [...pathSuffixes, ...pathFragments].some((value) => typeof value !== "string" || value.length === 0) ||
+      (!usesExplicit && pathSuffixes.length + pathFragments.length === 0)
+    ) {
+      throw new TypeError("scanHarnessSurfaceInventory: each detector needs a non-empty path rule");
+    }
+    return Object.freeze({
+      detectorId: detector.detectorId,
+      surfaceType: detector.surfaceType,
+      match: usesExplicit ? Object.freeze(structuredClone(detector.match)) : null,
+      pathSuffixes: Object.freeze([...new Set(pathSuffixes)].sort()),
+      pathFragments: Object.freeze([...new Set(pathFragments)].sort()),
+    });
+  });
+  const ids = normalized.map((detector) => detector.detectorId);
+  if (new Set(ids).size !== ids.length) {
+    throw new TypeError("scanHarnessSurfaceInventory: detectorId values must be unique");
+  }
+  return normalized.sort((a, b) => (a.detectorId < b.detectorId ? -1 : 1));
+}
+
+function detectorMatches(detector, relPath) {
+  if (detector.match !== null) {
+    const clauses = detector.match.anyOf ?? [detector.match];
+    return clauses.some((clause) => clause.allOf.every((predicate) => {
+      if (predicate.pathSuffix !== undefined) return relPath.endsWith(predicate.pathSuffix);
+      if (predicate.pathFragment !== undefined) return relPath.includes(predicate.pathFragment);
+      return relPath === predicate.pathPrefix || relPath.startsWith(`${predicate.pathPrefix}/`);
+    }));
+  }
+  return detector.pathSuffixes.some((suffix) => relPath.endsWith(suffix)) ||
+    detector.pathFragments.some((fragment) => relPath.includes(fragment));
+}
+
+async function scanSurfaceFiles(root, scanRoot, detectors) {
+  if (scanRoot !== "." && (typeof scanRoot !== "string" || scanRoot.length === 0)) {
+    throw new TypeError("scanHarnessSurfaceInventory: scanRoot must be '.' or a contained path");
+  }
+  const start = scanRoot === "." ? await realpath(root) : await resolveContained(root, scanRoot);
+  const surfaces = [];
+  async function walk(absDir, prefix) {
+    const entries = await readdir(absDir, { withFileTypes: true });
+    entries.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+    for (const entry of entries) {
+      const relPath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absPath = path.join(absDir, entry.name);
+      if (entry.isSymbolicLink()) {
+        throw invalidInventory("harness surface scan refuses symbolic links", { path: relPath });
+      }
+      if (entry.isDirectory()) {
+        await walk(absPath, relPath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      const matches = detectors.filter((detector) => detectorMatches(detector, relPath));
+      if (matches.length > 1) {
+        throw invalidInventory("harness surface detectors overlap", {
+          path: relPath,
+          detectorIds: matches.map((detector) => detector.detectorId),
+        });
+      }
+      if (matches.length === 0) continue;
+      const detector = matches[0];
+      const bytes = await readFile(absPath);
+      surfaces.push({
+        surfaceId: `${detector.surfaceType}:${relPath}`,
+        surfaceType: detector.surfaceType,
+        path: relPath,
+        evidence: { sha256: digestBytes(bytes), detectorId: detector.detectorId },
+      });
+    }
+  }
+  await walk(start, scanRoot === "." ? "" : scanRoot);
+  return surfaces.sort((a, b) => (a.surfaceId < b.surfaceId ? -1 : 1));
+}
+
+function surfaceInventoryDigest(receipt) {
+  const digestInput = { ...receipt };
+  delete digestInput.inventoryDigest;
+  return digestDocument(digestInput);
+}
+
+/** Produce a deterministic, exhaustive, domain-neutral Harness surface receipt. */
+export async function scanHarnessSurfaceInventory({ root, scanRoot, detectors } = {}) {
+  const normalizedDetectors = normalizeSurfaceDetectors(detectors);
+  const surfaces = await scanSurfaceFiles(root, scanRoot, normalizedDetectors);
+  const receipt = {
+    schemaVersion: 1,
+    kind: "skill-family.harness-surface-inventory",
+    scanRoot,
+    exhaustive: true,
+    surfaces,
+  };
+  receipt.inventoryDigest = surfaceInventoryDigest(receipt);
+  const outcome = validateHarnessSurfaceInventoryDocument(receipt);
+  if (!outcome.valid) {
+    throw invalidInventory("generated harness surface inventory violates its contract", { findings: outcome.errors });
+  }
+  return outcome.data;
+}
+
+/** Re-scan and require exact receipt equality; callers need no local hash/path implementation. */
+export async function verifyHarnessSurfaceInventory({ root, inventory, detectors } = {}) {
+  const outcome = validateHarnessSurfaceInventoryDocument(inventory);
+  if (!outcome.valid || inventory.inventoryDigest !== surfaceInventoryDigest(inventory)) {
+    throw invalidInventory("harness surface inventory receipt is invalid or digest-drifted", {
+      findings: outcome.errors,
+    });
+  }
+  const actual = await scanHarnessSurfaceInventory({ root, scanRoot: inventory.scanRoot, detectors });
+  if (canonicalJson(actual) !== canonicalJson(inventory)) {
+    throw invalidInventory("harness surface inventory no longer matches the exhaustive scan", {
+      expectedDigest: inventory.inventoryDigest,
+      actualDigest: actual.inventoryDigest,
+    });
+  }
+  return { valid: true, inventoryDigest: actual.inventoryDigest, surfaceCount: actual.surfaces.length };
+}
+
+const FOUNDATION_MECHANISM_OPERATIONS = Object.freeze([
+  "validate-by-schema-id",
+  "canonical-json",
+  "digest-document",
+  "resource-closure",
+  "resolve-contained",
+  "create-task",
+  "wrap-result",
+  "verify-exchange",
+]);
+
+function findUnsafeInteger(value, instancePath = "") {
+  if (typeof value === "number") {
+    return Number.isInteger(value) && !Number.isSafeInteger(value) ? instancePath : null;
+  }
+  if (Array.isArray(value)) {
+    for (let index = 0; index < value.length; index += 1) {
+      const issue = findUnsafeInteger(value[index], `${instancePath}/${index}`);
+      if (issue !== null) return issue;
+    }
+    return null;
+  }
+  if (value !== null && typeof value === "object") {
+    for (const key of Object.keys(value)) {
+      const issue = findUnsafeInteger(
+        value[key],
+        `${instancePath}/${key.replaceAll("~", "~0").replaceAll("/", "~1")}`,
+      );
+      if (issue !== null) return issue;
+    }
+  }
+  return null;
+}
+
+/**
+ * Fixed, business-neutral mechanism bridge for consumers that cannot import
+ * several Foundation modules directly. validateBySchemaId is injected only
+ * by the trusted offline Bundle; callers cannot name arbitrary functions.
+ */
+export async function invokeFoundationMechanism(request, { validateBySchemaId } = {}) {
+  if (request === null || typeof request !== "object" || Array.isArray(request)) {
+    throw new TypeError("invokeFoundationMechanism: request must be an object");
+  }
+  assertJsonValue("invokeFoundationMechanism", "request", request);
+  const { operation, params } = request;
+  if (!FOUNDATION_MECHANISM_OPERATIONS.includes(operation)) {
+    throw new TypeError(`invokeFoundationMechanism: unknown operation: ${String(operation)}`);
+  }
+  if (params === null || typeof params !== "object" || Array.isArray(params)) {
+    throw new TypeError("invokeFoundationMechanism: params must be an object");
+  }
+  if (operation === "validate-by-schema-id") {
+    if (typeof validateBySchemaId !== "function") {
+      throw new TypeError("invokeFoundationMechanism: validate-by-schema-id requires the trusted Bundle validator");
+    }
+    return validateBySchemaId(params.schemaId, params.document);
+  }
+  if (operation === "canonical-json") {
+    if (Object.keys(params).length !== 1 || !Object.hasOwn(params, "document")) {
+      throw new TypeError("invokeFoundationMechanism: canonical-json params must contain exactly document");
+    }
+    const unsafeIntegerPath = findUnsafeInteger(params.document);
+    if (unsafeIntegerPath !== null) {
+      throw new TypeError(
+        "invokeFoundationMechanism: canonical-json document contains an unsafe integer" +
+          (unsafeIntegerPath ? ` at ${unsafeIntegerPath}` : ""),
+      );
+    }
+    return { text: canonicalJson(params.document) };
+  }
+  if (operation === "digest-document") {
+    return { digest: digestDocument(params.document) };
+  }
+  if (operation === "resource-closure") {
+    return computeResourceClosure({ root: params.root, resources: params.resources });
+  }
+  if (operation === "create-task") {
+    return createQuickstartTask(params);
+  }
+  if (operation === "wrap-result") {
+    return wrapQuickstartResult(params);
+  }
+  if (operation === "verify-exchange") {
+    return verifyQuickstartExchange(params);
+  }
+  await resolveContained(params.root, params.path);
+  return { path: params.path, contained: true };
+}
 
 function invalidProfile(kind, outcome) {
   return mechanismError(

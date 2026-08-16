@@ -32,6 +32,9 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   REALPATH_ESCAPE: "realpath-escape",
   INVALID_ROOT: "invalid-root",
   ATOMIC_WRITE_FAILED: "atomic-write-failed",
+  EXCLUSIVE_PUBLISH_CONFLICT: "exclusive-publish-conflict",
+  EXCLUSIVE_PUBLICATION_FAILED: "exclusive-publication-failed",
+  ATOMIC_REPLACE_FAILED: "atomic-replace-failed",
   READ_FAILED: "read-failed",
   MISSING_RESOURCE: "missing-resource",
   WORKSPACE_CREATE_FAILED: "workspace-create-failed",
@@ -57,6 +60,12 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   UNTRUSTED_EXECUTABLE: "untrusted-executable",
   PORTABLE_PATH_COLLISION: "portable-path-collision",
   MANIFEST_MISMATCH: "manifest-mismatch",
+  BASELINE_MISMATCH: "baseline-mismatch",
+  CONTENT_GUARD_REJECTED: "content-guard-rejected",
+  READ_CHOKEPOINT_REJECTED: "read-chokepoint-rejected",
+  SURFACE_SCAN_VIOLATION: "surface-scan-violation",
+  SCAN_POLICY_INVALID: "scan-policy-invalid",
+  UPPER_BOUND_EXCEEDED: "upper-bound-exceeded",
 });
 
 /**

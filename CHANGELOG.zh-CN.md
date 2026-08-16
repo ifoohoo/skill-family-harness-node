@@ -1,5 +1,28 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.4.0 locale=zh-CN baseline=sha256:dafaa1100bf6163a28d53fc982a30e8325d8bd3cab43bbb6daf2e6002befa2c1 -->
+## [0.4.0] - 2026-08-16
+
+本版在稳定 Harness 面上新增五项有限封闭语义机制与 token-lock 原语（FND-ADR-009），HARNESS_CAPABILITIES 从 9 项增至 16 项，并随附 rename-directory-no-replace 原生预编译候选。
+
+### 新增
+
+- 新增五项有限封闭语义机制（FND-ADR-009）：冻结基线物化 + contentGuard、通用只读 chokepoint、策略化表面扫描、确定性 token 上界估算与通用上限守卫。
+- 新增 token-lock 原语：独占 token 文件发布与摘要复验。
+- HARNESS_CAPABILITIES 从 9 项增至 16 项，覆盖上述新机制。
+- 新增 rename-directory-no-replace 候选：覆盖 darwin-arm64、darwin-x64、linux-arm64-gnu、linux-x64-gnu 的原生预编译 no-replace 目录改名 addon，附带发布 receipt 与 SBOM。
+
+### 变更
+
+- 保持 0.3.0 交付的 Quickstart Profile v2 Task/Result 交换校验：path-backed output 与 evidence 重算真实字节、拒绝重复 Resource id、evidence 精确绑定逐项复验。
+- 方法选择、重试策略与领域结果解释继续归消费者所有。
+
+### 升级说明
+
+0.4.0 已发布到 npm 与 public 镜像仓。candidate 子路径必须精确锁定 0.4.0；机制导入使用 HARNESS_CAPABILITIES 公布的稳定能力名。
+<!-- release-skill:changelog:end version=0.4.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.3.0 locale=zh-CN baseline=sha256:b635e4170d3f7ac634e59f612939683ab04727f87101790d9a9f5613ea38fcfe -->
 ## [0.3.0] - 2026-08-12
 

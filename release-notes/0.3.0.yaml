@@ -7,6 +7,7 @@ locales:
       added:
         - Recomputes real bytes for path-backed outputs and evidence, and rejects duplicate Resource ids across observations, outputs, and evidence.
         - Verifies operation identity, Task digest, every run/stage/attempt field, and the exact evidence binding set.
+        - Adds five finite-closed-semantics mechanisms (FND-ADR-009): baseline materialization with contentGuard, the generic read chokepoint, strategy-driven surface scanning, deterministic token upper-bound estimation, and the generic upper-bound guard; HARNESS_CAPABILITIES grows from 9 to 16 entries.
       changed:
         - Replaces the incompatible 0.2.1 candidate surface; consumers that still require v1 must remain pinned to exactly 0.2.1.
         - Leaves method selection, retry policy, and domain result interpretation to the consumer.
@@ -17,6 +18,7 @@ locales:
       added:
         - 对 path-backed output 与 evidence 重算真实字节摘要，并拒绝 observation、output、evidence 之间重复的 Resource id。
         - 逐项复验 operation 身份、Task digest、run/stage/attempt 字段和 evidence 精确绑定集合。
+        - 新增五项有限封闭语义机制（FND-ADR-009）：基线物化 + contentGuard、通用只读 chokepoint、策略化表面扫描、确定性 token 上界估算与通用上限守卫；HARNESS_CAPABILITIES 从 9 项增至 16 项。
       changed:
         - 替换与 0.2.1 不兼容的 candidate 面；仍依赖 v1 的消费者必须继续精确锁定 0.2.1。
         - 方法选择、重试策略与领域结果解释继续归消费者所有。

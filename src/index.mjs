@@ -13,6 +13,8 @@
 export const HARNESS_CAPABILITIES = Object.freeze([
   "schema-validation",
   "atomic-write",
+  "strict-file-publication",
+  "nonblocking-filesystem-lock",
   "path-containment",
   "temporary-workspace",
   "resource-closure",
@@ -20,6 +22,11 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "host-adapter-mechanism",
   "report-rendering",
   "durable-state-store",
+  "baseline-materialization",
+  "read-chokepoint",
+  "surface-scan",
+  "token-estimation",
+  "upper-bound-guard",
 ]);
 
 export const HARNESS_EXCLUSIONS = Object.freeze([
@@ -35,13 +42,38 @@ export { HarnessError, HARNESS_ERROR_KINDS, mechanismError } from "./errors.mjs"
 
 export { classifyPathInput, resolveContained, readFileContained } from "./paths.mjs";
 
-export { writeFileAtomic } from "./atomic.mjs";
+export { writeFileAtomic, publishFileExclusive, publishFileOrReplace, replaceFileAtomic } from "./atomic.mjs";
+
+export {
+  acquireFilesystemLock,
+  inspectFilesystemLock,
+  releaseFilesystemLock,
+  recoverFilesystemLock,
+} from "./token-lock.mjs";
 
 export {
   TemporaryWorkspace,
   createTemporaryWorkspace,
   withTemporaryWorkspace,
 } from "./workspace.mjs";
+
+// Finite-closed-semantics tools (FND-ADR-009). Mechanism only: baseline
+// byte fidelity, read admission, strategy-driven surface scanning,
+// deterministic estimation, and the consumer-injected usage upper bound.
+export { computeDirectoryDigest, materializeBaseline } from "./baseline.mjs";
+
+export { createReadChokepoint } from "./chokepoint.mjs";
+
+export { scanSurface } from "./surface-scan.mjs";
+
+export { estimateTokenUpperBound } from "./token-estimate.mjs";
+
+export {
+  openUsageGuard,
+  appendUsageEvent,
+  readUsage,
+  closeUsageGuard,
+} from "./budget-guard.mjs";
 
 export { digestBytes, computeResourceClosure, closureContains } from "./closure.mjs";
 
