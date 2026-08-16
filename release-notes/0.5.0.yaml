@@ -1,0 +1,29 @@
+version: 0.5.0
+date: 2026-08-16
+locales:
+  en:
+    summary: This release adds the declared read surface assertion (FND-ADR-010) and the structured surface scanner (FND-ADR-011) to the stable Harness surface, growing HARNESS_CAPABILITIES from 16 to 18 entries, and adds three dependency-reviewed runtime libraries.
+    changes:
+      added:
+        - "Adds assertDeclaredReadSurface (FND-ADR-010): a no-execution, syntax-surface-only assertion that every node:fs named import inside a declared module set stays inside the consumer-declared read surface, with a closed violation vocabulary and a frozen declared-read-surface-result envelope."
+        - "Adds scanSurfaceStructured (FND-ADR-011): the structured sibling of scanSurface. IP-shaped candidates enter a single standard parse entry (ipaddr.js) with consumer-declared CIDR approval and fail closed when unparseable; scoped and unscoped coordinates, registries and hosts need consumer-declared approval; format adapters (pnpm-lockfile via @pnpm/lockfile.fs with yaml AST comment regions, and tree-json) parse structurally with no position-level exemptions; binary and symlink policies fail closed. The closed nine-rule vocabulary travels in details.rule of the structured-scan-violation mechanism error."
+        - "Adds three dependency-reviewed runtime libraries for the structured scanner, reviewed per FND-ADR-006 section-4 analogy (dependency-closure pre-review, executor self-review pending independent review): ipaddr.js 2.5.0 (MIT, zero dependencies), yaml 2.9.0 (ISC), and @pnpm/lockfile.fs 1001.1.35 (MIT, 18 transitive dependencies all inside the approved public coordinates)."
+        - Grows HARNESS_CAPABILITIES from 16 to 18 entries for the two new mechanisms.
+      changed:
+        - "Documents the relationship of the two policy documents to workspace-private leak policies: a workspace-private leak-policy.json instance document is not a subset, not isomorphic and not a migration target of the surface-scan-policy or structured-scan-policy schemas — the documents share rule vocabulary and fail-closed semantics by design, but their byte-level shapes are independent and must not be compared for compatibility. scanSurface is the execution-core generalization projection: the public, consumer-parameterized form of the same mechanism family, without any private identity, path, or approval-list interpretation of its own."
+        - "Records the cost of the dependency-review decision honestly: the harness tarball grows with the @pnpm/lockfile.fs closure, the thin-runtime property changes from zero third-party runtime dependencies to three reviewed ones, and the pnpm-lockfile adapter writes one temporary lockfile copy under the OS temp directory (removed afterwards). The engineering-kit offline-consumer verification gates now derive the complete third-party production closure of the three Foundation packages mechanically (identity-deduplicated, npm: alias-aware, range-scoped override selectors) instead of a single-package closure, so the review decision is continuously verified against the real installed bytes."
+        - "Keeps mechanism purity: no execution of scanned files, no model calls, no network; symlinked entries are never followed."
+    upgradeNotes: Version 0.5.0 is the FND-ADR-010/011 harness line. Mechanism imports use the stable capability names published in HARNESS_CAPABILITIES; structured-scan policies must pass the structured-scan-policy contract validation of contract-spec 1.5.0.
+  zh-CN:
+    summary: 本版在稳定 Harness 面上新增声明读取表面断言（FND-ADR-010）与结构化表面扫描器（FND-ADR-011），HARNESS_CAPABILITIES 从 16 项增至 18 项，并引入三个经依赖评审的运行时库。
+    changes:
+      added:
+        - 新增 assertDeclaredReadSurface（FND-ADR-010）：不执行、仅语法面的断言，声明模块集内的每个 node:fs 具名导入必须落在消费者声明的读取表面内，违规词汇表为闭集，返回冻结的 declared-read-surface-result 信封。
+        - 新增 scanSurfaceStructured（FND-ADR-011）：scanSurface 的结构化兄弟。IP 形候选统一进入单一标准解析入口（ipaddr.js），按消费者声明的 CIDR 批准，不可解析即失败关闭；坐标（scoped 与非 scoped）、注册表与主机均需消费者声明批准；格式适配器（pnpm-lockfile 经 @pnpm/lockfile.fs + yaml AST 注释区域，tree-json 经 JSON.parse）结构化解析且无位置级豁免；二进制与符号链接策略失败关闭。闭集九规则词汇表经 structured-scan-violation 机制错误的 details.rule 承载。
+        - 为结构化扫描器引入三个经依赖评审的运行时库，评审按 FND-ADR-006 第 4 节类比执行（依赖闭包预审，执行者自审，独立复核另行安排）：ipaddr.js 2.5.0（MIT，零依赖）、yaml 2.9.0（ISC）、@pnpm/lockfile.fs 1001.1.35（MIT，18 个传递依赖全部在批准公共坐标内）。
+        - HARNESS_CAPABILITIES 从 16 项增至 18 项，覆盖两个新机制。
+      changed:
+        - 显式说明两个策略文档与工作区私有 leak 策略的关系：工作区私有的 leak-policy.json 实例文档既不是 surface-scan-policy 或 structured-scan-policy schema 的子集、也不同构、更不是迁移目标——两类文档按设计共享规则词汇与失败关闭语义，但字节级形状相互独立，不得比较兼容性。scanSurface 是执行内核通用化投影：同一机制族的公开、消费者参数化形态，自身不解释任何私有身份、路径或批准清单。
+        - "如实记录依赖评审决策的成本：harness tarball 随 @pnpm/lockfile.fs 闭包扩大；薄运行时属性从零第三方运行时依赖变为三个经评审依赖；pnpm-lockfile 适配器会在 OS 临时目录写一份临时锁文件副本（用后即删）。engineering-kit 的离线消费者验证门随之把第三方闭包推导从单包闭包机械扩展为三个 Foundation 包的完整生产闭包（真实身份去重、npm: 别名感知、range-scoped override selector），使评审决策持续对着真实安装字节被验证。"
+        - 保持机制纯度：不执行被扫描文件、无模型调用、无网络；永不跟随符号链接。
+    upgradeNotes: 0.5.0 是 FND-ADR-010/011 harness 线。机制导入使用 HARNESS_CAPABILITIES 公布的稳定能力名；structured-scan 策略必须通过契约规格 1.5.0 的 structured-scan-policy 契约校验。

@@ -25,6 +25,8 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "baseline-materialization",
   "read-chokepoint",
   "surface-scan",
+  "declared-read-surface",
+  "structured-scan",
   "token-estimation",
   "upper-bound-guard",
 ]);
@@ -65,6 +67,10 @@ export { computeDirectoryDigest, materializeBaseline } from "./baseline.mjs";
 export { createReadChokepoint } from "./chokepoint.mjs";
 
 export { scanSurface } from "./surface-scan.mjs";
+
+export { assertDeclaredReadSurface } from "./declared-read-surface.mjs";
+
+export { scanSurfaceStructured, STRUCTURED_SCAN_RULES, isIpv6ShapedRun, extractIpCandidates, normalizeIpToken, classifyIpToken, collectLockfileCommentRegions } from "./structured-scan.mjs";
 
 export { estimateTokenUpperBound } from "./token-estimate.mjs";
 

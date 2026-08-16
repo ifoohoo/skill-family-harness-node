@@ -65,6 +65,10 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   READ_CHOKEPOINT_REJECTED: "read-chokepoint-rejected",
   SURFACE_SCAN_VIOLATION: "surface-scan-violation",
   SCAN_POLICY_INVALID: "scan-policy-invalid",
+  DECLARED_READ_SURFACE_VIOLATION: "declared-read-surface-violation",
+  DECLARED_READ_SURFACE_INVALID: "declared-read-surface-invalid",
+  STRUCTURED_SCAN_VIOLATION: "structured-scan-violation",
+  STRUCTURED_SCAN_INVALID: "structured-scan-invalid",
   UPPER_BOUND_EXCEEDED: "upper-bound-exceeded",
 });
 
