@@ -4,22 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.7.0 -->
+<!-- release-skill:release-version: 0.8.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.7.0** (2026-08-21)
+**0.8.0** (2026-08-21)
 
-Lockstep version bump with the Foundation 0.7.0 line; the thin mechanism runtime is unchanged.
+Lockstep version bump with Foundation 0.8.0; the Harness mechanism surface is unchanged.
 
 **Changed**
 
-- No capability change - HARNESS_CAPABILITIES stays at 21 items and every exported mechanism (atomic contained writes, path containment, strict authority read, resource closure, digests, bounded subprocess supervision, URL credential redaction) keeps its 0.6.0 contract; the package version moves in lockstep with the Foundation line because the three leaf packages share one public version coordinate.
+- Contracts 1.7.0 adds the Project Profile contract, but no Harness capability or exported mechanism changes.
 
 **Upgrade Notes**
 
-Version 0.7.0 carries no harness surface change. Consumers keep their existing pins; the harness computeResourceClosure resource closure remains distinct from the Kit plan closure introduced by engineering-kit 0.7.0 and the two are not interchangeable.
+Consumers keep their Harness mechanism pins. Project Profile verification belongs to Engineering Kit/Profile SPI, not to a new Harness mechanism.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -33,14 +33,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.7.0
+npm install skill-family-harness-node@0.8.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.7.0
+// Run from an empty directory: npm install skill-family-harness-node@0.8.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.8.0 locale=zh-CN baseline=sha256:83f13f0b9f624ee26865c5d1bb0295ecd8cbaa64c581f066b53012eadf1dc040 -->
+## [0.8.0] - 2026-08-21
+
+随 Foundation 0.8.0 线锁步升版；Harness 机制表面不变。
+
+### 变更
+
+- Contracts 1.7.0 新增 Project Profile 合同，但 Harness 能力和导出机制均不变。
+
+### 升级说明
+
+消费者保持 Harness 机制锁定；Project Profile 校验归 Engineering Kit/Profile SPI 负责，不新增 Harness 机制。
+<!-- release-skill:changelog:end version=0.8.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.7.0 locale=zh-CN baseline=sha256:b3c207e2dd4134b75e5219842ee64a43c6da964763a86f7e360f0d0b60667516 -->
 ## [0.7.0] - 2026-08-21
 

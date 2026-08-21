@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.8.0 locale=en baseline=sha256:85322b5fb8d4e3a2177fbe9e37427235256d530bf604d0b5cdb95cf2ad11cc50 -->
+## [0.8.0] - 2026-08-21
+
+Lockstep version bump with Foundation 0.8.0; the Harness mechanism surface is unchanged.
+
+### Changed
+
+- Contracts 1.7.0 adds the Project Profile contract, but no Harness capability or exported mechanism changes.
+
+### Upgrade Notes
+
+Consumers keep their Harness mechanism pins. Project Profile verification belongs to Engineering Kit/Profile SPI, not to a new Harness mechanism.
+<!-- release-skill:changelog:end version=0.8.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.7.0 locale=en baseline=sha256:062a81c93d213982e9d6beda1e574959ba98b18170f0c703efb0dd71573a3e77 -->
 ## [0.7.0] - 2026-08-21
 

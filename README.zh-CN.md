@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.7.0 -->
+<!-- release-skill:release-version: 0.8.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.7.0** (2026-08-21)
+**0.8.0** (2026-08-21)
 
-随 Foundation 0.7.0 线锁步升版；薄机制运行时不变。
+随 Foundation 0.8.0 线锁步升版；Harness 机制表面不变。
 
 **变更**
 
-- 能力无变更——HARNESS_CAPABILITIES 保持 21 项，全部导出机制（原子受收容写、路径收容、严格权威读取、资源闭包、摘要、有界子进程监督、URL 凭证脱敏）保持 0.6.0 合同；包版本随 Foundation 线锁步，因为三个叶子包共用同一公开版本坐标。
+- Contracts 1.7.0 新增 Project Profile 合同，但 Harness 能力和导出机制均不变。
 
 **升级说明**
 
-0.7.0 不携带任何 harness 表面变更。消费者保持既有锁定；harness computeResourceClosure 的资源闭包与 engineering-kit 0.7.0 引入的 Kit 计划闭包仍然形状不同、用途不同，二者不能互换。
+消费者保持 Harness 机制锁定；Project Profile 校验归 Engineering Kit/Profile SPI 负责，不新增 Harness 机制。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -34,14 +34,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.7.0
+npm install skill-family-harness-node@0.8.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.7.0
+// 从空目录运行：npm install skill-family-harness-node@0.8.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

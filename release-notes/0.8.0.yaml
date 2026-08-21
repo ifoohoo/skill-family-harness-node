@@ -1,0 +1,15 @@
+version: 0.8.0
+date: 2026-08-21
+locales:
+  en:
+    summary: Lockstep version bump with Foundation 0.8.0; the Harness mechanism surface is unchanged.
+    changes:
+      changed:
+        - Contracts 1.7.0 adds the Project Profile contract, but no Harness capability or exported mechanism changes.
+    upgradeNotes: Consumers keep their Harness mechanism pins. Project Profile verification belongs to Engineering Kit/Profile SPI, not to a new Harness mechanism.
+  zh-CN:
+    summary: 随 Foundation 0.8.0 线锁步升版；Harness 机制表面不变。
+    changes:
+      changed:
+        - Contracts 1.7.0 新增 Project Profile 合同，但 Harness 能力和导出机制均不变。
+    upgradeNotes: 消费者保持 Harness 机制锁定；Project Profile 校验归 Engineering Kit/Profile SPI 负责，不新增 Harness 机制。
