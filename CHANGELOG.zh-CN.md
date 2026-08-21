@@ -1,5 +1,44 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.7.0 locale=zh-CN baseline=sha256:b3c207e2dd4134b75e5219842ee64a43c6da964763a86f7e360f0d0b60667516 -->
+## [0.7.0] - 2026-08-21
+
+随 Foundation 0.7.0 线锁步升版；薄机制运行时不变。
+
+### 变更
+
+- 能力无变更——HARNESS_CAPABILITIES 保持 21 项，全部导出机制（原子受收容写、路径收容、严格权威读取、资源闭包、摘要、有界子进程监督、URL 凭证脱敏）保持 0.6.0 合同；包版本随 Foundation 线锁步，因为三个叶子包共用同一公开版本坐标。
+
+### 升级说明
+
+0.7.0 不携带任何 harness 表面变更。消费者保持既有锁定；harness computeResourceClosure 的资源闭包与 engineering-kit 0.7.0 引入的 Kit 计划闭包仍然形状不同、用途不同，二者不能互换。
+<!-- release-skill:changelog:end version=0.7.0 locale=zh-CN -->
+
+
+<!-- release-skill:changelog:start version=0.6.0 locale=zh-CN baseline=sha256:6a4a94f692909faf2090445638988b27841a8bca67a85fd7812864d656299175 -->
+## [0.6.0] - 2026-08-21
+
+本版新增有界子进程监督（FND-ADR-012），补齐 Foundation 严格权威读取路径与受收容嵌套目录准备（FG-1），新增落盘前 URL 凭证脱敏（FG-2），HARNESS_CAPABILITIES 从 18 项增至 21 项。
+
+### 新增
+
+- 新增 superviseProcess 与 validateTimeoutPolicy、WATCHDOG_REASONS、TERMINATION_REASONS、PROCESS_STATUSES、ENVELOPE_GUARANTEES（FND-ADR-012）：单次有界 spawn、显式事件判活、消费者提供的超时策略、对进程组 SIGTERM→宽限→SIGKILL、单一闭集枚举终止信封；机制从不重启被监督进程，也从不持有超时数值。
+- 新增 readFileStrict（FG-1）：严格写入路径的读取孪生体——先收容、拒绝符号链接（O_NOFOLLOW）、在已打开句柄上复核常规文件身份（dev/ino），并返回所读精确字节的 sha256 摘要回执；可选 expectedSha256 内容守卫在任何交付前失败关闭。
+- publishFileExclusive 新增 createParents 选项（FG-1）：父目录链缺失部分在收容层内准备为真实目录，每个中间条目都复核为真实目录；符号链接组件仍被拒绝，任何条目都不被替换。
+- 新增 redactUrlCredentials 与 REDACTED_URL_PLACEHOLDER（FG-2）：任何 URL 的 userinfo 部分在数值到达磁盘或日志前剥离；不可解析输入退化为不透明占位符，绝不泄漏到输出。
+- 在 estimateTokens 旁转导出 contracts 拥有的 token 估算消费合同（consumeTokenEstimate、consumeTokenEstimateStrict 及伴生常量），并承载权威词元估算器 estimateTokens 与 skill-family-token-estimate CLI（审计整改 C1）。
+
+### 变更
+
+- HARNESS_CAPABILITIES 从 18 项增至 21 项（新增 supervise-process、strict-read、url-credential-redaction）；严格写入路径的不替换、字节验证回执语义保持不变。
+- 业务语义、重试/重启策略、预算阈值与「哪些值是 URL」的判定继续归消费者所有；harness 只拥有机制。
+
+### 升级说明
+
+0.6.0 是 Foundation 能力补齐线。publishFileExclusive 的 createParents 选项是按 2026-08-19 纪律的 Foundation 侧 profile 行为变更；需要受收容嵌套发布的消费者必须精确锁定 0.6.0。
+<!-- release-skill:changelog:end version=0.6.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.5.0 locale=zh-CN baseline=sha256:003472359596147fe26ad2ba53a82303a217c28cb89a6afacdaa955793001f71 -->
 ## [0.5.0] - 2026-08-16
 

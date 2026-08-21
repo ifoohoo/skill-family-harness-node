@@ -1,0 +1,15 @@
+version: 0.7.0
+date: 2026-08-21
+locales:
+  en:
+    summary: Lockstep version bump with the Foundation 0.7.0 line; the thin mechanism runtime is unchanged.
+    changes:
+      changed:
+        - No capability change - HARNESS_CAPABILITIES stays at 21 items and every exported mechanism (atomic contained writes, path containment, strict authority read, resource closure, digests, bounded subprocess supervision, URL credential redaction) keeps its 0.6.0 contract; the package version moves in lockstep with the Foundation line because the three leaf packages share one public version coordinate.
+    upgradeNotes: Version 0.7.0 carries no harness surface change. Consumers keep their existing pins; the harness computeResourceClosure resource closure remains distinct from the Kit plan closure introduced by engineering-kit 0.7.0 and the two are not interchangeable.
+  zh-CN:
+    summary: 随 Foundation 0.7.0 线锁步升版；薄机制运行时不变。
+    changes:
+      changed:
+        - 能力无变更——HARNESS_CAPABILITIES 保持 21 项，全部导出机制（原子受收容写、路径收容、严格权威读取、资源闭包、摘要、有界子进程监督、URL 凭证脱敏）保持 0.6.0 合同；包版本随 Foundation 线锁步，因为三个叶子包共用同一公开版本坐标。
+    upgradeNotes: 0.7.0 不携带任何 harness 表面变更。消费者保持既有锁定；harness computeResourceClosure 的资源闭包与 engineering-kit 0.7.0 引入的 Kit 计划闭包仍然形状不同、用途不同，二者不能互换。

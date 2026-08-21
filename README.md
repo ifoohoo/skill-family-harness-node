@@ -4,31 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.5.0 -->
+<!-- release-skill:release-version: 0.7.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.5.0** (2026-08-16)
+**0.7.0** (2026-08-21)
 
-This release adds the declared read surface assertion (FND-ADR-010) and the structured surface scanner (FND-ADR-011) to the stable Harness surface, growing HARNESS_CAPABILITIES from 16 to 18 entries, and adds three dependency-reviewed runtime libraries.
-
-**Added**
-
-- Adds assertDeclaredReadSurface (FND-ADR-010): a no-execution, syntax-surface-only assertion that every node:fs named import inside a declared module set stays inside the consumer-declared read surface, with a closed violation vocabulary and a frozen declared-read-surface-result envelope.
-- Adds scanSurfaceStructured (FND-ADR-011): the structured sibling of scanSurface. IP-shaped candidates enter a single standard parse entry (ipaddr.js) with consumer-declared CIDR approval and fail closed when unparseable; scoped and unscoped coordinates, registries and hosts need consumer-declared approval; format adapters (pnpm-lockfile via @pnpm/lockfile.fs with yaml AST comment regions, and tree-json) parse structurally with no position-level exemptions; binary and symlink policies fail closed. The closed nine-rule vocabulary travels in details.rule of the structured-scan-violation mechanism error.
-- Adds three dependency-reviewed runtime libraries for the structured scanner, reviewed per FND-ADR-006 section-4 analogy (dependency-closure pre-review, executor self-review pending independent review): ipaddr.js 2.5.0 (MIT, zero dependencies), yaml 2.9.0 (ISC), and @pnpm/lockfile.fs 1001.1.35 (MIT, 18 transitive dependencies all inside the approved public coordinates).
-- Grows HARNESS_CAPABILITIES from 16 to 18 entries for the two new mechanisms.
+Lockstep version bump with the Foundation 0.7.0 line; the thin mechanism runtime is unchanged.
 
 **Changed**
 
-- Documents the relationship of the two policy documents to workspace-private leak policies: a workspace-private leak-policy.json instance document is not a subset, not isomorphic and not a migration target of the surface-scan-policy or structured-scan-policy schemas — the documents share rule vocabulary and fail-closed semantics by design, but their byte-level shapes are independent and must not be compared for compatibility. scanSurface is the execution-core generalization projection: the public, consumer-parameterized form of the same mechanism family, without any private identity, path, or approval-list interpretation of its own.
-- Records the cost of the dependency-review decision honestly: the harness tarball grows with the @pnpm/lockfile.fs closure, the thin-runtime property changes from zero third-party runtime dependencies to three reviewed ones, and the pnpm-lockfile adapter writes one temporary lockfile copy under the OS temp directory (removed afterwards). The engineering-kit offline-consumer verification gates now derive the complete third-party production closure of the three Foundation packages mechanically (identity-deduplicated, npm: alias-aware, range-scoped override selectors) instead of a single-package closure, so the review decision is continuously verified against the real installed bytes.
-- Keeps mechanism purity: no execution of scanned files, no model calls, no network; symlinked entries are never followed.
+- No capability change - HARNESS_CAPABILITIES stays at 21 items and every exported mechanism (atomic contained writes, path containment, strict authority read, resource closure, digests, bounded subprocess supervision, URL credential redaction) keeps its 0.6.0 contract; the package version moves in lockstep with the Foundation line because the three leaf packages share one public version coordinate.
 
 **Upgrade Notes**
 
-Version 0.5.0 is the FND-ADR-010/011 harness line. Mechanism imports use the stable capability names published in HARNESS_CAPABILITIES; structured-scan policies must pass the structured-scan-policy contract validation of contract-spec 1.5.0.
+Version 0.7.0 carries no harness surface change. Consumers keep their existing pins; the harness computeResourceClosure resource closure remains distinct from the Kit plan closure introduced by engineering-kit 0.7.0 and the two are not interchangeable.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -42,14 +33,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.5.0
+npm install skill-family-harness-node@0.7.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.5.0
+// Run from an empty directory: npm install skill-family-harness-node@0.7.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

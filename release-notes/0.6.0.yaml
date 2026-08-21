@@ -1,0 +1,29 @@
+version: 0.6.0
+date: 2026-08-21
+locales:
+  en:
+    summary: This release adds bounded subprocess supervision (FND-ADR-012), completes the Foundation strict authority read path with contained nested directory preparation (FG-1), adds pre-persistence URL credential redaction (FG-2), and grows HARNESS_CAPABILITIES from 18 to 21.
+    changes:
+      added:
+        - Adds superviseProcess with validateTimeoutPolicy, WATCHDOG_REASONS, TERMINATION_REASONS, PROCESS_STATUSES and ENVELOPE_GUARANTEES (FND-ADR-012) - one bounded spawn, liveness by explicit events, consumer-supplied timeout policy, SIGTERM then grace then SIGKILL against the process group, and a single closed-enum termination envelope; the mechanism never restarts the supervised process and never holds timeout values.
+        - Adds readFileStrict (FG-1), the read-side twin of the strict write path - containment first, symlink refusal with O_NOFOLLOW, regular-file identity re-assertion on the opened handle (dev/ino), and a sha256 digest receipt of the exact bytes read; an optional expectedSha256 content guard fails closed before any delivery.
+        - Adds the createParents option to publishFileExclusive (FG-1) - the missing portion of the parent chain is prepared as real directories inside the containment layer and every intermediate entry is re-verified as a real directory; symlink components are still refused and no entry is ever replaced.
+        - Adds redactUrlCredentials with REDACTED_URL_PLACEHOLDER (FG-2) - strips the userinfo component from any URL before the value reaches disk or logs; unparseable input degrades to an opaque placeholder and never leaks to the output.
+        - Re-exports the contracts-owned token estimate consumption contract (consumeTokenEstimate, consumeTokenEstimateStrict and companions) next to estimateTokens, and carries the authoritative token estimator estimateTokens with the skill-family-token-estimate CLI (audit remediation C1).
+      changed:
+        - Grows HARNESS_CAPABILITIES from 18 to 21 (adds supervise-process, strict-read and url-credential-redaction); the strict write path keeps its no-replace, byte-verified receipt semantics unchanged.
+        - Keeps business semantics, retry/restart policy, budget thresholds, and the decision of which values are URLs under consumer ownership; the harness owns mechanism only.
+    upgradeNotes: Version 0.6.0 is the Foundation capability completion line. The createParents option of publishFileExclusive is a Foundation-side profile behavior change under the 2026-08-19 discipline; consumers needing contained nested publication must pin exactly 0.6.0.
+  zh-CN:
+    summary: 本版新增有界子进程监督（FND-ADR-012），补齐 Foundation 严格权威读取路径与受收容嵌套目录准备（FG-1），新增落盘前 URL 凭证脱敏（FG-2），HARNESS_CAPABILITIES 从 18 项增至 21 项。
+    changes:
+      added:
+        - 新增 superviseProcess 与 validateTimeoutPolicy、WATCHDOG_REASONS、TERMINATION_REASONS、PROCESS_STATUSES、ENVELOPE_GUARANTEES（FND-ADR-012）：单次有界 spawn、显式事件判活、消费者提供的超时策略、对进程组 SIGTERM→宽限→SIGKILL、单一闭集枚举终止信封；机制从不重启被监督进程，也从不持有超时数值。
+        - 新增 readFileStrict（FG-1）：严格写入路径的读取孪生体——先收容、拒绝符号链接（O_NOFOLLOW）、在已打开句柄上复核常规文件身份（dev/ino），并返回所读精确字节的 sha256 摘要回执；可选 expectedSha256 内容守卫在任何交付前失败关闭。
+        - publishFileExclusive 新增 createParents 选项（FG-1）：父目录链缺失部分在收容层内准备为真实目录，每个中间条目都复核为真实目录；符号链接组件仍被拒绝，任何条目都不被替换。
+        - 新增 redactUrlCredentials 与 REDACTED_URL_PLACEHOLDER（FG-2）：任何 URL 的 userinfo 部分在数值到达磁盘或日志前剥离；不可解析输入退化为不透明占位符，绝不泄漏到输出。
+        - 在 estimateTokens 旁转导出 contracts 拥有的 token 估算消费合同（consumeTokenEstimate、consumeTokenEstimateStrict 及伴生常量），并承载权威词元估算器 estimateTokens 与 skill-family-token-estimate CLI（审计整改 C1）。
+      changed:
+        - HARNESS_CAPABILITIES 从 18 项增至 21 项（新增 supervise-process、strict-read、url-credential-redaction）；严格写入路径的不替换、字节验证回执语义保持不变。
+        - 业务语义、重试/重启策略、预算阈值与「哪些值是 URL」的判定继续归消费者所有；harness 只拥有机制。
+    upgradeNotes: 0.6.0 是 Foundation 能力补齐线。publishFileExclusive 的 createParents 选项是按 2026-08-19 纪律的 Foundation 侧 profile 行为变更；需要受收容嵌套发布的消费者必须精确锁定 0.6.0。

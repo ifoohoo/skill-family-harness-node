@@ -70,6 +70,10 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   STRUCTURED_SCAN_VIOLATION: "structured-scan-violation",
   STRUCTURED_SCAN_INVALID: "structured-scan-invalid",
   UPPER_BOUND_EXCEEDED: "upper-bound-exceeded",
+  // Bounded subprocess supervision (FND-ADR-012). Both kinds report through
+  // SFC2004 with details.kind; the AUD namespace never enters here.
+  TIMEOUT_POLICY_INVALID: "timeout-policy-invalid",
+  SUPERVISE_PROCESS_FAILED: "supervise-process-failed",
 });
 
 /**

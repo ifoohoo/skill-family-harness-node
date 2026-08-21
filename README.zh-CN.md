@@ -5,31 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.5.0 -->
+<!-- release-skill:release-version: 0.7.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.5.0** (2026-08-16)
+**0.7.0** (2026-08-21)
 
-本版在稳定 Harness 面上新增声明读取表面断言（FND-ADR-010）与结构化表面扫描器（FND-ADR-011），HARNESS_CAPABILITIES 从 16 项增至 18 项，并引入三个经依赖评审的运行时库。
-
-**新增**
-
-- 新增 assertDeclaredReadSurface（FND-ADR-010）：不执行、仅语法面的断言，声明模块集内的每个 node:fs 具名导入必须落在消费者声明的读取表面内，违规词汇表为闭集，返回冻结的 declared-read-surface-result 信封。
-- 新增 scanSurfaceStructured（FND-ADR-011）：scanSurface 的结构化兄弟。IP 形候选统一进入单一标准解析入口（ipaddr.js），按消费者声明的 CIDR 批准，不可解析即失败关闭；坐标（scoped 与非 scoped）、注册表与主机均需消费者声明批准；格式适配器（pnpm-lockfile 经 @pnpm/lockfile.fs + yaml AST 注释区域，tree-json 经 JSON.parse）结构化解析且无位置级豁免；二进制与符号链接策略失败关闭。闭集九规则词汇表经 structured-scan-violation 机制错误的 details.rule 承载。
-- 为结构化扫描器引入三个经依赖评审的运行时库，评审按 FND-ADR-006 第 4 节类比执行（依赖闭包预审，执行者自审，独立复核另行安排）：ipaddr.js 2.5.0（MIT，零依赖）、yaml 2.9.0（ISC）、@pnpm/lockfile.fs 1001.1.35（MIT，18 个传递依赖全部在批准公共坐标内）。
-- HARNESS_CAPABILITIES 从 16 项增至 18 项，覆盖两个新机制。
+随 Foundation 0.7.0 线锁步升版；薄机制运行时不变。
 
 **变更**
 
-- 显式说明两个策略文档与工作区私有 leak 策略的关系：工作区私有的 leak-policy.json 实例文档既不是 surface-scan-policy 或 structured-scan-policy schema 的子集、也不同构、更不是迁移目标——两类文档按设计共享规则词汇与失败关闭语义，但字节级形状相互独立，不得比较兼容性。scanSurface 是执行内核通用化投影：同一机制族的公开、消费者参数化形态，自身不解释任何私有身份、路径或批准清单。
-- 如实记录依赖评审决策的成本：harness tarball 随 @pnpm/lockfile.fs 闭包扩大；薄运行时属性从零第三方运行时依赖变为三个经评审依赖；pnpm-lockfile 适配器会在 OS 临时目录写一份临时锁文件副本（用后即删）。engineering-kit 的离线消费者验证门随之把第三方闭包推导从单包闭包机械扩展为三个 Foundation 包的完整生产闭包（真实身份去重、npm: 别名感知、range-scoped override selector），使评审决策持续对着真实安装字节被验证。
-- 保持机制纯度：不执行被扫描文件、无模型调用、无网络；永不跟随符号链接。
+- 能力无变更——HARNESS_CAPABILITIES 保持 21 项，全部导出机制（原子受收容写、路径收容、严格权威读取、资源闭包、摘要、有界子进程监督、URL 凭证脱敏）保持 0.6.0 合同；包版本随 Foundation 线锁步，因为三个叶子包共用同一公开版本坐标。
 
 **升级说明**
 
-0.5.0 是 FND-ADR-010/011 harness 线。机制导入使用 HARNESS_CAPABILITIES 公布的稳定能力名；structured-scan 策略必须通过契约规格 1.5.0 的 structured-scan-policy 契约校验。
+0.7.0 不携带任何 harness 表面变更。消费者保持既有锁定；harness computeResourceClosure 的资源闭包与 engineering-kit 0.7.0 引入的 Kit 计划闭包仍然形状不同、用途不同，二者不能互换。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -43,14 +34,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.5.0
+npm install skill-family-harness-node@0.7.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.5.0
+// 从空目录运行：npm install skill-family-harness-node@0.7.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

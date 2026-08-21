@@ -29,6 +29,11 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "structured-scan",
   "token-estimation",
   "upper-bound-guard",
+  "supervise-process",
+  // Foundation capability completion (FG-1/FG-2): strict authority reads and
+  // pre-persistence URL credential redaction.
+  "strict-read",
+  "url-credential-redaction",
 ]);
 
 export const HARNESS_EXCLUSIONS = Object.freeze([
@@ -43,6 +48,14 @@ export const HARNESS_EXCLUSIONS = Object.freeze([
 export { HarnessError, HARNESS_ERROR_KINDS, mechanismError } from "./errors.mjs";
 
 export { classifyPathInput, resolveContained, readFileContained } from "./paths.mjs";
+
+// Strict contained read (FG-1): no-follow, regular-file identity assertion,
+// and a post-read sha256 digest receipt for existing authority files.
+export { readFileStrict } from "./strict-read.mjs";
+
+// Generic URL credential redaction (FG-2): strip userinfo before any value
+// reaches disk or logs; unparseable input degrades to an opaque placeholder.
+export { redactUrlCredentials, REDACTED_URL_PLACEHOLDER } from "./url-redaction.mjs";
 
 export { writeFileAtomic, publishFileExclusive, publishFileOrReplace, replaceFileAtomic } from "./atomic.mjs";
 
@@ -72,7 +85,26 @@ export { assertDeclaredReadSurface } from "./declared-read-surface.mjs";
 
 export { scanSurfaceStructured, STRUCTURED_SCAN_RULES, isIpv6ShapedRun, extractIpCandidates, normalizeIpToken, classifyIpToken, collectLockfileCommentRegions } from "./structured-scan.mjs";
 
-export { estimateTokenUpperBound } from "./token-estimate.mjs";
+export {
+  estimateTokenUpperBound,
+  estimateTokens,
+  isCjkCodePoint,
+  CJK_CODE_POINT_RANGES,
+  TOKEN_ESTIMATOR_ID,
+  TOKEN_ESTIMATOR_VERSION,
+  TOKEN_ESTIMATION_ALGORITHM,
+} from "./token-estimate.mjs";
+
+// Minimal consumption contract of the token estimate record (SG-33): the
+// contracts-owned consumption functions are re-exported next to the estimator
+// so mechanism consumers keep one import surface. Pure functions only.
+export {
+  TOKEN_ESTIMATE_CONSUMPTION,
+  TOKEN_ESTIMATE_CONSUMPTION_REASONS,
+  TOKEN_ESTIMATE_CONSUMPTION_ERROR_KIND,
+  consumeTokenEstimate,
+  consumeTokenEstimateStrict,
+} from "skill-family-contracts";
 
 export {
   openUsageGuard,
@@ -80,6 +112,21 @@ export {
   readUsage,
   closeUsageGuard,
 } from "./budget-guard.mjs";
+
+// Bounded subprocess supervision (FND-ADR-012). Mechanism only: one bounded
+// spawn, liveness by explicit events, consumer-supplied timeout policy,
+// SIGTERM -> grace -> SIGKILL against the process group, terminal-progress
+// observation, and a single closed-enum termination envelope. The mechanism
+// never restarts the supervised process and never holds timeout values;
+// retry/restart policy and budget thresholds stay consumer-owned.
+export {
+  superviseProcess,
+  validateTimeoutPolicy,
+  WATCHDOG_REASONS,
+  TERMINATION_REASONS,
+  PROCESS_STATUSES,
+  ENVELOPE_GUARANTEES,
+} from "./supervise-process.mjs";
 
 export { digestBytes, computeResourceClosure, closureContains } from "./closure.mjs";
 

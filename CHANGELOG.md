@@ -1,5 +1,44 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.7.0 locale=en baseline=sha256:062a81c93d213982e9d6beda1e574959ba98b18170f0c703efb0dd71573a3e77 -->
+## [0.7.0] - 2026-08-21
+
+Lockstep version bump with the Foundation 0.7.0 line; the thin mechanism runtime is unchanged.
+
+### Changed
+
+- No capability change - HARNESS_CAPABILITIES stays at 21 items and every exported mechanism (atomic contained writes, path containment, strict authority read, resource closure, digests, bounded subprocess supervision, URL credential redaction) keeps its 0.6.0 contract; the package version moves in lockstep with the Foundation line because the three leaf packages share one public version coordinate.
+
+### Upgrade Notes
+
+Version 0.7.0 carries no harness surface change. Consumers keep their existing pins; the harness computeResourceClosure resource closure remains distinct from the Kit plan closure introduced by engineering-kit 0.7.0 and the two are not interchangeable.
+<!-- release-skill:changelog:end version=0.7.0 locale=en -->
+
+
+<!-- release-skill:changelog:start version=0.6.0 locale=en baseline=sha256:c67e713aebe53382c651655a2be9e78ace8da6a1b7852c1e6acadcb383ff2422 -->
+## [0.6.0] - 2026-08-21
+
+This release adds bounded subprocess supervision (FND-ADR-012), completes the Foundation strict authority read path with contained nested directory preparation (FG-1), adds pre-persistence URL credential redaction (FG-2), and grows HARNESS_CAPABILITIES from 18 to 21.
+
+### Added
+
+- Adds superviseProcess with validateTimeoutPolicy, WATCHDOG_REASONS, TERMINATION_REASONS, PROCESS_STATUSES and ENVELOPE_GUARANTEES (FND-ADR-012) - one bounded spawn, liveness by explicit events, consumer-supplied timeout policy, SIGTERM then grace then SIGKILL against the process group, and a single closed-enum termination envelope; the mechanism never restarts the supervised process and never holds timeout values.
+- Adds readFileStrict (FG-1), the read-side twin of the strict write path - containment first, symlink refusal with O_NOFOLLOW, regular-file identity re-assertion on the opened handle (dev/ino), and a sha256 digest receipt of the exact bytes read; an optional expectedSha256 content guard fails closed before any delivery.
+- Adds the createParents option to publishFileExclusive (FG-1) - the missing portion of the parent chain is prepared as real directories inside the containment layer and every intermediate entry is re-verified as a real directory; symlink components are still refused and no entry is ever replaced.
+- Adds redactUrlCredentials with REDACTED_URL_PLACEHOLDER (FG-2) - strips the userinfo component from any URL before the value reaches disk or logs; unparseable input degrades to an opaque placeholder and never leaks to the output.
+- Re-exports the contracts-owned token estimate consumption contract (consumeTokenEstimate, consumeTokenEstimateStrict and companions) next to estimateTokens, and carries the authoritative token estimator estimateTokens with the skill-family-token-estimate CLI (audit remediation C1).
+
+### Changed
+
+- Grows HARNESS_CAPABILITIES from 18 to 21 (adds supervise-process, strict-read and url-credential-redaction); the strict write path keeps its no-replace, byte-verified receipt semantics unchanged.
+- Keeps business semantics, retry/restart policy, budget thresholds, and the decision of which values are URLs under consumer ownership; the harness owns mechanism only.
+
+### Upgrade Notes
+
+Version 0.6.0 is the Foundation capability completion line. The createParents option of publishFileExclusive is a Foundation-side profile behavior change under the 2026-08-19 discipline; consumers needing contained nested publication must pin exactly 0.6.0.
+<!-- release-skill:changelog:end version=0.6.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.5.0 locale=en baseline=sha256:03eca87a8c9bea814e741518168696f17c869bdb71baf2046cef4c3596d9ebf3 -->
 ## [0.5.0] - 2026-08-16
 
