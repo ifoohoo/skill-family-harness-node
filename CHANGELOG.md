@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.8.1 locale=en baseline=sha256:4cd9f23da3561184cef4ebadb7e758a22d377d069742bbe7c77166d6c1b3bd14 -->
+## [0.8.1] - 2026-08-22
+
+Harness now preserves its own report renderer version when a host bundles it into a single-file adapter.
+
+### Changed
+
+- Moves the package version to 0.8.1 together with Contracts and Engineering Kit.
+- Keeps all 21 Harness capabilities, report contracts, and public exports unchanged.
+
+### Fixed
+
+- Replaces the report renderer's runtime import.meta.url package-manifest lookup with a static JSON import, so esbuild inlines the Harness version instead of resolving the host adapter's package metadata.
+- Adds source and third-party single-file bundle regression tests for REPORT_RENDERER_VERSION.
+
+### Upgrade Notes
+
+Host adapters that bundle the report renderer must pin Harness 0.8.1. The report API and renderer identity remain unchanged, so no API migration is required from 0.8.0.
+<!-- release-skill:changelog:end version=0.8.1 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.8.0 locale=en baseline=sha256:85322b5fb8d4e3a2177fbe9e37427235256d530bf604d0b5cdb95cf2ad11cc50 -->
 ## [0.8.0] - 2026-08-21
 

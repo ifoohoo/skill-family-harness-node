@@ -5,22 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.0 -->
+<!-- release-skill:release-version: 0.8.1 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.0** (2026-08-21)
+**0.8.1** (2026-08-22)
 
-随 Foundation 0.8.0 线锁步升版；Harness 机制表面不变。
+宿主把 Harness 打包进单文件适配器后，报告渲染器仍能保留 Harness 自身的包版本。
 
 **变更**
 
-- Contracts 1.7.0 新增 Project Profile 合同，但 Harness 能力和导出机制均不变。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.1。
+- Harness 的 21 项能力、报告合同和公共导出均保持不变。
+
+**修复**
+
+- 用静态 JSON import 替换报告渲染器运行时基于 import.meta.url 的包清单查找，使 esbuild 内联 Harness 版本，不再读取宿主适配器的包元数据。
+- 为 REPORT_RENDERER_VERSION 新增源码运行与第三方单文件 bundle 回归测试。
 
 **升级说明**
 
-消费者保持 Harness 机制锁定；Project Profile 校验归 Engineering Kit/Profile SPI 负责，不新增 Harness 机制。
+把报告渲染器打包进宿主适配器的消费者必须精确锁定 Harness 0.8.1；报告 API 与渲染器身份保持不变，从 0.8.0 升级不需要迁移 API。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -34,14 +40,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.8.0
+npm install skill-family-harness-node@0.8.1
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.8.0
+// 从空目录运行：npm install skill-family-harness-node@0.8.1
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

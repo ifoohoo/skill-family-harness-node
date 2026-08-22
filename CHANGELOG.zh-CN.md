@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.8.1 locale=zh-CN baseline=sha256:904de77446dbc69ef7e70cdda0020fd98632a6e704754f6ed57e136764e3112e -->
+## [0.8.1] - 2026-08-22
+
+宿主把 Harness 打包进单文件适配器后，报告渲染器仍能保留 Harness 自身的包版本。
+
+### 变更
+
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.1。
+- Harness 的 21 项能力、报告合同和公共导出均保持不变。
+
+### 修复
+
+- 用静态 JSON import 替换报告渲染器运行时基于 import.meta.url 的包清单查找，使 esbuild 内联 Harness 版本，不再读取宿主适配器的包元数据。
+- 为 REPORT_RENDERER_VERSION 新增源码运行与第三方单文件 bundle 回归测试。
+
+### 升级说明
+
+把报告渲染器打包进宿主适配器的消费者必须精确锁定 Harness 0.8.1；报告 API 与渲染器身份保持不变，从 0.8.0 升级不需要迁移 API。
+<!-- release-skill:changelog:end version=0.8.1 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.8.0 locale=zh-CN baseline=sha256:83f13f0b9f624ee26865c5d1bb0295ecd8cbaa64c581f066b53012eadf1dc040 -->
 ## [0.8.0] - 2026-08-21
 

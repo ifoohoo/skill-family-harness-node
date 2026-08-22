@@ -1,0 +1,23 @@
+version: 0.8.1
+date: 2026-08-22
+locales:
+  en:
+    summary: Harness now preserves its own report renderer version when a host bundles it into a single-file adapter.
+    changes:
+      fixed:
+        - Replaces the report renderer's runtime import.meta.url package-manifest lookup with a static JSON import, so esbuild inlines the Harness version instead of resolving the host adapter's package metadata.
+        - Adds source and third-party single-file bundle regression tests for REPORT_RENDERER_VERSION.
+      changed:
+        - Moves the package version to 0.8.1 together with Contracts and Engineering Kit.
+        - Keeps all 21 Harness capabilities, report contracts, and public exports unchanged.
+    upgradeNotes: Host adapters that bundle the report renderer must pin Harness 0.8.1. The report API and renderer identity remain unchanged, so no API migration is required from 0.8.0.
+  zh-CN:
+    summary: 宿主把 Harness 打包进单文件适配器后，报告渲染器仍能保留 Harness 自身的包版本。
+    changes:
+      fixed:
+        - 用静态 JSON import 替换报告渲染器运行时基于 import.meta.url 的包清单查找，使 esbuild 内联 Harness 版本，不再读取宿主适配器的包元数据。
+        - 为 REPORT_RENDERER_VERSION 新增源码运行与第三方单文件 bundle 回归测试。
+      changed:
+        - 包版本与 Contracts、Engineering Kit 一同升至 0.8.1。
+        - Harness 的 21 项能力、报告合同和公共导出均保持不变。
+    upgradeNotes: 把报告渲染器打包进宿主适配器的消费者必须精确锁定 Harness 0.8.1；报告 API 与渲染器身份保持不变，从 0.8.0 升级不需要迁移 API。
