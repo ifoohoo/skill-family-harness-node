@@ -5,28 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.1 -->
+<!-- release-skill:release-version: 0.8.2 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.1** (2026-08-22)
+**0.8.2** (2026-08-23)
 
-宿主把 Harness 打包进单文件适配器后，报告渲染器仍能保留 Harness 自身的包版本。
+固定的候选机制桥接新增 read-file-strict，直接公开既有严格读取机制。
+
+**新增**
+
+- invokeFoundationMechanism 新增 read-file-strict；参数闭合为 root、path、encoding 和 expectedSha256。
+- UTF-8 内容返回字符串，二进制内容返回标准的 JSON 安全 Buffer 形态。
 
 **变更**
 
-- 包版本与 Contracts、Engineering Kit 一同升至 0.8.1。
-- Harness 的 21 项能力、报告合同和公共导出均保持不变。
-
-**修复**
-
-- 用静态 JSON import 替换报告渲染器运行时基于 import.meta.url 的包清单查找，使 esbuild 内联 Harness 版本，不再读取宿主适配器的包元数据。
-- 为 REPORT_RENDERER_VERSION 新增源码运行与第三方单文件 bundle 回归测试。
+- 路径收容、文件读取、摘要复验和失败分类全部转发给 readFileStrict，不新增第二套读取算法。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.2。
 
 **升级说明**
 
-把报告渲染器打包进宿主适配器的消费者必须精确锁定 Harness 0.8.1；报告 API 与渲染器身份保持不变，从 0.8.0 升级不需要迁移 API。
+候选消费者必须把三个 Foundation 包精确锁定到 0.8.2，再重建受管 Bundle。直接调用继续返回 SFC2004 与 details.kind；JSON CLI 只承诺成功退出码 0 和拒绝退出码 2。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -40,14 +40,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.8.1
+npm install skill-family-harness-node@0.8.2
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.8.1
+// 从空目录运行：npm install skill-family-harness-node@0.8.2
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

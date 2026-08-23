@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.8.2 locale=en baseline=sha256:af051a6925c7d1f46bef6fbe367aceea8685b4a916629af4e69334e73014e3a7 -->
+## [0.8.2] - 2026-08-23
+
+The fixed candidate mechanism bridge now exposes the existing strict reader through read-file-strict.
+
+### Added
+
+- Adds read-file-strict to invokeFoundationMechanism with closed root, path, encoding, and expectedSha256 parameters.
+- Returns UTF-8 content as a string and binary content in the standard JSON-safe Buffer shape.
+
+### Changed
+
+- Delegates containment, file reading, digest verification, and failure classification directly to readFileStrict; no second read algorithm is introduced.
+- Moves the package version to 0.8.2 together with Contracts and Engineering Kit.
+
+### Upgrade Notes
+
+Candidate consumers must pin all three Foundation packages to exactly 0.8.2 and rebuild their managed Bundle. Direct calls retain SFC2004 details.kind failures; the JSON CLI continues to promise only exit code 0 for success and 2 for rejection.
+<!-- release-skill:changelog:end version=0.8.2 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.8.1 locale=en baseline=sha256:4cd9f23da3561184cef4ebadb7e758a22d377d069742bbe7c77166d6c1b3bd14 -->
 ## [0.8.1] - 2026-08-22
 

@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import { computeResourceClosure, digestBytes } from "../src/closure.mjs";
 import { HARNESS_ERROR_KINDS, HarnessError, mechanismError } from "../src/errors.mjs";
 import { resolveContained } from "../src/paths.mjs";
+import { readFileStrict } from "../src/strict-read.mjs";
 
 /**
  * Candidate quickstart profile v2 mechanisms (unstable).
@@ -455,6 +456,7 @@ const FOUNDATION_MECHANISM_OPERATIONS = Object.freeze([
   "digest-document",
   "resource-closure",
   "resolve-contained",
+  "read-file-strict",
   "create-task",
   "wrap-result",
   "verify-exchange",
@@ -481,6 +483,34 @@ function findUnsafeInteger(value, instancePath = "") {
     }
   }
   return null;
+}
+
+function assertReadFileStrictParams(params) {
+  const allowedKeys = new Set(["root", "path", "encoding", "expectedSha256"]);
+  const unknownKey = Object.keys(params).find((key) => !allowedKeys.has(key));
+  if (unknownKey !== undefined) {
+    throw new TypeError(`invokeFoundationMechanism: read-file-strict unknown param: ${unknownKey}`);
+  }
+  for (const key of ["root", "path"]) {
+    if (!Object.hasOwn(params, key) || typeof params[key] !== "string" || params[key].length === 0) {
+      throw new TypeError(`invokeFoundationMechanism: read-file-strict ${key} must be a non-empty string`);
+    }
+  }
+  if (Object.hasOwn(params, "encoding") && params.encoding !== "utf8") {
+    throw new TypeError('invokeFoundationMechanism: read-file-strict encoding must be "utf8" or omitted');
+  }
+}
+
+async function invokeReadFileStrict(params) {
+  assertReadFileStrictParams(params);
+  const receipt = await readFileStrict(params.root, params.path, {
+    ...(Object.hasOwn(params, "encoding") ? { encoding: params.encoding } : {}),
+    ...(Object.hasOwn(params, "expectedSha256") ? { expectedSha256: params.expectedSha256 } : {}),
+  });
+  return {
+    ...receipt,
+    content: Buffer.isBuffer(receipt.content) ? receipt.content.toJSON() : receipt.content,
+  };
 }
 
 /**
@@ -524,6 +554,9 @@ export async function invokeFoundationMechanism(request, { validateBySchemaId } 
   }
   if (operation === "resource-closure") {
     return computeResourceClosure({ root: params.root, resources: params.resources });
+  }
+  if (operation === "read-file-strict") {
+    return invokeReadFileStrict(params);
   }
   if (operation === "create-task") {
     return createQuickstartTask(params);

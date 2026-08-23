@@ -1,0 +1,23 @@
+version: 0.8.2
+date: 2026-08-23
+locales:
+  en:
+    summary: The fixed candidate mechanism bridge now exposes the existing strict reader through read-file-strict.
+    changes:
+      added:
+        - Adds read-file-strict to invokeFoundationMechanism with closed root, path, encoding, and expectedSha256 parameters.
+        - Returns UTF-8 content as a string and binary content in the standard JSON-safe Buffer shape.
+      changed:
+        - Delegates containment, file reading, digest verification, and failure classification directly to readFileStrict; no second read algorithm is introduced.
+        - Moves the package version to 0.8.2 together with Contracts and Engineering Kit.
+    upgradeNotes: Candidate consumers must pin all three Foundation packages to exactly 0.8.2 and rebuild their managed Bundle. Direct calls retain SFC2004 details.kind failures; the JSON CLI continues to promise only exit code 0 for success and 2 for rejection.
+  zh-CN:
+    summary: 固定的候选机制桥接新增 read-file-strict，直接公开既有严格读取机制。
+    changes:
+      added:
+        - invokeFoundationMechanism 新增 read-file-strict；参数闭合为 root、path、encoding 和 expectedSha256。
+        - UTF-8 内容返回字符串，二进制内容返回标准的 JSON 安全 Buffer 形态。
+      changed:
+        - 路径收容、文件读取、摘要复验和失败分类全部转发给 readFileStrict，不新增第二套读取算法。
+        - 包版本与 Contracts、Engineering Kit 一同升至 0.8.2。
+    upgradeNotes: 候选消费者必须把三个 Foundation 包精确锁定到 0.8.2，再重建受管 Bundle。直接调用继续返回 SFC2004 与 details.kind；JSON CLI 只承诺成功退出码 0 和拒绝退出码 2。

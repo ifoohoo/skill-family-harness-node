@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.8.2 locale=zh-CN baseline=sha256:748d79d51dcabe6193332e60ec69a6eb26fd914ad3555f6e924b78db71016192 -->
+## [0.8.2] - 2026-08-23
+
+固定的候选机制桥接新增 read-file-strict，直接公开既有严格读取机制。
+
+### 新增
+
+- invokeFoundationMechanism 新增 read-file-strict；参数闭合为 root、path、encoding 和 expectedSha256。
+- UTF-8 内容返回字符串，二进制内容返回标准的 JSON 安全 Buffer 形态。
+
+### 变更
+
+- 路径收容、文件读取、摘要复验和失败分类全部转发给 readFileStrict，不新增第二套读取算法。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.2。
+
+### 升级说明
+
+候选消费者必须把三个 Foundation 包精确锁定到 0.8.2，再重建受管 Bundle。直接调用继续返回 SFC2004 与 details.kind；JSON CLI 只承诺成功退出码 0 和拒绝退出码 2。
+<!-- release-skill:changelog:end version=0.8.2 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.8.1 locale=zh-CN baseline=sha256:904de77446dbc69ef7e70cdda0020fd98632a6e704754f6ed57e136764e3112e -->
 ## [0.8.1] - 2026-08-22
 

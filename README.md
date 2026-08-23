@@ -4,28 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.1 -->
+<!-- release-skill:release-version: 0.8.2 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.1** (2026-08-22)
+**0.8.2** (2026-08-23)
 
-Harness now preserves its own report renderer version when a host bundles it into a single-file adapter.
+The fixed candidate mechanism bridge now exposes the existing strict reader through read-file-strict.
+
+**Added**
+
+- Adds read-file-strict to invokeFoundationMechanism with closed root, path, encoding, and expectedSha256 parameters.
+- Returns UTF-8 content as a string and binary content in the standard JSON-safe Buffer shape.
 
 **Changed**
 
-- Moves the package version to 0.8.1 together with Contracts and Engineering Kit.
-- Keeps all 21 Harness capabilities, report contracts, and public exports unchanged.
-
-**Fixed**
-
-- Replaces the report renderer's runtime import.meta.url package-manifest lookup with a static JSON import, so esbuild inlines the Harness version instead of resolving the host adapter's package metadata.
-- Adds source and third-party single-file bundle regression tests for REPORT_RENDERER_VERSION.
+- Delegates containment, file reading, digest verification, and failure classification directly to readFileStrict; no second read algorithm is introduced.
+- Moves the package version to 0.8.2 together with Contracts and Engineering Kit.
 
 **Upgrade Notes**
 
-Host adapters that bundle the report renderer must pin Harness 0.8.1. The report API and renderer identity remain unchanged, so no API migration is required from 0.8.0.
+Candidate consumers must pin all three Foundation packages to exactly 0.8.2 and rebuild their managed Bundle. Direct calls retain SFC2004 details.kind failures; the JSON CLI continues to promise only exit code 0 for success and 2 for rejection.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +39,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.8.1
+npm install skill-family-harness-node@0.8.2
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.8.1
+// Run from an empty directory: npm install skill-family-harness-node@0.8.2
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
