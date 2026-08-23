@@ -5,28 +5,23 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.3 -->
+<!-- release-skill:release-version: 0.8.4 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.3** (2026-08-23)
+**0.8.4** (2026-08-24)
 
-路径收容现在可处理一次精确的锚点并发删除，同时保持越界检查失败关闭。
+随 Foundation 0.8.4 锁步升版；Harness 不新增机制或公共 API。
 
 **变更**
 
-- 第二次 ENOENT 与所有非 ENOENT 错误仍失败关闭；符号链接替换、根目录外目标和既有收容检查仍全部拒绝。
-- 测试钩子只留在 paths 模块的测试表面，不新增公共导出、通用重试策略、锁层、账本或 runner。
-- 包版本与 Contracts、Engineering Kit 一同升至 0.8.3。
-
-**修复**
-
-- 当另一进程删除已选锚点，导致该锚点的 realpath 返回 ENOENT 时，resolveContained 仅重新计算一次最深既存祖先。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.4。
+- 21 项 Harness 能力与公共导出保持不变；source-authority receipt 校验归 Contracts。
 
 **升级说明**
 
-消费者必须把三个 Foundation 包精确锁定到 0.8.3。并发获取锁时，即使当前持有者删除已选锁文件锚点，也能完成一次安全重求；Harness API 无需迁移。
+消费者必须把三个 Foundation 包精确锁定到 0.8.4；Harness API 无需迁移。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -40,14 +35,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.8.3
+npm install skill-family-harness-node@0.8.4
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.8.3
+// 从空目录运行：npm install skill-family-harness-node@0.8.4
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

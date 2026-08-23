@@ -4,28 +4,23 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.3 -->
+<!-- release-skill:release-version: 0.8.4 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.3** (2026-08-23)
+**0.8.4** (2026-08-24)
 
-Path containment now tolerates one exact anchor-removal race while preserving fail-closed escape checks.
+Lockstep Foundation 0.8.4 version update with no new Harness mechanism or public API.
 
 **Changed**
 
-- A second ENOENT and every non-ENOENT failure remain closed; symlink swaps, out-of-root targets, and all existing containment checks remain rejected.
-- Keeps the hook private to the paths module test surface and adds no public export, general retry policy, lock layer, ledger, or runner.
-- Moves the package version to 0.8.3 together with Contracts and Engineering Kit.
-
-**Fixed**
-
-- When realpath of the selected existing anchor fails with ENOENT because another process removed it, resolveContained recomputes the deepest existing ancestor exactly once.
+- Moves the package version to 0.8.4 together with Contracts and Engineering Kit.
+- Keeps all 21 Harness capabilities and public exports unchanged; source-authority receipt validation belongs to Contracts.
 
 **Upgrade Notes**
 
-Consumers must pin all three Foundation packages to exactly 0.8.3. Concurrent lock acquisition can now survive the current owner removing the selected lock-file anchor; no Harness API migration is required.
+Consumers must pin all three Foundation packages to exactly 0.8.4. No Harness API migration is required.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +34,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.8.3
+npm install skill-family-harness-node@0.8.4
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.8.3
+// Run from an empty directory: npm install skill-family-harness-node@0.8.4
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

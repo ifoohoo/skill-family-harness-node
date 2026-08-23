@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.8.4 locale=en baseline=sha256:dfb053d7719d3c7cb5b7d8dbe7a2349597696614651ef4ae04451c34cd7bbc02 -->
+## [0.8.4] - 2026-08-24
+
+Lockstep Foundation 0.8.4 version update with no new Harness mechanism or public API.
+
+### Changed
+
+- Moves the package version to 0.8.4 together with Contracts and Engineering Kit.
+- Keeps all 21 Harness capabilities and public exports unchanged; source-authority receipt validation belongs to Contracts.
+
+### Upgrade Notes
+
+Consumers must pin all three Foundation packages to exactly 0.8.4. No Harness API migration is required.
+<!-- release-skill:changelog:end version=0.8.4 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.8.3 locale=en baseline=sha256:449943bedf3698888fec4dcb09a0460f337b9406d5258946a3d3ffcd23143b8d -->
 ## [0.8.3] - 2026-08-23
 

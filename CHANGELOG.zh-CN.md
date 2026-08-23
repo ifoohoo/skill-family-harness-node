@@ -1,5 +1,21 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.8.4 locale=zh-CN baseline=sha256:e8d7be87a26ef296ee4ae27e2325ac8ff1dc33fc69e5f4a65520656f9860bb91 -->
+## [0.8.4] - 2026-08-24
+
+随 Foundation 0.8.4 锁步升版；Harness 不新增机制或公共 API。
+
+### 变更
+
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.4。
+- 21 项 Harness 能力与公共导出保持不变；source-authority receipt 校验归 Contracts。
+
+### 升级说明
+
+消费者必须把三个 Foundation 包精确锁定到 0.8.4；Harness API 无需迁移。
+<!-- release-skill:changelog:end version=0.8.4 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.8.3 locale=zh-CN baseline=sha256:b84695a286aca7c1a9f90844f8682cde07d32276cebc11583568bc5ef11753fc -->
 ## [0.8.3] - 2026-08-23
 
