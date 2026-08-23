@@ -4,28 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.2 -->
+<!-- release-skill:release-version: 0.8.3 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.2** (2026-08-23)
+**0.8.3** (2026-08-23)
 
-The fixed candidate mechanism bridge now exposes the existing strict reader through read-file-strict.
-
-**Added**
-
-- Adds read-file-strict to invokeFoundationMechanism with closed root, path, encoding, and expectedSha256 parameters.
-- Returns UTF-8 content as a string and binary content in the standard JSON-safe Buffer shape.
+Path containment now tolerates one exact anchor-removal race while preserving fail-closed escape checks.
 
 **Changed**
 
-- Delegates containment, file reading, digest verification, and failure classification directly to readFileStrict; no second read algorithm is introduced.
-- Moves the package version to 0.8.2 together with Contracts and Engineering Kit.
+- A second ENOENT and every non-ENOENT failure remain closed; symlink swaps, out-of-root targets, and all existing containment checks remain rejected.
+- Keeps the hook private to the paths module test surface and adds no public export, general retry policy, lock layer, ledger, or runner.
+- Moves the package version to 0.8.3 together with Contracts and Engineering Kit.
+
+**Fixed**
+
+- When realpath of the selected existing anchor fails with ENOENT because another process removed it, resolveContained recomputes the deepest existing ancestor exactly once.
 
 **Upgrade Notes**
 
-Candidate consumers must pin all three Foundation packages to exactly 0.8.2 and rebuild their managed Bundle. Direct calls retain SFC2004 details.kind failures; the JSON CLI continues to promise only exit code 0 for success and 2 for rejection.
+Consumers must pin all three Foundation packages to exactly 0.8.3. Concurrent lock acquisition can now survive the current owner removing the selected lock-file anchor; no Harness API migration is required.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +39,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.8.2
+npm install skill-family-harness-node@0.8.3
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.8.2
+// Run from an empty directory: npm install skill-family-harness-node@0.8.3
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

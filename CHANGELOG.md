@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.8.3 locale=en baseline=sha256:449943bedf3698888fec4dcb09a0460f337b9406d5258946a3d3ffcd23143b8d -->
+## [0.8.3] - 2026-08-23
+
+Path containment now tolerates one exact anchor-removal race while preserving fail-closed escape checks.
+
+### Changed
+
+- A second ENOENT and every non-ENOENT failure remain closed; symlink swaps, out-of-root targets, and all existing containment checks remain rejected.
+- Keeps the hook private to the paths module test surface and adds no public export, general retry policy, lock layer, ledger, or runner.
+- Moves the package version to 0.8.3 together with Contracts and Engineering Kit.
+
+### Fixed
+
+- When realpath of the selected existing anchor fails with ENOENT because another process removed it, resolveContained recomputes the deepest existing ancestor exactly once.
+
+### Upgrade Notes
+
+Consumers must pin all three Foundation packages to exactly 0.8.3. Concurrent lock acquisition can now survive the current owner removing the selected lock-file anchor; no Harness API migration is required.
+<!-- release-skill:changelog:end version=0.8.3 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.8.2 locale=en baseline=sha256:af051a6925c7d1f46bef6fbe367aceea8685b4a916629af4e69334e73014e3a7 -->
 ## [0.8.2] - 2026-08-23
 

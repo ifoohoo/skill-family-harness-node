@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.8.3 locale=zh-CN baseline=sha256:b84695a286aca7c1a9f90844f8682cde07d32276cebc11583568bc5ef11753fc -->
+## [0.8.3] - 2026-08-23
+
+路径收容现在可处理一次精确的锚点并发删除，同时保持越界检查失败关闭。
+
+### 变更
+
+- 第二次 ENOENT 与所有非 ENOENT 错误仍失败关闭；符号链接替换、根目录外目标和既有收容检查仍全部拒绝。
+- 测试钩子只留在 paths 模块的测试表面，不新增公共导出、通用重试策略、锁层、账本或 runner。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.8.3。
+
+### 修复
+
+- 当另一进程删除已选锚点，导致该锚点的 realpath 返回 ENOENT 时，resolveContained 仅重新计算一次最深既存祖先。
+
+### 升级说明
+
+消费者必须把三个 Foundation 包精确锁定到 0.8.3。并发获取锁时，即使当前持有者删除已选锁文件锚点，也能完成一次安全重求；Harness API 无需迁移。
+<!-- release-skill:changelog:end version=0.8.3 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.8.2 locale=zh-CN baseline=sha256:748d79d51dcabe6193332e60ec69a6eb26fd914ad3555f6e924b78db71016192 -->
 ## [0.8.2] - 2026-08-23
 
