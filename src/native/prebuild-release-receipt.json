@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "skill-family.filesystem-bound-read-prebuild-release-receipt",
+  "status": "stable",
+  "node": { "napi": 10 },
+  "source": {
+    "path": "packages/skill-family-harness-node/src/native/bound_read.c",
+    "sha256": "51caf9aca8b28170878244fdf4cfa3f2a181c585b6782eff38e82cb8dd208450"
+  },
+  "manifestSha256": "bc944f9a41dbac91d0889967279710ad970acd378ca5809df1f41c31a43e3eb2",
+  "platforms": ["darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu"]
+}

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "skill-family.filesystem-bound-read-prebuild-sbom",
+  "status": "stable",
+  "source": {
+    "path": "packages/skill-family-harness-node/src/native/bound_read.c",
+    "sha256": "51caf9aca8b28170878244fdf4cfa3f2a181c585b6782eff38e82cb8dd208450"
+  },
+  "files": [
+    { "platformKey": "darwin-arm64", "binary": "prebuilds/darwin-arm64/bound_read.darwin-arm64.node", "sha256": "3172e6f78341502c1455e82a3843730303a2c46f70284c3635885b8f5e1df4b2", "license": "Apache-2.0" },
+    { "platformKey": "darwin-x64", "binary": "prebuilds/darwin-x64/bound_read.darwin-x64.node", "sha256": "ace0bfd36e8ddaaf69a68dc6fa00b77f6920f258a6a0db249f295a131225b27b", "license": "Apache-2.0" },
+    { "platformKey": "linux-arm64-gnu", "binary": "prebuilds/linux-arm64-gnu/bound_read.linux-arm64-gnu.node", "sha256": "dfee29ad477376cc0288970bca5b2da19c3e925409d2eacf8e6ba6325e9e2b7f", "license": "Apache-2.0" },
+    { "platformKey": "linux-x64-gnu", "binary": "prebuilds/linux-x64-gnu/bound_read.linux-x64-gnu.node", "sha256": "c936852191b19a998b1e2ba3b588151f7bf4b3804a30554d2368f25042aaa3be", "license": "Apache-2.0" }
+  ]
+}

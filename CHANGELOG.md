@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.9.0 locale=en baseline=sha256:e5f4e3bb6ab343e4ccfb7dcdbba8b9ab4576b4cf285c30bb3597d577be5eb391 -->
+## [0.9.0] - 2026-08-24
+
+Harness 0.9.0 adds stable identity-bound reads and fixed-set no-replace publication with a fixed four-platform native closure.
+
+### Added
+
+- Adds createFilesystemRootBinding and readFileBound with handle-relative no-follow acquisition and optional byte digest guarding.
+- Adds the stable fixed-set-publication subpath with native no-replace publication and terminal indeterminate receipts.
+- Adds the candidate validate-many-by-schema-id mechanism to the existing Quickstart dispatcher.
+
+### Changed
+
+- Keeps protected deletion excluded and preserves the existing 21-item capability registry.
+
+### Upgrade Notes
+
+Pin Contracts, Harness, and Engineering Kit to exactly 0.9.0. Batch validation and the Quickstart Bundle remain candidate; filesystem binding and fixed-set publication are stable.
+<!-- release-skill:changelog:end version=0.9.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.8.4 locale=en baseline=sha256:dfb053d7719d3c7cb5b7d8dbe7a2349597696614651ef4ae04451c34cd7bbc02 -->
 ## [0.8.4] - 2026-08-24
 

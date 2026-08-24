@@ -5,23 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.4 -->
+<!-- release-skill:release-version: 0.9.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.4** (2026-08-24)
+**0.9.0** (2026-08-24)
 
-随 Foundation 0.8.4 锁步升版；Harness 不新增机制或公共 API。
+Harness 0.9.0 新增稳定身份绑定读取与固定集合不替换发布，并携带固定四平台原生闭包。
+
+**新增**
+
+- 新增 createFilesystemRootBinding 与 readFileBound，使用句柄相对不跟随符号链接获取，并支持可选字节摘要保护。
+- 新增稳定 fixed-set-publication 子路径，使用原生不替换发布并保留终态 indeterminate 回执。
+- 在既有 Quickstart dispatcher 中增加 validate-many-by-schema-id candidate 机制。
 
 **变更**
 
-- 包版本与 Contracts、Engineering Kit 一同升至 0.8.4。
-- 21 项 Harness 能力与公共导出保持不变；source-authority receipt 校验归 Contracts。
+- 身份保护删除继续排除，既有 21 项能力登记保持不变。
 
 **升级说明**
 
-消费者必须把三个 Foundation 包精确锁定到 0.8.4；Harness API 无需迁移。
+三个 Foundation 包必须精确锁定 0.9.0。批量校验与 Quickstart Bundle 仍为 candidate；文件系统绑定与固定集合发布为 stable。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -35,14 +40,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.8.4
+npm install skill-family-harness-node@0.9.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.8.4
+// 从空目录运行：npm install skill-family-harness-node@0.9.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

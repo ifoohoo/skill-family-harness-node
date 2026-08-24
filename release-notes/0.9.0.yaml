@@ -1,0 +1,23 @@
+version: 0.9.0
+date: 2026-08-24
+locales:
+  en:
+    summary: Harness 0.9.0 adds stable identity-bound reads and fixed-set no-replace publication with a fixed four-platform native closure.
+    changes:
+      added:
+        - Adds createFilesystemRootBinding and readFileBound with handle-relative no-follow acquisition and optional byte digest guarding.
+        - Adds the stable fixed-set-publication subpath with native no-replace publication and terminal indeterminate receipts.
+        - Adds the candidate validate-many-by-schema-id mechanism to the existing Quickstart dispatcher.
+      changed:
+        - Keeps protected deletion excluded and preserves the existing 21-item capability registry.
+    upgradeNotes: Pin Contracts, Harness, and Engineering Kit to exactly 0.9.0. Batch validation and the Quickstart Bundle remain candidate; filesystem binding and fixed-set publication are stable.
+  zh-CN:
+    summary: Harness 0.9.0 新增稳定身份绑定读取与固定集合不替换发布，并携带固定四平台原生闭包。
+    changes:
+      added:
+        - 新增 createFilesystemRootBinding 与 readFileBound，使用句柄相对不跟随符号链接获取，并支持可选字节摘要保护。
+        - 新增稳定 fixed-set-publication 子路径，使用原生不替换发布并保留终态 indeterminate 回执。
+        - 在既有 Quickstart dispatcher 中增加 validate-many-by-schema-id candidate 机制。
+      changed:
+        - 身份保护删除继续排除，既有 21 项能力登记保持不变。
+    upgradeNotes: 三个 Foundation 包必须精确锁定 0.9.0。批量校验与 Quickstart Bundle 仍为 candidate；文件系统绑定与固定集合发布为 stable。

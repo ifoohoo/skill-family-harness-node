@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.9.0 locale=zh-CN baseline=sha256:7f3ff503831b8fb52f20293a4af4003ff116b7f9d820a0c2da1bd34a0b261248 -->
+## [0.9.0] - 2026-08-24
+
+Harness 0.9.0 新增稳定身份绑定读取与固定集合不替换发布，并携带固定四平台原生闭包。
+
+### 新增
+
+- 新增 createFilesystemRootBinding 与 readFileBound，使用句柄相对不跟随符号链接获取，并支持可选字节摘要保护。
+- 新增稳定 fixed-set-publication 子路径，使用原生不替换发布并保留终态 indeterminate 回执。
+- 在既有 Quickstart dispatcher 中增加 validate-many-by-schema-id candidate 机制。
+
+### 变更
+
+- 身份保护删除继续排除，既有 21 项能力登记保持不变。
+
+### 升级说明
+
+三个 Foundation 包必须精确锁定 0.9.0。批量校验与 Quickstart Bundle 仍为 candidate；文件系统绑定与固定集合发布为 stable。
+<!-- release-skill:changelog:end version=0.9.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.8.4 locale=zh-CN baseline=sha256:e8d7be87a26ef296ee4ae27e2325ac8ff1dc33fc69e5f4a65520656f9860bb91 -->
 ## [0.8.4] - 2026-08-24
 

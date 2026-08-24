@@ -1,4 +1,4 @@
-import { canonicalJson, digestDocument, isRegisteredErrorCode } from "skill-family-contracts";
+import { canonicalJson, ContractsError, digestDocument, isRegisteredErrorCode } from "skill-family-contracts";
 import {
   QUICKSTART_PROTOCOL,
   findNonJsonValue,
@@ -452,6 +452,7 @@ export async function verifyHarnessSurfaceInventory({ root, inventory, detectors
 
 const FOUNDATION_MECHANISM_OPERATIONS = Object.freeze([
   "validate-by-schema-id",
+  "validate-many-by-schema-id",
   "canonical-json",
   "digest-document",
   "resource-closure",
@@ -518,7 +519,48 @@ async function invokeReadFileStrict(params) {
  * several Foundation modules directly. validateBySchemaId is injected only
  * by the trusted offline Bundle; callers cannot name arbitrary functions.
  */
-export async function invokeFoundationMechanism(request, { validateBySchemaId } = {}) {
+function assertBatchRequest(request) {
+  if (Object.keys(request).sort().join(",") !== "operation,params" ||
+      request.operation !== "validate-many-by-schema-id" ||
+      request.params === null || typeof request.params !== "object" || Array.isArray(request.params) ||
+      Object.keys(request.params).sort().join(",") !== "requests" ||
+      !Array.isArray(request.params.requests) || request.params.requests.length === 0) {
+    throw new TypeError("invokeFoundationMechanism: validate-many-by-schema-id request is malformed");
+  }
+  for (const item of request.params.requests) {
+    if (item === null || typeof item !== "object" || Array.isArray(item) ||
+        Object.keys(item).sort().join(",") !== "document,schemaId" ||
+        typeof item.schemaId !== "string" || item.schemaId.length === 0) {
+      throw new TypeError("invokeFoundationMechanism: validate-many-by-schema-id item is malformed");
+    }
+  }
+}
+
+function invokeValidationBatch(request, { validateBySchemaId, listValidatableSchemaIds } = {}) {
+  assertBatchRequest(request);
+  if (typeof validateBySchemaId !== "function" || typeof listValidatableSchemaIds !== "function") {
+    throw new TypeError("invokeFoundationMechanism: validate-many-by-schema-id requires the trusted Bundle validator index");
+  }
+  const schemaIds = listValidatableSchemaIds();
+  if (!Array.isArray(schemaIds) || schemaIds.some((schemaId) => typeof schemaId !== "string")) {
+    throw new TypeError("invokeFoundationMechanism: trusted Bundle validator index is unavailable");
+  }
+  const known = new Set(schemaIds);
+  for (const item of request.params.requests) {
+    if (!known.has(item.schemaId)) {
+      throw new ContractsError("SFC1002", `unknown schema $id: ${item.schemaId}`, { schemaId: item.schemaId });
+    }
+  }
+  return {
+    results: request.params.requests.map((item, inputIndex) => ({
+      inputIndex,
+      schemaId: item.schemaId,
+      result: validateBySchemaId(item.schemaId, item.document),
+    })),
+  };
+}
+
+export async function invokeFoundationMechanism(request, { validateBySchemaId, listValidatableSchemaIds } = {}) {
   if (request === null || typeof request !== "object" || Array.isArray(request)) {
     throw new TypeError("invokeFoundationMechanism: request must be an object");
   }
@@ -529,6 +571,9 @@ export async function invokeFoundationMechanism(request, { validateBySchemaId } 
   }
   if (params === null || typeof params !== "object" || Array.isArray(params)) {
     throw new TypeError("invokeFoundationMechanism: params must be an object");
+  }
+  if (operation === "validate-many-by-schema-id") {
+    return invokeValidationBatch(request, { validateBySchemaId, listValidatableSchemaIds });
   }
   if (operation === "validate-by-schema-id") {
     if (typeof validateBySchemaId !== "function") {

@@ -42,6 +42,7 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   WORKSPACE_DISPOSED: "workspace-disposed",
   CLOSURE_CONFLICT: "closure-conflict",
   UNSUPPORTED_POLICY: "unsupported-policy",
+  UNSUPPORTED_PLATFORM: "unsupported-platform",
   EXECUTION_FAILED: "execution-failed",
   INVALID_RESULT: "invalid-result",
   STORE_CLOSED: "store-closed",

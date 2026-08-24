@@ -4,23 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.8.4 -->
+<!-- release-skill:release-version: 0.9.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.8.4** (2026-08-24)
+**0.9.0** (2026-08-24)
 
-Lockstep Foundation 0.8.4 version update with no new Harness mechanism or public API.
+Harness 0.9.0 adds stable identity-bound reads and fixed-set no-replace publication with a fixed four-platform native closure.
+
+**Added**
+
+- Adds createFilesystemRootBinding and readFileBound with handle-relative no-follow acquisition and optional byte digest guarding.
+- Adds the stable fixed-set-publication subpath with native no-replace publication and terminal indeterminate receipts.
+- Adds the candidate validate-many-by-schema-id mechanism to the existing Quickstart dispatcher.
 
 **Changed**
 
-- Moves the package version to 0.8.4 together with Contracts and Engineering Kit.
-- Keeps all 21 Harness capabilities and public exports unchanged; source-authority receipt validation belongs to Contracts.
+- Keeps protected deletion excluded and preserves the existing 21-item capability registry.
 
 **Upgrade Notes**
 
-Consumers must pin all three Foundation packages to exactly 0.8.4. No Harness API migration is required.
+Pin Contracts, Harness, and Engineering Kit to exactly 0.9.0. Batch validation and the Quickstart Bundle remain candidate; filesystem binding and fixed-set publication are stable.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -34,14 +39,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.8.4
+npm install skill-family-harness-node@0.9.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.8.4
+// Run from an empty directory: npm install skill-family-harness-node@0.9.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
