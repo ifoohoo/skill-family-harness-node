@@ -4,28 +4,29 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.9.0 -->
+<!-- release-skill:release-version: 0.10.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.9.0** (2026-08-24)
+**0.10.0** (2026-08-24)
 
-Harness 0.9.0 adds stable identity-bound reads and fixed-set no-replace publication with a fixed four-platform native closure.
+Harness 0.10.0 adds canonical entrypoints, reuses existing host mechanisms, and adds read-only peer adapter verification from real directories.
 
 **Added**
 
-- Adds createFilesystemRootBinding and readFileBound with handle-relative no-follow acquisition and optional byte digest guarding.
-- Adds the stable fixed-set-publication subpath with native no-replace publication and terminal indeterminate receipts.
-- Adds the candidate validate-many-by-schema-id mechanism to the existing Quickstart dispatcher.
+- Adds skill-family-harness-node/quickstart-profile and skill-family-harness-node/rename-directory-no-replace canonical exports.
+- Reuses filesystem-root binding, strict no-replace publication, atomic replacement, and existing build digests for the Kit's local host install/update path.
+- Adds `verifyPeerAdapterDirectories`, which re-enumerates peer roots and verifies common closure, byte digests, standard manifests, and complete logical mappings without writing them.
 
 **Changed**
 
-- Keeps protected deletion excluded and preserves the existing 21-item capability registry.
+- Keeps each historical candidate export as a same-source migration alias and leaves the mechanism registry unchanged.
+- Keeps validate-many-by-schema-id and its error semantics unchanged while managed Bundles accept historical and canonical Schema IDs through the same validator.
 
 **Upgrade Notes**
 
-Pin Contracts, Harness, and Engineering Kit to exactly 0.9.0. Batch validation and the Quickstart Bundle remain candidate; filesystem binding and fixed-set publication are stable.
+Update all three exact pins to 0.10.0 and migrate historical candidate imports and Schema IDs once to canonical identities. The low-level no-replace primitive remains distinct from the stable fixed-set-publication API; choose the contract that matches the use case.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -39,14 +40,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.9.0
+npm install skill-family-harness-node@0.10.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.9.0
+// Run from an empty directory: npm install skill-family-harness-node@0.10.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -75,12 +76,12 @@ import {
   createQuickstartTask,
   wrapQuickstartResult,
   verifyQuickstartExchange,
-} from "skill-family-harness-node/candidate/quickstart-profile";
+} from "skill-family-harness-node/quickstart-profile";
 ```
 
 The v2 mechanism recomputes the bytes of every path-backed output and evidence Resource. It also rejects duplicate Resource ids, correlation drift, a changed Task digest, and incomplete or mismatched evidence bindings. It does not perform a domain audit, choose a method, retry work, or own lifecycle state.
 
-The subpath is public but **not stable** and may change or be removed in a later minor release. Pin exactly `0.4.0` for v2; integrations that still produce candidate v1 exchanges must stay pinned to exactly `0.2.1`.
+The capability remains **candidate**. Pin all three Foundation packages exactly while evaluating it. Version 0.10.0 adds the canonical path above; the historical `/candidate/quickstart-profile` path remains a same-source migration alias. Migrate once to the canonical path. A later stable promotion will not require another import or same-byte Bundle rebuild. Integrations that still produce candidate v1 exchanges must stay pinned to exactly `0.2.1`.
 
 ## Typical Use Cases
 
@@ -167,7 +168,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 ### Do not use when
 
 - You need to put file-selection business rules into the Foundation (business rules are owned by the caller).
-- You need host apply/install/update/uninstall, a full Qoder driver, or binary adapter source (explicitly unsupported).
+- You need host identity policy, host drivers, remote publication, uninstall deletion, a full Qoder driver, or binary adapter source (explicitly unsupported).
 - You need domain audit semantics, retry orchestration, or a compatibility-frozen Quickstart API.
 
 ### Capability selection
@@ -179,7 +180,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 - `foundation.harness.resource-closure`: deterministic resource closure and sha256 digest.
 - `foundation.harness.request-processing`: operation-request → terminal operation-result.
 - `foundation.harness.report`: report-model validation/render/binding/check.
-- `foundation.harness.host-adapter`: adapter source closure/build/materialize and version probe.
+- `foundation.harness.host-adapter`: adapter source closure/build/materialize, version probe, and read-only peer adapter verification.
 - `foundation.harness.state-store`: append-only events, hash chain, snapshots, and lock recovery.
 - `foundation.harness.errors`: mechanism error types and stable error classes.
 - `foundation.harness.quickstart-profile-candidate`: exact-version observation/task/result construction and binding verification.
@@ -208,16 +209,17 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 - Event meaning and reducer transitions remain consumer-owned; state-store only provides the base.
 - Only text adapter source (utf8) is supported; binary projection is not supported.
+- `verifyPeerAdapterDirectories` enumerates and reads two or more real peer roots, reuses bound-read/path containment/closure/manifest primitives, and fails closed on symlinks, escapes, byte drift, member drift, or incomplete mappings.
 
 ### Route elsewhere when
 
 - Business state machine / terminal states: route to loop-agent.
-- Host apply: explicitly unsupported.
+- Host identity policy, host drivers, and lifecycle authorization belong to Engineering Kit; Harness supplies only the reusable bound-read, strict-publication, atomic-write, closure, and probe mechanisms.
 - Domain audit semantics: route to a standalone audit consumer.
 
 ### Machine-readable sources
 
 - Public capability catalog: [`capability-catalog.json`](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json) (`foundation.harness.*` entries).
 - Package-local source: `src/*.mjs`.
-- Package-local candidate source: `candidate/quickstart-profile.mjs`; public import: `skill-family-harness-node/candidate/quickstart-profile`.
+- Package-local candidate source: `candidate/quickstart-profile.mjs`; canonical public import: `skill-family-harness-node/quickstart-profile`; historical migration alias: `skill-family-harness-node/candidate/quickstart-profile`.
 <!-- agent-quick-reference:end -->

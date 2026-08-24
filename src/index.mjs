@@ -148,6 +148,7 @@ export {
   materializeAdapterBuild,
   probeVersionVector,
 } from "./host.mjs";
+export { verifyPeerAdapterDirectories } from "./peer-adapter.mjs";
 
 // Deterministic report layer (FND-ADR-005): validate -> render -> bind -> check.
 // Pure functions only: no clock, no environment, no network, no model calls.

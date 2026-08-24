@@ -6,7 +6,7 @@ import {
   validateHarnessSurfaceDetectorDocument,
   validateHarnessSurfaceInventoryDocument,
   validateQuickstartProfileDocument,
-} from "skill-family-contracts/candidate/quickstart-profile";
+} from "skill-family-contracts/quickstart-profile";
 import { lstat, readdir, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

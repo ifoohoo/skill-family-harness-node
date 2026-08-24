@@ -5,28 +5,29 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.9.0 -->
+<!-- release-skill:release-version: 0.10.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.9.0** (2026-08-24)
+**0.10.0** (2026-08-24)
 
-Harness 0.9.0 新增稳定身份绑定读取与固定集合不替换发布，并携带固定四平台原生闭包。
+Harness 0.10.0 增加规范入口，复用既有宿主机制，并从真实目录提供同级适配器只读验证。
 
 **新增**
 
-- 新增 createFilesystemRootBinding 与 readFileBound，使用句柄相对不跟随符号链接获取，并支持可选字节摘要保护。
-- 新增稳定 fixed-set-publication 子路径，使用原生不替换发布并保留终态 indeterminate 回执。
-- 在既有 Quickstart dispatcher 中增加 validate-many-by-schema-id candidate 机制。
+- 新增 skill-family-harness-node/quickstart-profile 与 skill-family-harness-node/rename-directory-no-replace 规范导出。
+- 复用 filesystem-root binding、严格不替换发布、原子替换和既有构建摘要，支持 Kit 的本地宿主 install/update。
+- 新增 `verifyPeerAdapterDirectories`，重新枚举 peer 根目录，验证共同闭包、逐字节摘要、标准 manifest 和完整 logicalMappings，不写入目录。
 
 **变更**
 
-- 身份保护删除继续排除，既有 21 项能力登记保持不变。
+- 历史 candidate 导出继续作为同源迁移别名，机制登记表不变。
+- validate-many-by-schema-id 及错误语义不变；受管 Bundle 让历史与规范 Schema ID 共用同一 validator。
 
 **升级说明**
 
-三个 Foundation 包必须精确锁定 0.9.0。批量校验与 Quickstart Bundle 仍为 candidate；文件系统绑定与固定集合发布为 stable。
+消费者应把三个包的精确 pin 更新到 0.10.0，并把历史 candidate 导入和 Schema ID 一次迁移到规范身份。低层不替换原语仍不同于稳定 fixed-set-publication API，消费者按所需合同选择。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -40,14 +41,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.9.0
+npm install skill-family-harness-node@0.10.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.9.0
+// 从空目录运行：npm install skill-family-harness-node@0.10.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -76,12 +77,12 @@ import {
   createQuickstartTask,
   wrapQuickstartResult,
   verifyQuickstartExchange,
-} from "skill-family-harness-node/candidate/quickstart-profile";
+} from "skill-family-harness-node/quickstart-profile";
 ```
 
 v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字节摘要，并拒绝重复 Resource id、correlation 漂移、Task digest 变化，以及缺失或错配的 evidence binding。它不执行领域审计，不选择 method，不编排重试，也不拥有生命周期状态。
 
-该子路径公开但**不稳定**，后续小版本可以修改或移除。使用 v2 时应精确锁定 `0.4.0`；仍生产 candidate v1 交换的接入必须继续精确锁定 `0.2.1`。
+该能力仍是 **candidate**，评估时必须精确锁定三个 Foundation 包。0.10.0 新增上面的规范入口；历史 `/candidate/quickstart-profile` 入口作为同源迁移别名继续可用。消费者迁移一次后，未来晋升 stable 不再切入口或重建相同 Bundle。仍生产 candidate v1 交换的接入必须继续精确锁定 `0.2.1`。
 
 ## 典型使用场景
 
@@ -168,7 +169,7 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 ### Do not use when
 
 - 需要把文件选择的业务规则放入 Foundation（业务规则由调用方拥有）。
-- 需要 host apply/install/update/uninstall、Qoder 完整 driver 或二进制 adapter source（明确 unsupported）。
+- 需要宿主身份策略、宿主 driver、远端发布、删除式 uninstall、Qoder 完整 driver 或二进制 adapter source（明确 unsupported）。
 - 需要领域审计语义、重试编排或兼容性已冻结的 Quickstart API。
 
 ### Capability selection
@@ -213,12 +214,12 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 ### Route elsewhere when
 
 - 业务状态机/终态：转 loop-agent。
-- 宿主 apply：明确 unsupported。
+- 宿主身份策略、宿主 driver 和生命周期授权归 Engineering Kit；Harness 只提供可复用的绑定读取、严格发布、原子写、闭包和探测机制。
 - 领域审计语义：转独立审计消费者。
 
 ### Machine-readable sources
 
 - 公开能力目录：[`capability-catalog.json`](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json)（`foundation.harness.*` 条目）。
 - 包内源：`src/*.mjs`。
-- 包内 Candidate 源：`candidate/quickstart-profile.mjs`；公共导入：`skill-family-harness-node/candidate/quickstart-profile`。
+- 包内 Candidate 源：`candidate/quickstart-profile.mjs`；规范公共导入：`skill-family-harness-node/quickstart-profile`；历史迁移别名：`skill-family-harness-node/candidate/quickstart-profile`。
 <!-- agent-quick-reference:end -->

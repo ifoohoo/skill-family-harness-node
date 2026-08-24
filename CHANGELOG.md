@@ -1,5 +1,27 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.10.0 locale=en baseline=sha256:64a325d3e51604a8436b33df5a7f617f9aab1f1e02adb32ccb58316aa5c5eab1 -->
+## [0.10.0] - 2026-08-24
+
+Harness 0.10.0 adds canonical entrypoints, reuses existing host mechanisms, and adds read-only peer adapter verification from real directories.
+
+### Added
+
+- Adds skill-family-harness-node/quickstart-profile and skill-family-harness-node/rename-directory-no-replace canonical exports.
+- Reuses filesystem-root binding, strict no-replace publication, atomic replacement, and existing build digests for the Kit's local host install/update path.
+- Adds `verifyPeerAdapterDirectories`, which re-enumerates peer roots and verifies common closure, byte digests, standard manifests, and complete logical mappings without writing them.
+
+### Changed
+
+- Keeps each historical candidate export as a same-source migration alias and leaves the mechanism registry unchanged.
+- Keeps validate-many-by-schema-id and its error semantics unchanged while managed Bundles accept historical and canonical Schema IDs through the same validator.
+
+### Upgrade Notes
+
+Update all three exact pins to 0.10.0 and migrate historical candidate imports and Schema IDs once to canonical identities. The low-level no-replace primitive remains distinct from the stable fixed-set-publication API; choose the contract that matches the use case.
+<!-- release-skill:changelog:end version=0.10.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.9.0 locale=en baseline=sha256:e5f4e3bb6ab343e4ccfb7dcdbba8b9ab4576b4cf285c30bb3597d577be5eb391 -->
 ## [0.9.0] - 2026-08-24
 

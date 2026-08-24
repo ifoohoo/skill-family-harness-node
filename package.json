@@ -10,7 +10,7 @@
   "dependencies": {
     "@pnpm/lockfile.fs": "1001.1.35",
     "ipaddr.js": "2.5.0",
-    "skill-family-contracts": "0.9.0",
+    "skill-family-contracts": "0.10.0",
     "yaml": "2.9.0"
   },
   "description": "Thin Node.js mechanism runtime for Skill Family engineering contracts.",
@@ -22,7 +22,9 @@
     ".": "./src/index.mjs",
     "./candidate/quickstart-profile": "./candidate/quickstart-profile.mjs",
     "./candidate/rename-directory-no-replace": "./candidate/rename-directory-no-replace/rename-directory-no-replace.mjs",
-    "./fixed-set-publication": "./src/fixed-set-publication.mjs"
+    "./fixed-set-publication": "./src/fixed-set-publication.mjs",
+    "./quickstart-profile": "./candidate/quickstart-profile.mjs",
+    "./rename-directory-no-replace": "./candidate/rename-directory-no-replace/rename-directory-no-replace.mjs"
   },
   "files": [
     "src",
@@ -46,7 +48,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node.git"
   },
   "type": "module",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "scripts": {
     "check": "node --test",
     "test": "node --test"

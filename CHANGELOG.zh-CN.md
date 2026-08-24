@@ -1,5 +1,27 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.10.0 locale=zh-CN baseline=sha256:d8e27cce0c3e97b7d10b6f88fad4df66c8d527d3d6a2fb165f8c909612ff9f19 -->
+## [0.10.0] - 2026-08-24
+
+Harness 0.10.0 增加规范入口，复用既有宿主机制，并从真实目录提供同级适配器只读验证。
+
+### 新增
+
+- 新增 skill-family-harness-node/quickstart-profile 与 skill-family-harness-node/rename-directory-no-replace 规范导出。
+- 复用 filesystem-root binding、严格不替换发布、原子替换和既有构建摘要，支持 Kit 的本地宿主 install/update。
+- 新增 `verifyPeerAdapterDirectories`，重新枚举 peer 根目录，验证共同闭包、逐字节摘要、标准 manifest 和完整 logicalMappings，不写入目录。
+
+### 变更
+
+- 历史 candidate 导出继续作为同源迁移别名，机制登记表不变。
+- validate-many-by-schema-id 及错误语义不变；受管 Bundle 让历史与规范 Schema ID 共用同一 validator。
+
+### 升级说明
+
+消费者应把三个包的精确 pin 更新到 0.10.0，并把历史 candidate 导入和 Schema ID 一次迁移到规范身份。低层不替换原语仍不同于稳定 fixed-set-publication API，消费者按所需合同选择。
+<!-- release-skill:changelog:end version=0.10.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.9.0 locale=zh-CN baseline=sha256:7f3ff503831b8fb52f20293a4af4003ff116b7f9d820a0c2da1bd34a0b261248 -->
 ## [0.9.0] - 2026-08-24
 
