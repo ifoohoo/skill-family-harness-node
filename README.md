@@ -4,29 +4,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.10.0 -->
+<!-- release-skill:release-version: 0.11.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.10.0** (2026-08-24)
+**0.11.0** (2026-08-25)
 
-Harness 0.10.0 adds canonical entrypoints, reuses existing host mechanisms, and adds read-only peer adapter verification from real directories.
+Harness 0.11.0 adds raw-byte subprocess sinks and exposes the bound-read root identity needed by host verification.
 
 **Added**
 
-- Adds skill-family-harness-node/quickstart-profile and skill-family-harness-node/rename-directory-no-replace canonical exports.
-- Reuses filesystem-root binding, strict no-replace publication, atomic replacement, and existing build digests for the Kit's local host install/update path.
-- Adds `verifyPeerAdapterDirectories`, which re-enumerates peer roots and verifies common closure, byte digests, standard manifests, and complete logical mappings without writing them.
+- Extends superviseProcess with an exclusive, no-follow raw stdout/stderr sink that waits for stream close, queued writes, fsync, and close.
+- Keeps the existing bound-read mechanism as the only root and member read authority.
 
 **Changed**
 
-- Keeps each historical candidate export as a same-source migration alias and leaves the mechanism registry unchanged.
-- Keeps validate-many-by-schema-id and its error semantics unchanged while managed Bundles accept historical and canonical Schema IDs through the same validator.
+- Carries the previously prepared host Profile closure into the lockstep 0.11.0 family release.
 
 **Upgrade Notes**
 
-Update all three exact pins to 0.10.0 and migrate historical candidate imports and Schema IDs once to canonical identities. The low-level no-replace primitive remains distinct from the stable fixed-set-publication API; choose the contract that matches the use case.
+The raw sink is mechanism-only; it does not create a second process runner, receipt state machine, or host-specific policy. The caller must exclusively control the sink namespace for the whole call; handle protection does not prove stable pathname or root identity.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -35,19 +33,19 @@ Contracts defines "what should be", and the Harness turns that into "can be safe
 
 ## Core Mental Model
 
-The Harness consumes `skill-family-contracts` (a workspace dependency), reusing its dialect-routed Ajv validator, Kernel Protocol, frozen error codes, and fixtures; it does not copy protocol definitions or re-interpret the Schema. It only implements mechanisms: Schema validation, atomic writes, path containment, temporary workspaces, resource closure, the operation-request → operation-result pipeline, and business-neutral event logging with derived snapshots. Explicitly excluded: business semantics, task orchestration, Git writes, model calls, remote networking, and publish state. See `HARNESS_EXCLUSIONS`.
+The Harness consumes `skill-family-contracts` (a workspace dependency), reusing its dialect-routed Ajv validator, Kernel Protocol, frozen error codes, and fixtures; it does not copy protocol definitions or re-interpret the Schema. It only implements mechanisms: Schema validation, atomic writes, path containment, temporary workspaces, resource closure, bounded process supervision, the operation-request → operation-result pipeline, and business-neutral event logging with derived snapshots. Explicitly excluded: business semantics, task orchestration, Git writes, model calls, remote networking, and publish state. See `HARNESS_EXCLUSIONS`.
 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.10.0
+npm install skill-family-harness-node@0.11.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.10.0
+// Run from an empty directory: npm install skill-family-harness-node@0.11.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -107,6 +105,7 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | `writeFileAtomic` | Atomic write: leaves no half-written artifact on failure (temp file + fsync + rename). |
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | Auto-cleanup temporary workspace, cleaned up even on exception paths. |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | Resource closure and deterministic sha256 digest. |
+| `superviseProcess` / `validateTimeoutPolicy` | The single bounded subprocess supervisor. Its 0.11.0 `rawSink` option writes raw stdout/stderr bytes only to a fresh canonical private root, then waits for child/stream close, queued writes, fsync, and handle close. The caller must exclusively control the sink namespace for the entire call; handle protection does not prove stable pathname/root identity. |
 | `parseRequest` / `processRequest` | Parse `operation-request`, output terminal `operation-result`. |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | Consume a Contracts-validated report model, deterministically render neutral Markdown, and verify source/result/report binding; does not interpret business output. |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | Generic text-source closure, full-manifest digest re-verification, and atomic landing of the target set; specific Profile/driver is not in the Harness. |
@@ -144,7 +143,7 @@ Comparison is based on the canonical root after `realpath`, avoiding misjudgment
 
 ## Testing
 
-`node --test` covers: full Contracts fixture replay, security negative cases, atomic-failure paths, temporary workspaces, closure determinism, report fact binding and Markdown injection, host manifest/path/command trust, and state-store crashes, concurrency, corruption, fencing, explicit recovery, symlinks, hard links, and FIFO negative cases.
+`node --test` covers: full Contracts fixture replay, security negative cases, atomic-failure paths, temporary workspaces, closure determinism, raw sink delayed-stream and failure paths, report fact binding and Markdown injection, host manifest/path/command trust, and state-store crashes, concurrency, corruption, fencing, explicit recovery, symlinks, hard links, and FIFO negative cases.
 
 ## Troubleshooting
 
@@ -178,6 +177,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 - `foundation.harness.atomic-write`: atomic write within contained paths, rolling back on failure.
 - `foundation.harness.temporary-workspace`: auto-cleanup temporary workspace.
 - `foundation.harness.resource-closure`: deterministic resource closure and sha256 digest.
+- `foundation.harness.supervise-process`: one bounded subprocess supervisor; raw evidence capture remains mechanism-only and does not produce a receipt or domain verdict.
 - `foundation.harness.request-processing`: operation-request → terminal operation-result.
 - `foundation.harness.report`: report-model validation/render/binding/check.
 - `foundation.harness.host-adapter`: adapter source closure/build/materialize, version probe, and read-only peer adapter verification.

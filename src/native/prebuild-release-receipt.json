@@ -2,11 +2,39 @@
   "schemaVersion": 1,
   "kind": "skill-family.filesystem-bound-read-prebuild-release-receipt",
   "status": "stable",
-  "node": { "napi": 10 },
+  "node": {
+    "version": "v22.23.2",
+    "napi": 10
+  },
   "source": {
     "path": "packages/skill-family-harness-node/src/native/bound_read.c",
-    "sha256": "51caf9aca8b28170878244fdf4cfa3f2a181c585b6782eff38e82cb8dd208450"
+    "sha256": "58928393adc6921a399685446784efc7eead3987b99378ffd7ac23287d4ccf74"
   },
-  "manifestSha256": "bc944f9a41dbac91d0889967279710ad970acd378ca5809df1f41c31a43e3eb2",
-  "platforms": ["darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu"]
+  "buildRecipe": {
+    "path": "packages/skill-family-harness-node/src/native/binding.gyp",
+    "sha256": "1631420afe903b1978a856dbeadd37a655a704cd7ded9d1ab6696f87e1116d7f"
+  },
+  "manifestSha256": "1ded122cb8692d7ec6038bf79b11baaa330d94e3407cff159b9d94f61ee8337e",
+  "inputs": [
+    {
+      "platformKey": "darwin-arm64",
+      "platformReceiptSha256": "43a7f1ba15b9811f115bcd4868a8e63e79472731c8027d7744a6db04e69fb2e2",
+      "binarySha256": "edf0be6988f0c0d26ec03860e55d81be8ddf85fd82d29aba4ab6963bd58f9651"
+    },
+    {
+      "platformKey": "darwin-x64",
+      "platformReceiptSha256": "4f1db41cd657ddfdf3a10926f7372674b36072bb395ee7b3f2f2851b5b7c0b8d",
+      "binarySha256": "cf11633c8ea804a4c9af58eb205852d38eb6f49979bdad21abc93ba49184ac41"
+    },
+    {
+      "platformKey": "linux-arm64-gnu",
+      "platformReceiptSha256": "f024e7f765ffcd8162fc2d7accc60806a337ff7945315dbbaf2609bdea87001a",
+      "binarySha256": "577db2c4b200ecddf0e5807034a57afa0f4d98fd6ee7cdbaeb358f3ff05313ae"
+    },
+    {
+      "platformKey": "linux-x64-gnu",
+      "platformReceiptSha256": "aca0b64b4943dfdae39a2870d75a745088694a84f27b7ceafbfded4234a5fb73",
+      "binarySha256": "f12ed96d4b5a338d87232a074b5d95117d81c5fdeb31f79c664a93c17f28a809"
+    }
+  ]
 }

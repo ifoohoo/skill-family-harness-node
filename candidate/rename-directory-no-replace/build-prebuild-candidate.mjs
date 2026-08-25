@@ -16,6 +16,7 @@ import {
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { run as runReceiptAssembler } from "../../src/native/receipt-assembler-core.mjs";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const SOURCE = path.join(ROOT, "addon", "rename_directory_no_replace.c");
@@ -128,60 +129,35 @@ function replaceManaged(outputRoot, stage, names) {
 }
 
 export function assemble(argv) {
-  const args = parseArgs(argv);
-  const sourceSha = sha256(readFileSync(SOURCE));
-  const inputs = [];
-  for (const key of KEYS) {
-    const receiptPath = path.resolve(args.get(`${key}-receipt`));
-    const binaryPath = path.resolve(args.get(`${key}-binary`));
-    const receipt = readJson(receiptPath);
-    const facts = receiptFacts(key, receipt.document);
-    if (facts.sourceSha !== sourceSha) throw new Error(`${key}: receipt source SHA与current native source不匹配`);
-    verifyBinary(key, binaryPath, facts);
-    inputs.push({ key, receiptSha: receipt.sha256, binaryPath, ...facts });
-  }
-  if (new Set(inputs.map((entry) => entry.sourceSha)).size !== 1) throw new Error("四份receipt的native source SHA不一致");
-
-  const outputRoot = path.resolve(args.get("output-root"));
-  const stage = mkdtempSync(path.join(path.dirname(outputRoot), ".native-prebuild-stage-"));
-  const entries = [];
-  try {
-    for (const input of inputs) {
-      const filename = `rename_directory_no_replace.${input.key}.node`;
-      const relative = `prebuilds/${input.key}/${filename}`;
-      const destination = path.join(stage, relative);
-      mkdirSync(path.dirname(destination), { recursive: true });
-      copyFileSync(input.binaryPath, destination);
-      chmodSync(destination, MODE);
-      entries.push({ platformKey: input.key, ...CONFIG[input.key], binary: relative, mode: MODE, sha256: input.binarySha, napi: Number(NAPI), exports: EXPORTS });
-    }
-    const manifest = { schemaVersion: 2, kind: "skill-family.rename-directory-no-replace-prebuild-manifest", status: "candidate", entries };
-    const sbom = {
+  return runReceiptAssembler({
+    keys: KEYS,
+    platforms: CONFIG,
+    sourceFile: SOURCE,
+    mode: MODE,
+    napi: NAPI,
+    exports: EXPORTS,
+    binaryName: (key) => `rename_directory_no_replace.${key}.node`,
+    extractFacts: (key, receipt) => receiptFacts(key, receipt),
+    manifestDoc: (entries) => ({ schemaVersion: 2, kind: "skill-family.rename-directory-no-replace-prebuild-manifest", status: "candidate", entries }),
+    sbomDoc: (sourceSha, entries) => ({
       schemaVersion: 1,
       kind: "skill-family.rename-directory-no-replace-prebuild-sbom",
       status: "candidate",
       source: { path: EXPECTED_SOURCE, sha256: sourceSha },
       files: entries.map(({ platformKey, binary, sha256: digest }) => ({ platformKey, binary, sha256: digest, license: "Apache-2.0" })),
-    };
-    const releaseReceipt = {
+    }),
+    releaseReceiptDoc: ({ inputs, sourceSha, manifestSha }) => ({
       schemaVersion: 1,
       kind: "skill-family.rename-directory-no-replace-prebuild-release-receipt",
       status: "candidate",
       node: { version: NODE_VERSION, napi: Number(NAPI) },
       source: { path: EXPECTED_SOURCE, sha256: sourceSha },
-      manifestSha256: sha256(Buffer.from(canonical(manifest))),
+      manifestSha256: manifestSha,
       inputs: inputs.map(({ key, receiptSha, binarySha }) => ({ platformKey: key, platformReceiptSha256: receiptSha, binarySha256: binarySha })),
-    };
-    writeFileSync(path.join(stage, "prebuild-manifest.json"), canonical(manifest));
-    writeFileSync(path.join(stage, "prebuild-sbom.json"), canonical(sbom));
-    writeFileSync(path.join(stage, "prebuild-release-receipt.json"), canonical(releaseReceipt));
-    writeFileSync(path.join(stage, "NOTICE"), "Skill Family Foundation rename-directory-no-replace candidate prebuilds\nCompiled from the Apache-2.0 source identified in prebuild-sbom.json.\nNo fallback implementation or stable-registry activation is included.\n");
-    const managed = ["prebuilds", "prebuild-manifest.json", "prebuild-sbom.json", "prebuild-release-receipt.json", "NOTICE"];
-    replaceManaged(outputRoot, stage, managed);
-    return releaseReceipt;
-  } finally {
-    rmSync(stage, { recursive: true, force: true });
-  }
+    }),
+    noticeText: "Skill Family Foundation rename-directory-no-replace candidate prebuilds\nCompiled from the Apache-2.0 source identified in prebuild-sbom.json.\nNo fallback implementation or stable-registry activation is included.\n",
+    managedNames: ["prebuilds", "prebuild-manifest.json", "prebuild-sbom.json", "prebuild-release-receipt.json", "NOTICE"],
+  }, argv);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

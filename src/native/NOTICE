@@ -1,3 +1,2 @@
-Skill Family Foundation stable filesystem native prebuilds (bound-read and fixed-set publication).
-Compiled from the Apache-2.0 source identified in prebuild-sbom.json.
-The closure contains no JavaScript fallback and no candidate entry-point dependency.
+Skill Family Foundation filesystem bound-read stable prebuilds
+Generated only from four verified platform receipts.

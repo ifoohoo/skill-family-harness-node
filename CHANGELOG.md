@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.11.0 locale=en baseline=sha256:e20f505e42ba45865bfee38a6c83671006bf20148d5d4e421ff7f443bcce260b -->
+## [0.11.0] - 2026-08-25
+
+Harness 0.11.0 adds raw-byte subprocess sinks and exposes the bound-read root identity needed by host verification.
+
+### Added
+
+- Extends superviseProcess with an exclusive, no-follow raw stdout/stderr sink that waits for stream close, queued writes, fsync, and close.
+- Keeps the existing bound-read mechanism as the only root and member read authority.
+
+### Changed
+
+- Carries the previously prepared host Profile closure into the lockstep 0.11.0 family release.
+
+### Upgrade Notes
+
+The raw sink is mechanism-only; it does not create a second process runner, receipt state machine, or host-specific policy. The caller must exclusively control the sink namespace for the whole call; handle protection does not prove stable pathname or root identity.
+<!-- release-skill:changelog:end version=0.11.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.10.0 locale=en baseline=sha256:64a325d3e51604a8436b33df5a7f617f9aab1f1e02adb32ccb58316aa5c5eab1 -->
 ## [0.10.0] - 2026-08-24
 

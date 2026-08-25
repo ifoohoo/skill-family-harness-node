@@ -38,7 +38,9 @@
  */
 
 import { spawn as nodeSpawn } from "node:child_process";
-import { existsSync, readFileSync, statSync, writeFileSync, renameSync } from "node:fs";
+import { constants as FS_CONSTANTS, existsSync, readFileSync, statSync, writeFileSync, renameSync } from "node:fs";
+import { open as openFile, readdir, realpath, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { mechanismError } from "./errors.mjs";
 
@@ -162,7 +164,7 @@ function validateOptions(options) {
   const {
     command, args, cwd, env,
     timeoutPolicy, progressPaths, terminalProgressPaths, terminalGraceSeconds,
-    checkIntervalSeconds, longToolActive, budgetExhausted, evidencePath,
+    checkIntervalSeconds, longToolActive, budgetExhausted, evidencePath, rawSink, rawStreamSink,
   } = options;
   if (typeof command !== "string" || command.length === 0) {
     throw new TypeError("superviseProcess: command must be a non-empty string");
@@ -209,10 +211,142 @@ function validateOptions(options) {
   if (evidencePath !== undefined && typeof evidencePath !== "string") {
     throw new TypeError("superviseProcess: evidencePath must be a string when provided");
   }
+  if (rawStreamSink !== undefined) {
+    throw new TypeError(
+      "superviseProcess: rawStreamSink is not supported (rawSink requires a fresh canonical root and two relative file names)",
+    );
+  }
+  if (rawSink !== undefined) {
+    const problem = validateRawSink(rawSink);
+    if (problem) throw new TypeError(`superviseProcess: ${problem}`);
+  }
   const policyProblem = validateTimeoutPolicy(timeoutPolicy);
   if (policyProblem) {
     throw mechanismError("timeout-policy-invalid", policyProblem);
   }
+}
+
+const RAW_SINK_FIELDS = Object.freeze(["root", "stdoutFile", "stderrFile", "onClosed"]);
+
+function validateSingleSegmentName(value, field) {
+  if (typeof value !== "string" || value.length === 0) return `${field} must be a non-empty string`;
+  if (value.includes("\0") || value.includes("/") || value.includes("\\")) {
+    return `${field} must be a single-segment relative name`;
+  }
+  if (value === "." || value === "..") return `${field} must be a safe relative name`;
+  if (/^[A-Za-z]:/u.test(value)) return `${field} must be a safe relative name`;
+  return null;
+}
+
+/**
+ * The sink shape is closed: one fresh canonical root plus two distinct
+ * single-segment relative file names. Absolute or nested paths are rejected
+ * here (shape violation); canonicality and freshness of the root are state
+ * checks performed at open time.
+ */
+function validateRawSink(sink) {
+  if (!isPlainObject(sink)) return "rawSink must be a plain object";
+  for (const field of Object.keys(sink)) {
+    if (!RAW_SINK_FIELDS.includes(field)) {
+      return `rawSink unknown field ${field} (closed field set: ${RAW_SINK_FIELDS.join(", ")})`;
+    }
+  }
+  if (typeof sink.root !== "string" || sink.root.length === 0 || !path.isAbsolute(sink.root) || sink.root.includes("\0") || path.normalize(sink.root) !== sink.root) {
+    return "rawSink root must be a normalized absolute path";
+  }
+  for (const field of ["stdoutFile", "stderrFile"]) {
+    const problem = validateSingleSegmentName(sink[field], `rawSink ${field}`);
+    if (problem) return problem;
+  }
+  if (sink.stdoutFile === sink.stderrFile) {
+    return "rawSink stdoutFile and stderrFile must be different names";
+  }
+  if (sink.onClosed !== undefined && typeof sink.onClosed !== "function") {
+    return "rawSink onClosed must be a function when provided";
+  }
+  return null;
+}
+
+/**
+ * Prepares the sink root: it must already be its canonical realpath, a real
+ * directory, and fresh (empty). The captured identity (device/inode/mode) is
+ * re-verified after every sink open, mirroring the root-binding containment
+ * the harness applies to bound reads and exclusive publications.
+ */
+async function captureRawSinkRoot(root) {
+  let canonical;
+  try {
+    canonical = await realpath(root);
+  } catch (cause) {
+    throw new Error(`raw sink root must exist and be canonical: ${cause?.code ?? cause?.message ?? "unknown"}`);
+  }
+  if (canonical !== root) throw new Error("raw sink root must already be its canonical realpath");
+  let info;
+  try {
+    info = await stat(root);
+  } catch (cause) {
+    throw new Error(`raw sink root cannot be inspected: ${cause?.code ?? cause?.message ?? "unknown"}`);
+  }
+  if (!info.isDirectory()) throw new Error("raw sink root must be a directory");
+  if ((await readdir(root)).length !== 0) throw new Error("raw sink root must be fresh (empty)");
+  return { canonical, identity: { dev: info.dev, ino: info.ino, mode: info.mode } };
+}
+
+async function openRawSinkFile(captured, filename) {
+  const flags = FS_CONSTANTS.O_WRONLY | FS_CONSTANTS.O_CREAT | FS_CONSTANTS.O_EXCL |
+    (FS_CONSTANTS.O_NOFOLLOW ?? 0) | (FS_CONSTANTS.O_CLOEXEC ?? 0);
+  const handle = await openFile(path.join(captured.canonical, filename), flags, 0o600);
+  try {
+    const info = await stat(captured.canonical);
+    if (info.dev !== captured.identity.dev || info.ino !== captured.identity.ino || info.mode !== captured.identity.mode) {
+      throw new Error("raw sink root changed while opening sink files");
+    }
+  } catch (error) {
+    await handle.close().catch(() => {});
+    throw error;
+  }
+  return handle;
+}
+
+function makeRawStreamState(handle) {
+  return { handle, hash: createHash("sha256"), bytes: 0, queue: Promise.resolve(), closed: false };
+}
+
+function enqueueRawChunk(state, chunk) {
+  const bytes = Buffer.from(chunk);
+  state.hash.update(bytes);
+  state.bytes += bytes.length;
+  state.queue = state.queue.then(() => state.handle.write(bytes));
+  return state.queue;
+}
+
+async function closeRawStreamState(state) {
+  if (state.closed) return;
+  state.closed = true;
+  // A failed write or fsync must not skip the close attempt.  Preserve the
+  // first failure for the caller, but make every later durability/close step
+  // best-effort so a FileHandle never becomes a GC-cleanup leak.
+  let primary = null;
+  try {
+    await state.queue;
+  } catch (error) {
+    primary = error;
+  }
+  try {
+    await state.handle.sync();
+  } catch (error) {
+    primary ??= error;
+  }
+  try {
+    await state.handle.close();
+  } catch (error) {
+    primary ??= error;
+  }
+  if (primary !== null) throw primary;
+}
+
+function rawStreamSummary(state) {
+  return { sha256: state.hash.digest("hex"), bytes: state.bytes, sensitivity: "private" };
 }
 
 // ---------------------------------------------------------------------------
@@ -509,6 +643,14 @@ function buildEnvelope({
  * @param {string} [options.evidencePath] - optional persistence of the
  *   supervision trace (started_at + cadence at spawn, per forensics) and the
  *   final envelope (atomic replace; write failure fails closed).
+ * @param {object} [options.rawSink] - optional raw-byte sink
+ *   (FND-DES-012 section 6): { root, stdoutFile, stderrFile, onClosed? }
+ *   where root must be a fresh (empty) directory that already is its
+ *   canonical realpath, and the two file names must be distinct
+ *   single-segment relative names. Both files are opened
+ *   exclusive/no-follow with mode 0600 before spawn, and closed only after
+ *   child close, both stream closes, every queued write, fsync and handle
+ *   close. onClosed receives the frozen { stdout, stderr } summaries.
  * @param {object} [deps] - injected dependencies for deterministic tests.
  * @returns {Promise<object>} exactly one watchdog-termination-envelope.
  * @throws {TypeError} on option shape violations (programming errors).
@@ -536,6 +678,29 @@ export async function superviseProcess(options, deps = {}) {
     budgetExhausted,
     evidencePath,
   } = options;
+  const sink = options.rawSink ?? null;
+  let rawStreams = null;
+  if (sink !== null) {
+    try {
+      const captured = await captureRawSinkRoot(sink.root);
+      const stdoutHandle = await openRawSinkFile(captured, sink.stdoutFile);
+      let stderrHandle;
+      try {
+        stderrHandle = await openRawSinkFile(captured, sink.stderrFile);
+      } catch (error) {
+        await stdoutHandle.close().catch(() => {});
+        throw error;
+      }
+      rawStreams = {
+        stdout: makeRawStreamState(stdoutHandle),
+        stderr: makeRawStreamState(stderrHandle),
+      };
+    } catch (error) {
+      if (rawStreams?.stdout) await closeRawStreamState(rawStreams.stdout).catch(() => {});
+      if (rawStreams?.stderr) await closeRawStreamState(rawStreams.stderr).catch(() => {});
+      throw mechanismError("supervise-process-failed", "failed to open raw stream sink", { causeMessage: error.message });
+    }
+  }
 
   const startedAtMs = d.nowMs();
   const intervalMs = Math.max(1, checkIntervalSeconds * 1000);
@@ -567,6 +732,15 @@ export async function superviseProcess(options, deps = {}) {
         ),
       );
     } catch (error) {
+      // Trace persistence happens after both exclusive sink handles opened
+      // but before spawn.  The trace error is primary; all opened handles
+      // still have to be closed before this fail-closed rejection escapes.
+      if (rawStreams !== null) {
+        await Promise.allSettled([
+          closeRawStreamState(rawStreams.stdout),
+          closeRawStreamState(rawStreams.stderr),
+        ]);
+      }
       throw mechanismError(
         "supervise-process-failed",
         `failed to persist the supervision trace at ${evidencePath}`,
@@ -584,6 +758,7 @@ export async function superviseProcess(options, deps = {}) {
     everSeenLive: false,
     residualGroupCleanupCompleted: undefined,
     watchdogSignalSucceeded: false,
+    finalizing: false,
   };
   const signalSequence = [];
   let interval = null;
@@ -600,6 +775,16 @@ export async function superviseProcess(options, deps = {}) {
     rejectLifecycle = reject;
   });
 
+  // Close-state tracking is initialized before spawn so a synchronous spawn
+  // failure can still complete the sink close path deterministically (no
+  // child or streams ever exist in that path).
+  let resolveChildClosed;
+  let resolveStdoutClosed;
+  let resolveStderrClosed;
+  const childClosed = new Promise((resolve) => { resolveChildClosed = resolve; });
+  const stdoutClosed = new Promise((resolve) => { resolveStdoutClosed = resolve; });
+  const stderrClosed = new Promise((resolve) => { resolveStderrClosed = resolve; });
+
   let child;
   try {
     child = d.spawn(command, args, {
@@ -609,9 +794,16 @@ export async function superviseProcess(options, deps = {}) {
       stdio: ["ignore", "pipe", "pipe"],
     });
   } catch (spawnError) {
-    return finalizeSpawnFailure(spawnError);
+    return finalizeSpawnFailure(spawnError, { noChild: true });
   }
   const processGroupId = d.platform !== "win32" ? child.pid : undefined;
+  if (rawStreams) {
+    child.on("close", () => resolveChildClosed());
+    if (child.stdout) child.stdout.on("close", () => resolveStdoutClosed());
+    else resolveStdoutClosed();
+    if (child.stderr) child.stderr.on("close", () => resolveStderrClosed());
+    else resolveStderrClosed();
+  }
 
   function finishLifecycle(result) {
     if (lifecycle.phase === "finished") return;
@@ -624,6 +816,29 @@ export async function superviseProcess(options, deps = {}) {
       rejectLifecycle(result);
     } else {
       resolveLifecycle(result);
+    }
+  }
+
+  async function closeRawStreams() {
+    if (!rawStreams) return;
+    // Ordered durability: the child must be fully closed (which implies both
+    // stdio streams closed), then each sink's queued writes must complete,
+    // then each sink is fsynced and closed before the consumer callback.
+    await Promise.all([childClosed, stdoutClosed, stderrClosed]);
+    // Do not let a first sink error return before the other already-open
+    // handle has reached its own close attempt.  The stdout result remains
+    // the deterministic primary when both paths fail.
+    const closed = await Promise.allSettled([
+      closeRawStreamState(rawStreams.stdout),
+      closeRawStreamState(rawStreams.stderr),
+    ]);
+    const primary = closed.find((outcome) => outcome.status === "rejected");
+    if (primary) throw primary.reason;
+    if (typeof sink.onClosed === "function") {
+      await sink.onClosed(Object.freeze({
+        stdout: rawStreamSummary(rawStreams.stdout),
+        stderr: rawStreamSummary(rawStreams.stderr),
+      }));
     }
   }
 
@@ -730,6 +945,13 @@ export async function superviseProcess(options, deps = {}) {
   }
 
   async function finalize() {
+    if (lifecycle.finalizing) return;
+    lifecycle.finalizing = true;
+    try {
+      await closeRawStreams();
+    } catch (error) {
+      lifecycle.runtimeError = error;
+    }
     const envelope = assembleEnvelope();
     if (lifecycle.runtimeError !== null) {
       // Internal mechanism failure: persist the evidence when possible,
@@ -759,7 +981,15 @@ export async function superviseProcess(options, deps = {}) {
     finishLifecycle(envelope);
   }
 
-  function finalizeSpawnFailure(spawnError) {
+  async function finalizeSpawnFailure(spawnError, { noChild = false } = {}) {
+    if (noChild) {
+      // No child object exists (synchronous spawn failure): close-state
+      // tracking resolves immediately so the sink close path completes
+      // deterministically and the caller still receives the envelope.
+      resolveChildClosed();
+      resolveStdoutClosed();
+      resolveStderrClosed();
+    }
     const envelope = buildEnvelope({
       startedAtMs,
       finishedAtMs: d.nowMs(),
@@ -782,6 +1012,18 @@ export async function superviseProcess(options, deps = {}) {
       checkIntervalSeconds,
       isoNow: d.isoNow,
     });
+    try {
+      await closeRawStreams();
+    } catch (error) {
+      throw mechanismError("supervise-process-failed", "failed to close the raw stream sink after spawn failure", {
+        causeMessage: error.message,
+        watchdogReason: envelope.watchdogReason,
+        terminationReason: envelope.terminationReason,
+        exitStatus: envelope.exitStatus,
+        processStatus: envelope.processStatus,
+        evidence: envelope.evidence,
+      });
+    }
     return persistFinalEnvelope(envelope);
   }
 
@@ -1024,6 +1266,12 @@ export async function superviseProcess(options, deps = {}) {
   });
   child.stderr?.on("data", () => {
     lastStreamActivityAtMs = d.nowMs();
+  });
+  child.stdout?.on("data", (chunk) => {
+    if (rawStreams) void enqueueRawChunk(rawStreams.stdout, chunk).catch((error) => { lifecycle.runtimeError = error; });
+  });
+  child.stderr?.on("data", (chunk) => {
+    if (rawStreams) void enqueueRawChunk(rawStreams.stderr, chunk).catch((error) => { lifecycle.runtimeError = error; });
   });
   child.on("exit", (code, signalCode) => {
     lifecycle.leaderResult = { code, signalCode };

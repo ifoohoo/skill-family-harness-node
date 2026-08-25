@@ -5,29 +5,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.10.0 -->
+<!-- release-skill:release-version: 0.11.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.10.0** (2026-08-24)
+**0.11.0** (2026-08-25)
 
-Harness 0.10.0 增加规范入口，复用既有宿主机制，并从真实目录提供同级适配器只读验证。
+Harness 0.11.0 增加原始字节子进程输出 sink，并暴露真实宿主验证所需的受保护根身份。
 
 **新增**
 
-- 新增 skill-family-harness-node/quickstart-profile 与 skill-family-harness-node/rename-directory-no-replace 规范导出。
-- 复用 filesystem-root binding、严格不替换发布、原子替换和既有构建摘要，支持 Kit 的本地宿主 install/update。
-- 新增 `verifyPeerAdapterDirectories`，重新枚举 peer 根目录，验证共同闭包、逐字节摘要、标准 manifest 和完整 logicalMappings，不写入目录。
+- 为 superviseProcess 增加独占、禁止跟随符号链接的 stdout/stderr 原始字节 sink，并等待流关闭、排队写入、fsync 与 close。
+- 继续把既有 bound-read 机制作为唯一根目录与成员读取权威。
 
 **变更**
 
-- 历史 candidate 导出继续作为同源迁移别名，机制登记表不变。
-- validate-many-by-schema-id 及错误语义不变；受管 Bundle 让历史与规范 Schema ID 共用同一 validator。
+- 把此前准备好的宿主 Profile 闭包并入 0.11.0 三包锁步交付。
 
 **升级说明**
 
-消费者应把三个包的精确 pin 更新到 0.10.0，并把历史 candidate 导入和 Schema ID 一次迁移到规范身份。低层不替换原语仍不同于稳定 fixed-set-publication API，消费者按所需合同选择。
+原始 sink 只提供机制，不建立第二个进程 runner、收据状态机或宿主专属策略。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -41,14 +39,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.10.0
+npm install skill-family-harness-node@0.11.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.10.0
+// 从空目录运行：npm install skill-family-harness-node@0.11.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -108,6 +106,7 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 | `writeFileAtomic` | 原子写：失败不留半成品（临时文件 + fsync + rename）。 |
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | 自动清理的临时工作区，异常路径也清理。 |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | 资源闭包与确定性 sha256 摘要。 |
+| `superviseProcess` / `validateTimeoutPolicy` | 唯一的受约束子进程监督器。0.11.0 的 `rawSink` 只向 fresh canonical 私有根写原始 stdout/stderr 字节，并等待子进程、流、排队写入、fsync 与句柄全部关闭。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。 |
 | `parseRequest` / `processRequest` | 解析 `operation-request`，输出终态 `operation-result`。 |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | 消费经 Contracts 验证的 report model，确定性渲染中性 Markdown 并校验来源/结果/报告绑定；不解释业务输出。 |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | 通用文本 source closure、manifest 全摘要复验和目标集合原子落盘；具体 Profile/driver 不在 Harness。 |
@@ -179,6 +178,7 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 - `foundation.harness.atomic-write`：受收容路径内原子写，失败回滚。
 - `foundation.harness.temporary-workspace`：自动清理的临时工作区。
 - `foundation.harness.resource-closure`：确定性资源闭包与 sha256 摘要。
+- `foundation.harness.supervise-process`：监督一个有界子进程；原始证据收集仍只提供机制，不产生收据或领域结论。
 - `foundation.harness.request-processing`：operation-request → 终态 operation-result。
 - `foundation.harness.report`：report-model 校验/渲染/绑定/检查。
 - `foundation.harness.host-adapter`：adapter source closure/build/materialize 与版本探测。

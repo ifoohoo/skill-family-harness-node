@@ -47,14 +47,54 @@ static napi_value throw_last(napi_env env, const char *message) {
   return NULL;
 }
 
-static napi_value errno_result(napi_env env, int code) {
+static napi_value set_string(napi_env env, napi_value object, const char *name, const char *value);
+
+/* Failure reasons are the only closed internal set the JS layer may branch
+ * on: the five member-policy reasons prove a static member violation under a
+ * stable root; every other native fault (permission, allocation, read, …)
+ * collapses to "native-io". `errorCode` stays purely diagnostic and must not
+ * decide public disposition. */
+static napi_value failure_result(napi_env env, int code, const char *failure_reason, const struct stat *root_stat) {
   napi_value result, value;
+  char decimal[64];
   NAPI_OK(napi_create_object(env, &result), "cannot create native result");
   NAPI_OK(napi_create_int32(env, code, &value), "cannot encode native error");
   NAPI_OK(napi_set_named_property(env, result, "errorCode", value), "cannot set native error");
   NAPI_OK(napi_get_boolean(env, false, &value), "cannot encode native status");
   NAPI_OK(napi_set_named_property(env, result, "ok", value), "cannot set native status");
+  if (failure_reason != NULL) {
+    if (set_string(env, result, "failureReason", failure_reason) == NULL) return NULL;
+  }
+  if (root_stat == NULL) return result;
+  snprintf(decimal, sizeof(decimal), "%llu", (unsigned long long)root_stat->st_dev);
+  if (set_string(env, result, "rootDevice", decimal) == NULL) return NULL;
+  snprintf(decimal, sizeof(decimal), "%llu", (unsigned long long)root_stat->st_ino);
+  if (set_string(env, result, "rootInode", decimal) == NULL) return NULL;
+  if (napi_create_int64(env, (int64_t)(root_stat->st_mode & 0777), &value) != napi_ok ||
+      napi_set_named_property(env, result, "rootMode", value) != napi_ok) {
+    napi_throw_error(env, NULL, "cannot encode native root identity");
+    return NULL;
+  }
   return result;
+}
+
+static const char *intermediate_failure_reason(int code) {
+  if (code == ELOOP || code == ENOTDIR) return "intermediate-not-real-directory";
+  if (code == ENOENT) return "member-missing";
+  return "native-io";
+}
+
+static const char *leaf_open_failure_reason(int code) {
+  if (code == ELOOP) return "leaf-symbolic-link";
+  if (code == ENOENT) return "member-missing";
+  return "native-io";
+}
+
+/* Closes the walk fds exactly once: current_fd aliases root_fd until the
+ * first intermediate directory is opened, so it is skipped in that case. */
+static void close_walk_fds(int root_fd, int current_fd) {
+  if (current_fd >= 0 && current_fd != root_fd) close(current_fd);
+  if (root_fd >= 0) close(root_fd);
 }
 
 static int read_string(napi_env env, napi_value value, char *buffer, size_t capacity, const char *message) {
@@ -91,11 +131,12 @@ static napi_value set_string(napi_env env, napi_value object, const char *name, 
 
 static napi_value ReadFileBoundNative(napi_env env, napi_callback_info info) {
   size_t argc = 2;
-  napi_value argv[2], result, value, segments;
+  napi_value argv[2], result, value;
   char root[PATH_MAX];
   napi_valuetype type;
   int root_fd = -1;
   int current_fd = -1;
+  int leaf_fd = -1;
   struct stat root_stat;
   struct stat leaf_stat;
   unsigned char *bytes = NULL;
@@ -121,52 +162,87 @@ static napi_value ReadFileBoundNative(napi_env env, napi_callback_info info) {
   }
 
   root_fd = open(root, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
-  if (root_fd < 0) return errno_result(env, errno);
-  if (fstat(root_fd, &root_stat) != 0) { int code = errno; close(root_fd); return errno_result(env, code); }
-  if (!S_ISDIR(root_stat.st_mode)) { close(root_fd); return errno_result(env, ENOTDIR); }
+  if (root_fd < 0) return failure_result(env, errno, "native-io", NULL);
+  if (fstat(root_fd, &root_stat) != 0) {
+    int code = errno;
+    close(root_fd);
+    return failure_result(env, code, "native-io", NULL);
+  }
+  if (!S_ISDIR(root_stat.st_mode)) {
+    close(root_fd);
+    return failure_result(env, ENOTDIR, "native-io", NULL);
+  }
   current_fd = root_fd;
 
   for (uint32_t index = 0; index + 1 < segment_count; index += 1) {
     napi_value segment_value;
     char segment[NAME_MAX + 1];
-    NAPI_OK(napi_get_element(env, argv[1], index, &segment_value), "cannot inspect path segment");
-    if (!read_segment(env, segment_value, segment)) { close(current_fd); return NULL; }
+    if (napi_get_element(env, argv[1], index, &segment_value) != napi_ok) {
+      napi_throw_error(env, NULL, "cannot inspect path segment");
+      close_walk_fds(root_fd, current_fd);
+      return NULL;
+    }
+    if (!read_segment(env, segment_value, segment)) { close_walk_fds(root_fd, current_fd); return NULL; }
     int next_fd = openat(current_fd, segment, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
-    if (next_fd < 0) { int code = errno; close(current_fd); return errno_result(env, code); }
+    if (next_fd < 0) {
+      int code = errno;
+      close_walk_fds(root_fd, current_fd);
+      return failure_result(env, code, intermediate_failure_reason(code), &root_stat);
+    }
     if (current_fd != root_fd) close(current_fd);
     current_fd = next_fd;
   }
 
   napi_value leaf_value;
   char leaf[NAME_MAX + 1];
-  NAPI_OK(napi_get_element(env, argv[1], segment_count - 1, &leaf_value), "cannot inspect leaf segment");
-  if (!read_segment(env, leaf_value, leaf)) { close(current_fd); return NULL; }
-  int leaf_fd = openat(current_fd, leaf, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
-  if (leaf_fd < 0) { int code = errno; close(current_fd); return errno_result(env, code); }
-  if (fstat(leaf_fd, &leaf_stat) != 0) { int code = errno; close(leaf_fd); close(current_fd); return errno_result(env, code); }
-  if (!S_ISREG(leaf_stat.st_mode) || leaf_stat.st_nlink != 1) {
-    close(leaf_fd); close(current_fd); return errno_result(env, EPERM);
+  if (napi_get_element(env, argv[1], segment_count - 1, &leaf_value) != napi_ok) {
+    napi_throw_error(env, NULL, "cannot inspect leaf segment");
+    close_walk_fds(root_fd, current_fd);
+    return NULL;
+  }
+  if (!read_segment(env, leaf_value, leaf)) { close_walk_fds(root_fd, current_fd); return NULL; }
+  leaf_fd = openat(current_fd, leaf, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+  if (leaf_fd < 0) {
+    int code = errno;
+    close_walk_fds(root_fd, current_fd);
+    return failure_result(env, code, leaf_open_failure_reason(code), &root_stat);
+  }
+  if (fstat(leaf_fd, &leaf_stat) != 0) {
+    int code = errno;
+    close(leaf_fd);
+    close_walk_fds(root_fd, current_fd);
+    return failure_result(env, code, "native-io", &root_stat);
+  }
+  if (!S_ISREG(leaf_stat.st_mode)) {
+    close(leaf_fd);
+    close_walk_fds(root_fd, current_fd);
+    return failure_result(env, EPERM, "leaf-not-regular", &root_stat);
+  }
+  if (leaf_stat.st_nlink != 1) {
+    close(leaf_fd);
+    close_walk_fds(root_fd, current_fd);
+    return failure_result(env, EPERM, "leaf-multiple-links", &root_stat);
   }
 
   capacity = leaf_stat.st_size > 0 ? (size_t)leaf_stat.st_size : 1;
   bytes = malloc(capacity);
-  if (bytes == NULL) { close(leaf_fd); close(current_fd); return errno_result(env, ENOMEM); }
+  if (bytes == NULL) { close(leaf_fd); close_walk_fds(root_fd, current_fd); return failure_result(env, ENOMEM, "native-io", &root_stat); }
   for (;;) {
     if (length == capacity) {
       size_t next_capacity = capacity > SIZE_MAX / 2 ? SIZE_MAX : capacity * 2;
-      if (next_capacity <= capacity) { free(bytes); close(leaf_fd); close(current_fd); return errno_result(env, EFBIG); }
+      if (next_capacity <= capacity) { free(bytes); close(leaf_fd); close_walk_fds(root_fd, current_fd); return failure_result(env, EFBIG, "native-io", &root_stat); }
       unsigned char *grown = realloc(bytes, next_capacity);
-      if (grown == NULL) { free(bytes); close(leaf_fd); close(current_fd); return errno_result(env, ENOMEM); }
+      if (grown == NULL) { free(bytes); close(leaf_fd); close_walk_fds(root_fd, current_fd); return failure_result(env, ENOMEM, "native-io", &root_stat); }
       bytes = grown;
       capacity = next_capacity;
     }
     ssize_t read_count = read(leaf_fd, bytes + length, capacity - length);
-    if (read_count < 0) { int code = errno; free(bytes); close(leaf_fd); close(current_fd); return errno_result(env, code); }
+    if (read_count < 0) { int code = errno; free(bytes); close(leaf_fd); close_walk_fds(root_fd, current_fd); return failure_result(env, code, "native-io", &root_stat); }
     if (read_count == 0) break;
     length += (size_t)read_count;
   }
   close(leaf_fd);
-  close(current_fd);
+  close_walk_fds(root_fd, current_fd);
 
   NAPI_OK(napi_create_object(env, &result), "cannot create native result");
   NAPI_OK(napi_get_boolean(env, true, &value), "cannot encode native status");

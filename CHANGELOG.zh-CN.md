@@ -1,5 +1,25 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.11.0 locale=zh-CN baseline=sha256:51776685eead52118cc98ee47b8ac8990650a493d60567002133ff74e1c779c6 -->
+## [0.11.0] - 2026-08-25
+
+Harness 0.11.0 增加原始字节子进程输出 sink，并暴露真实宿主验证所需的受保护根身份。
+
+### 新增
+
+- 为 superviseProcess 增加独占、禁止跟随符号链接的 stdout/stderr 原始字节 sink，并等待流关闭、排队写入、fsync 与 close。
+- 继续把既有 bound-read 机制作为唯一根目录与成员读取权威。
+
+### 变更
+
+- 把此前准备好的宿主 Profile 闭包并入 0.11.0 三包锁步交付。
+
+### 升级说明
+
+原始 sink 只提供机制，不建立第二个进程 runner、收据状态机或宿主专属策略。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。
+<!-- release-skill:changelog:end version=0.11.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.10.0 locale=zh-CN baseline=sha256:d8e27cce0c3e97b7d10b6f88fad4df66c8d527d3d6a2fb165f8c909612ff9f19 -->
 ## [0.10.0] - 2026-08-24
 

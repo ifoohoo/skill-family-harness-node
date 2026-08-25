@@ -1,0 +1,21 @@
+version: 0.11.0
+date: 2026-08-25
+locales:
+  en:
+    summary: Harness 0.11.0 adds raw-byte subprocess sinks and exposes the bound-read root identity needed by host verification.
+    changes:
+      added:
+        - Extends superviseProcess with an exclusive, no-follow raw stdout/stderr sink that waits for stream close, queued writes, fsync, and close.
+        - Keeps the existing bound-read mechanism as the only root and member read authority.
+      changed:
+        - Carries the previously prepared host Profile closure into the lockstep 0.11.0 family release.
+    upgradeNotes: The raw sink is mechanism-only; it does not create a second process runner, receipt state machine, or host-specific policy. The caller must exclusively control the sink namespace for the whole call; handle protection does not prove stable pathname or root identity.
+  zh-CN:
+    summary: Harness 0.11.0 增加原始字节子进程输出 sink，并暴露真实宿主验证所需的受保护根身份。
+    changes:
+      added:
+        - 为 superviseProcess 增加独占、禁止跟随符号链接的 stdout/stderr 原始字节 sink，并等待流关闭、排队写入、fsync 与 close。
+        - 继续把既有 bound-read 机制作为唯一根目录与成员读取权威。
+      changed:
+        - 把此前准备好的宿主 Profile 闭包并入 0.11.0 三包锁步交付。
+    upgradeNotes: 原始 sink 只提供机制，不建立第二个进程 runner、收据状态机或宿主专属策略。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。

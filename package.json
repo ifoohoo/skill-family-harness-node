@@ -10,7 +10,7 @@
   "dependencies": {
     "@pnpm/lockfile.fs": "1001.1.35",
     "ipaddr.js": "2.5.0",
-    "skill-family-contracts": "0.10.0",
+    "skill-family-contracts": "0.11.0",
     "yaml": "2.9.0"
   },
   "description": "Thin Node.js mechanism runtime for Skill Family engineering contracts.",
@@ -48,7 +48,7 @@
     "url": "https://github.com/ifoohoo/skill-family-harness-node.git"
   },
   "type": "module",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "scripts": {
     "check": "node --test",
     "test": "node --test"

@@ -10,9 +10,15 @@
       "libc": "none",
       "binary": "prebuilds/darwin-arm64/bound_read.darwin-arm64.node",
       "mode": 420,
-      "sha256": "3172e6f78341502c1455e82a3843730303a2c46f70284c3635885b8f5e1df4b2",
+      "sha256": "edf0be6988f0c0d26ec03860e55d81be8ddf85fd82d29aba4ab6963bd58f9651",
       "napi": 10,
-      "exports": ["closeParentDirectory", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]
+      "exports": [
+        "closeParentDirectory",
+        "openParentDirectory",
+        "platform",
+        "readFileBoundNative",
+        "renameDirectoryNoReplace"
+      ]
     },
     {
       "platformKey": "darwin-x64",
@@ -21,9 +27,15 @@
       "libc": "none",
       "binary": "prebuilds/darwin-x64/bound_read.darwin-x64.node",
       "mode": 420,
-      "sha256": "ace0bfd36e8ddaaf69a68dc6fa00b77f6920f258a6a0db249f295a131225b27b",
+      "sha256": "cf11633c8ea804a4c9af58eb205852d38eb6f49979bdad21abc93ba49184ac41",
       "napi": 10,
-      "exports": ["closeParentDirectory", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]
+      "exports": [
+        "closeParentDirectory",
+        "openParentDirectory",
+        "platform",
+        "readFileBoundNative",
+        "renameDirectoryNoReplace"
+      ]
     },
     {
       "platformKey": "linux-arm64-gnu",
@@ -32,9 +44,15 @@
       "libc": "glibc",
       "binary": "prebuilds/linux-arm64-gnu/bound_read.linux-arm64-gnu.node",
       "mode": 420,
-      "sha256": "dfee29ad477376cc0288970bca5b2da19c3e925409d2eacf8e6ba6325e9e2b7f",
+      "sha256": "577db2c4b200ecddf0e5807034a57afa0f4d98fd6ee7cdbaeb358f3ff05313ae",
       "napi": 10,
-      "exports": ["closeParentDirectory", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]
+      "exports": [
+        "closeParentDirectory",
+        "openParentDirectory",
+        "platform",
+        "readFileBoundNative",
+        "renameDirectoryNoReplace"
+      ]
     },
     {
       "platformKey": "linux-x64-gnu",
@@ -43,9 +61,15 @@
       "libc": "glibc",
       "binary": "prebuilds/linux-x64-gnu/bound_read.linux-x64-gnu.node",
       "mode": 420,
-      "sha256": "c936852191b19a998b1e2ba3b588151f7bf4b3804a30554d2368f25042aaa3be",
+      "sha256": "f12ed96d4b5a338d87232a074b5d95117d81c5fdeb31f79c664a93c17f28a809",
       "napi": 10,
-      "exports": ["closeParentDirectory", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]
+      "exports": [
+        "closeParentDirectory",
+        "openParentDirectory",
+        "platform",
+        "readFileBoundNative",
+        "renameDirectoryNoReplace"
+      ]
     }
   ]
 }
