@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.12.0 locale=en baseline=sha256:0074df3a947706f6cd6d8593968a348cd4d3f38d8f2bf75f15a04c8183d76618 -->
+## [0.12.0] - 2026-08-26
+
+Harness 0.12.0 joins the lockstep Foundation release with its existing process and filesystem mechanisms unchanged.
+
+### Changed
+
+- Pins skill-family-contracts to 0.12.0 for the five-host verification extension implemented by Engineering Kit.
+
+### Upgrade Notes
+
+No new Harness API or runtime behavior is introduced. Existing process supervision, raw-byte sinks, bound reads, and digest mechanisms remain the shared implementation; host-specific protocol rules belong to Engineering Kit.
+<!-- release-skill:changelog:end version=0.12.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.11.0 locale=en baseline=sha256:e20f505e42ba45865bfee38a6c83671006bf20148d5d4e421ff7f443bcce260b -->
 ## [0.11.0] - 2026-08-25
 

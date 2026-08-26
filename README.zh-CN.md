@@ -5,27 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.11.0 -->
+<!-- release-skill:release-version: 0.12.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.11.0** (2026-08-25)
+**0.12.0** (2026-08-26)
 
-Harness 0.11.0 增加原始字节子进程输出 sink，并暴露真实宿主验证所需的受保护根身份。
-
-**新增**
-
-- 为 superviseProcess 增加独占、禁止跟随符号链接的 stdout/stderr 原始字节 sink，并等待流关闭、排队写入、fsync 与 close。
-- 继续把既有 bound-read 机制作为唯一根目录与成员读取权威。
+Harness 0.12.0 随 Foundation 三包锁步升级，既有进程与文件系统机制保持不变。
 
 **变更**
 
-- 把此前准备好的宿主 Profile 闭包并入 0.11.0 三包锁步交付。
+- 将 skill-family-contracts 精确依赖更新为 0.12.0，支持 Engineering Kit 的五平台验证扩展。
 
 **升级说明**
 
-原始 sink 只提供机制，不建立第二个进程 runner、收据状态机或宿主专属策略。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。
+本版本不新增 Harness API，也不改变运行行为。进程监督、原始字节输出、绑定读取和摘要继续复用既有机制；宿主专属的协议规则由 Engineering Kit 实现。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -39,14 +34,14 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 ## 安装和最小示例
 
 ```sh
-npm install skill-family-harness-node@0.11.0
+npm install skill-family-harness-node@0.12.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.11.0
+// 从空目录运行：npm install skill-family-harness-node@0.12.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {

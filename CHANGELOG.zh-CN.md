@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.12.0 locale=zh-CN baseline=sha256:2e7db41a08c30d9e0bdc16b4cd27853104ef79dc02f7e9925a1383a6546f5111 -->
+## [0.12.0] - 2026-08-26
+
+Harness 0.12.0 随 Foundation 三包锁步升级，既有进程与文件系统机制保持不变。
+
+### 变更
+
+- 将 skill-family-contracts 精确依赖更新为 0.12.0，支持 Engineering Kit 的五平台验证扩展。
+
+### 升级说明
+
+本版本不新增 Harness API，也不改变运行行为。进程监督、原始字节输出、绑定读取和摘要继续复用既有机制；宿主专属的协议规则由 Engineering Kit 实现。
+<!-- release-skill:changelog:end version=0.12.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.11.0 locale=zh-CN baseline=sha256:51776685eead52118cc98ee47b8ac8990650a493d60567002133ff74e1c779c6 -->
 ## [0.11.0] - 2026-08-25
 

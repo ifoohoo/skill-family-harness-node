@@ -1,0 +1,15 @@
+version: 0.12.0
+date: 2026-08-26
+locales:
+  en:
+    summary: Harness 0.12.0 joins the lockstep Foundation release with its existing process and filesystem mechanisms unchanged.
+    changes:
+      changed:
+        - Pins skill-family-contracts to 0.12.0 for the five-host verification extension implemented by Engineering Kit.
+    upgradeNotes: No new Harness API or runtime behavior is introduced. Existing process supervision, raw-byte sinks, bound reads, and digest mechanisms remain the shared implementation; host-specific protocol rules belong to Engineering Kit.
+  zh-CN:
+    summary: Harness 0.12.0 随 Foundation 三包锁步升级，既有进程与文件系统机制保持不变。
+    changes:
+      changed:
+        - 将 skill-family-contracts 精确依赖更新为 0.12.0，支持 Engineering Kit 的五平台验证扩展。
+    upgradeNotes: 本版本不新增 Harness API，也不改变运行行为。进程监督、原始字节输出、绑定读取和摘要继续复用既有机制；宿主专属的协议规则由 Engineering Kit 实现。

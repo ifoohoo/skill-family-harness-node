@@ -4,27 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.11.0 -->
+<!-- release-skill:release-version: 0.12.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.11.0** (2026-08-25)
+**0.12.0** (2026-08-26)
 
-Harness 0.11.0 adds raw-byte subprocess sinks and exposes the bound-read root identity needed by host verification.
-
-**Added**
-
-- Extends superviseProcess with an exclusive, no-follow raw stdout/stderr sink that waits for stream close, queued writes, fsync, and close.
-- Keeps the existing bound-read mechanism as the only root and member read authority.
+Harness 0.12.0 joins the lockstep Foundation release with its existing process and filesystem mechanisms unchanged.
 
 **Changed**
 
-- Carries the previously prepared host Profile closure into the lockstep 0.11.0 family release.
+- Pins skill-family-contracts to 0.12.0 for the five-host verification extension implemented by Engineering Kit.
 
 **Upgrade Notes**
 
-The raw sink is mechanism-only; it does not create a second process runner, receipt state machine, or host-specific policy. The caller must exclusively control the sink namespace for the whole call; handle protection does not prove stable pathname or root identity.
+No new Harness API or runtime behavior is introduced. Existing process supervision, raw-byte sinks, bound reads, and digest mechanisms remain the shared implementation; host-specific protocol rules belong to Engineering Kit.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -38,14 +33,14 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 ## Installation and Minimal Example
 
 ```sh
-npm install skill-family-harness-node@0.11.0
+npm install skill-family-harness-node@0.12.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.11.0
+// Run from an empty directory: npm install skill-family-harness-node@0.12.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
