@@ -1,5 +1,24 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.13.0 locale=en baseline=sha256:ba0667eb4b4805aafc2423cd79c04df3c835b8ae9bb07391867175f6ad96c36b -->
+## [0.13.0] - 2026-08-26
+
+Harness 0.13.0 is a source candidate for complete bound-tree observations and optional subprocess output limits.
+
+### Added
+
+- Adds observeFilesystemTree({ root, rootBinding }) as a public candidate entry for fresh private tree facts, including file bytes and POSIX mode observations.
+
+### Changed
+
+- Extends superviseProcess with independent stdout/stderr byte limits using the existing termination path. Equal-to-limit output is allowed; uncapped behavior remains compatible.
+
+### Upgrade Notes
+
+Pin Contracts and Harness together. Tree observation does not apply payload acceptance policy or promise a transaction snapshot. Candidate preparation is not publication.
+<!-- release-skill:changelog:end version=0.13.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.12.0 locale=en baseline=sha256:0074df3a947706f6cd6d8593968a348cd4d3f38d8f2bf75f15a04c8183d76618 -->
 ## [0.12.0] - 2026-08-26
 

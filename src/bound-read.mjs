@@ -161,7 +161,7 @@ export async function createFilesystemRootBinding(root) {
   }
 }
 
-function assertRelativePath(relPath) {
+export function assertRelativePath(relPath) {
   if (typeof relPath !== "string" || relPath.length === 0 || relPath.includes("\0") ||
       relPath.includes("\\") || path.posix.isAbsolute(relPath)) {
     throw mechanismError(HARNESS_ERROR_KINDS.INVALID_PATH, "bound read path is not a contained relative path");
@@ -269,6 +269,7 @@ export async function readFileBound(root, relPath, { rootBinding, encoding, expe
       sha256,
       bytes: bytes.length,
       mode: Number(native.leafMode),
+      statMode: Number(native.statMode),
       rootMode: captured.identity.mode,
     });
   } finally {

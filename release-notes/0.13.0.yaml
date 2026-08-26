@@ -1,0 +1,19 @@
+version: 0.13.0
+date: 2026-08-26
+locales:
+  en:
+    summary: Harness 0.13.0 is a source candidate for complete bound-tree observations and optional subprocess output limits.
+    changes:
+      added:
+        - Adds observeFilesystemTree({ root, rootBinding }) as a public candidate entry for fresh private tree facts, including file bytes and POSIX mode observations.
+      changed:
+        - Extends superviseProcess with independent stdout/stderr byte limits using the existing termination path. Equal-to-limit output is allowed; uncapped behavior remains compatible.
+    upgradeNotes: Pin Contracts and Harness together. Tree observation does not apply payload acceptance policy or promise a transaction snapshot. Candidate preparation is not publication.
+  zh-CN:
+    summary: Harness 0.13.0 源码候选增加完整绑定树观察与可选子进程输出上限。
+    changes:
+      added:
+        - 新增公开候选入口 observeFilesystemTree({ root, rootBinding })，每次读取私有树事实，包含文件字节与 POSIX 模式观察。
+      changed:
+        - 为 superviseProcess 增加 stdout/stderr 独立字节上限，复用既有终止路径；等于上限允许，未设置上限保持旧行为。
+    upgradeNotes: Contracts 与 Harness 须精确锁步。树观察不执行载荷接受政策，也不承诺事务快照。候选准备不代表发布完成。

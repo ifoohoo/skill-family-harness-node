@@ -61,6 +61,7 @@ export const WATCHDOG_REASONS = Object.freeze([
   "no_terminal_result",
   "residual_process_group",
   "context_budget_exhausted",
+  "output_limit_exceeded",
 ]);
 
 /** Termination reason: the deterministic mapping consumers consume (8 values). */
@@ -73,6 +74,7 @@ export const TERMINATION_REASONS = Object.freeze([
   "completed",
   "child_exit",
   "context_budget_exhausted",
+  "output_limit_exceeded",
 ]);
 
 /** Process status of the supervised process (7 values). */
@@ -114,6 +116,25 @@ const TIMEOUT_WATCHDOG_REASONS = new Set([
   "stale_progress",
   "tool_lease_expired",
 ]);
+
+const OUTPUT_LIMIT_FIELDS = Object.freeze(["stdout", "stderr"]);
+const MAX_SAFE_OUTPUT_BYTES = Number.MAX_SAFE_INTEGER;
+
+function validateOutputByteLimits(limits) {
+  if (limits === undefined) return null;
+  if (!isPlainObject(limits)) return "outputByteLimits must be a plain object";
+  const fields = Object.keys(limits);
+  if (fields.length === 0 || fields.some((field) => !OUTPUT_LIMIT_FIELDS.includes(field))) {
+    return "outputByteLimits must contain stdout and/or stderr only";
+  }
+  for (const field of fields) {
+    const value = limits[field];
+    if (!Number.isInteger(value) || value < 0 || value > MAX_SAFE_OUTPUT_BYTES) {
+      return `outputByteLimits.${field} must be an integer from 0 to Number.MAX_SAFE_INTEGER`;
+    }
+  }
+  return null;
+}
 
 // ---------------------------------------------------------------------------
 // Option and policy validation
@@ -164,7 +185,7 @@ function validateOptions(options) {
   const {
     command, args, cwd, env,
     timeoutPolicy, progressPaths, terminalProgressPaths, terminalGraceSeconds,
-    checkIntervalSeconds, longToolActive, budgetExhausted, evidencePath, rawSink, rawStreamSink,
+    checkIntervalSeconds, longToolActive, budgetExhausted, evidencePath, rawSink, rawStreamSink, outputByteLimits,
   } = options;
   if (typeof command !== "string" || command.length === 0) {
     throw new TypeError("superviseProcess: command must be a non-empty string");
@@ -220,6 +241,8 @@ function validateOptions(options) {
     const problem = validateRawSink(rawSink);
     if (problem) throw new TypeError(`superviseProcess: ${problem}`);
   }
+  const outputLimitProblem = validateOutputByteLimits(outputByteLimits);
+  if (outputLimitProblem) throw new TypeError(`superviseProcess: ${outputLimitProblem}`);
   const policyProblem = validateTimeoutPolicy(timeoutPolicy);
   if (policyProblem) {
     throw mechanismError("timeout-policy-invalid", policyProblem);
@@ -308,8 +331,8 @@ async function openRawSinkFile(captured, filename) {
   return handle;
 }
 
-function makeRawStreamState(handle) {
-  return { handle, hash: createHash("sha256"), bytes: 0, queue: Promise.resolve(), closed: false };
+function makeRawStreamState(handle, limit) {
+  return { handle, hash: createHash("sha256"), bytes: 0, limit, queue: Promise.resolve(), closed: false };
 }
 
 function enqueueRawChunk(state, chunk) {
@@ -503,6 +526,7 @@ const WATCHDOG_TO_TERMINATION = Object.freeze({
   no_terminal_result: "completed",
   residual_process_group: "child_exit",
   context_budget_exhausted: "context_budget_exhausted",
+  output_limit_exceeded: "output_limit_exceeded",
 });
 
 function mapWatchdogToTermination(watchdogReason) {
@@ -547,6 +571,8 @@ function buildEnvelope({
   signalSequence,
   forcedKill,
   timeoutPolicy,
+  outputByteLimits,
+  outputLimitExceeded,
   progressPaths,
   terminalProgressPaths,
   terminalSeen,
@@ -564,9 +590,9 @@ function buildEnvelope({
     sawLeaderExit,
   );
   const ok = watchdogReason === "terminal_progress"
-    ? true
+    ? outputLimitExceeded === null
     : watchdogReason === null
-      ? exitStatus === 0
+      ? exitStatus === 0 && outputLimitExceeded === null
       : false;
   const evidence = {
     command,
@@ -587,6 +613,7 @@ function buildEnvelope({
     startupProgressPaths: progressPaths,
     terminalProgressPaths,
     timeoutPolicy,
+    ...(outputByteLimits !== undefined ? { outputByteLimits, outputLimitExceeded } : {}),
     ...(terminalSeen ? { terminalIdentity: terminalSeen.identity } : {}),
     ...(terminalSeen?.status !== undefined ? { terminalStatus: terminalSeen.status } : {}),
     ...(residualGroupCleanupCompleted !== undefined
@@ -634,6 +661,9 @@ function buildEnvelope({
  *   terminal record must persist before the mechanism closes the process
  *   with watchdog_reason terminal_progress.
  * @param {number} [options.checkIntervalSeconds=1] - supervision cadence.
+ * @param {{stdout?: number, stderr?: number}} [options.outputByteLimits] -
+ *   optional independent raw-byte caps; equal is allowed, first excess
+ *   immediately enters the existing process-group termination path.
  * @param {() => boolean} [options.longToolActive] - consumer-owned long-tool
  *   activity probe; enables the tool-lease dimension (requires
  *   toolLeaseSeconds). Stream-idle is suspended while the probe is true.
@@ -679,6 +709,7 @@ export async function superviseProcess(options, deps = {}) {
     evidencePath,
   } = options;
   const sink = options.rawSink ?? null;
+  const outputByteLimits = options.outputByteLimits;
   let rawStreams = null;
   if (sink !== null) {
     try {
@@ -692,8 +723,8 @@ export async function superviseProcess(options, deps = {}) {
         throw error;
       }
       rawStreams = {
-        stdout: makeRawStreamState(stdoutHandle),
-        stderr: makeRawStreamState(stderrHandle),
+        stdout: makeRawStreamState(stdoutHandle, outputByteLimits?.stdout),
+        stderr: makeRawStreamState(stderrHandle, outputByteLimits?.stderr),
       };
     } catch (error) {
       if (rawStreams?.stdout) await closeRawStreamState(rawStreams.stdout).catch(() => {});
@@ -759,6 +790,8 @@ export async function superviseProcess(options, deps = {}) {
     residualGroupCleanupCompleted: undefined,
     watchdogSignalSucceeded: false,
     finalizing: false,
+    outputLimitExceeded: null,
+    outputBytes: { stdout: 0, stderr: 0 },
   };
   const signalSequence = [];
   let interval = null;
@@ -867,6 +900,9 @@ export async function superviseProcess(options, deps = {}) {
     let watchdogReason = lifecycle.vanish
       ? "no_terminal_result"
       : (termination?.reason ?? null);
+    if (watchdogReason === null && lifecycle.outputLimitExceeded !== null) {
+      watchdogReason = "output_limit_exceeded";
+    }
 
     // Terminal requirement reconciliation (R9-equivalent): when terminal
     // progress paths are configured and the close was authoritative
@@ -916,6 +952,8 @@ export async function superviseProcess(options, deps = {}) {
       signalSequence,
       forcedKill: termination?.forcedKill === true,
       timeoutPolicy,
+      outputByteLimits,
+      outputLimitExceeded: lifecycle.outputLimitExceeded,
       progressPaths,
       terminalProgressPaths,
       terminalSeen,
@@ -1005,6 +1043,8 @@ export async function superviseProcess(options, deps = {}) {
       signalSequence: [],
       forcedKill: false,
       timeoutPolicy,
+      outputByteLimits,
+      outputLimitExceeded: null,
       progressPaths,
       terminalProgressPaths,
       terminalSeen: null,
@@ -1260,6 +1300,24 @@ export async function superviseProcess(options, deps = {}) {
     }
   }
 
+  function handleOutputChunk(stream, chunk) {
+    const bytes = Buffer.from(chunk);
+    lifecycle.outputBytes[stream] += bytes.length;
+    const limit = outputByteLimits?.[stream];
+    let saved = bytes;
+    if (limit !== undefined) {
+      const allowed = Math.max(0, limit - (lifecycle.outputBytes[stream] - bytes.length));
+      saved = bytes.subarray(0, allowed);
+      if (lifecycle.outputBytes[stream] > limit) {
+        lifecycle.outputLimitExceeded ??= stream;
+        if (beginTermination("output_limit_exceeded", d.nowMs())) superviseLifecycle(d.nowMs());
+      }
+    }
+    if (rawStreams && saved.length > 0) {
+      void enqueueRawChunk(rawStreams[stream], saved).catch((error) => { lifecycle.runtimeError = error; });
+    }
+  }
+
   // Wire the child events.
   child.stdout?.on("data", () => {
     lastStreamActivityAtMs = d.nowMs();
@@ -1267,12 +1325,8 @@ export async function superviseProcess(options, deps = {}) {
   child.stderr?.on("data", () => {
     lastStreamActivityAtMs = d.nowMs();
   });
-  child.stdout?.on("data", (chunk) => {
-    if (rawStreams) void enqueueRawChunk(rawStreams.stdout, chunk).catch((error) => { lifecycle.runtimeError = error; });
-  });
-  child.stderr?.on("data", (chunk) => {
-    if (rawStreams) void enqueueRawChunk(rawStreams.stderr, chunk).catch((error) => { lifecycle.runtimeError = error; });
-  });
+  child.stdout?.on("data", (chunk) => handleOutputChunk("stdout", chunk));
+  child.stderr?.on("data", (chunk) => handleOutputChunk("stderr", chunk));
   child.on("exit", (code, signalCode) => {
     lifecycle.leaderResult = { code, signalCode };
     superviseLifecycle(d.nowMs());

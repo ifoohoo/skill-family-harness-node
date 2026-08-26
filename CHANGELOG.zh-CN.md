@@ -1,5 +1,24 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.13.0 locale=zh-CN baseline=sha256:1356b2ecff87da4a8bbe5bc04980b125ddf181873ff2b536be87a2e246b59609 -->
+## [0.13.0] - 2026-08-26
+
+Harness 0.13.0 源码候选增加完整绑定树观察与可选子进程输出上限。
+
+### 新增
+
+- 新增公开候选入口 observeFilesystemTree({ root, rootBinding })，每次读取私有树事实，包含文件字节与 POSIX 模式观察。
+
+### 变更
+
+- 为 superviseProcess 增加 stdout/stderr 独立字节上限，复用既有终止路径；等于上限允许，未设置上限保持旧行为。
+
+### 升级说明
+
+Contracts 与 Harness 须精确锁步。树观察不执行载荷接受政策，也不承诺事务快照。候选准备不代表发布完成。
+<!-- release-skill:changelog:end version=0.13.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.12.0 locale=zh-CN baseline=sha256:2e7db41a08c30d9e0bdc16b4cd27853104ef79dc02f7e9925a1383a6546f5111 -->
 ## [0.12.0] - 2026-08-26
 

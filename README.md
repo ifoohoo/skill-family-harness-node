@@ -4,22 +4,26 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.12.0 -->
+<!-- release-skill:release-version: 0.13.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.12.0** (2026-08-26)
+**0.13.0** (2026-08-26)
 
-Harness 0.12.0 joins the lockstep Foundation release with its existing process and filesystem mechanisms unchanged.
+Harness 0.13.0 is a source candidate for complete bound-tree observations and optional subprocess output limits.
+
+**Added**
+
+- Adds observeFilesystemTree({ root, rootBinding }) as a public candidate entry for fresh private tree facts, including file bytes and POSIX mode observations.
 
 **Changed**
 
-- Pins skill-family-contracts to 0.12.0 for the five-host verification extension implemented by Engineering Kit.
+- Extends superviseProcess with independent stdout/stderr byte limits using the existing termination path. Equal-to-limit output is allowed; uncapped behavior remains compatible.
 
 **Upgrade Notes**
 
-No new Harness API or runtime behavior is introduced. Existing process supervision, raw-byte sinks, bound reads, and digest mechanisms remain the shared implementation; host-specific protocol rules belong to Engineering Kit.
+Pin Contracts and Harness together. Tree observation does not apply payload acceptance policy or promise a transaction snapshot. Candidate preparation is not publication.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,15 +36,17 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
+Version 0.13.0 is not published. The registry command below is for use after publication; this iteration installs the three local candidate tarballs in an isolated directory.
+
 ```sh
-npm install skill-family-harness-node@0.12.0
+npm install skill-family-harness-node@0.13.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.12.0
+// Run from an empty directory: npm install skill-family-harness-node@0.13.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -218,3 +224,9 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 - Package-local source: `src/*.mjs`.
 - Package-local candidate source: `candidate/quickstart-profile.mjs`; canonical public import: `skill-family-harness-node/quickstart-profile`; historical migration alias: `skill-family-harness-node/candidate/quickstart-profile`.
 <!-- agent-quick-reference:end -->
+
+## Complete Plugin Candidate
+
+The candidate observeFilesystemTree({ root, rootBinding }) reads complete tree facts. Existing superviseProcess accepts optional per-stream raw-byte caps. Observing a payload does not accept it.
+
+Version 0.13.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete host qualification or release approval.

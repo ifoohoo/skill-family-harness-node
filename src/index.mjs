@@ -49,6 +49,10 @@ export { HarnessError, HARNESS_ERROR_KINDS, mechanismError } from "./errors.mjs"
 
 export { classifyPathInput, resolveContained, readFileContained } from "./paths.mjs";
 
+// Complete bound-tree facts for plugin verification. The native reader owns
+// descriptor-relative traversal and same-descriptor fstat/read checks.
+export { observeFilesystemTree } from "./filesystem-observation.mjs";
+
 // Strict contained read (FG-1): no-follow, regular-file identity assertion,
 // and a post-read sha256 digest receipt for existing authority files.
 export { readFileStrict } from "./strict-read.mjs";

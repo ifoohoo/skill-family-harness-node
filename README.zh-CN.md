@@ -5,22 +5,26 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.12.0 -->
+<!-- release-skill:release-version: 0.13.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.12.0** (2026-08-26)
+**0.13.0** (2026-08-26)
 
-Harness 0.12.0 随 Foundation 三包锁步升级，既有进程与文件系统机制保持不变。
+Harness 0.13.0 源码候选增加完整绑定树观察与可选子进程输出上限。
+
+**新增**
+
+- 新增公开候选入口 observeFilesystemTree({ root, rootBinding })，每次读取私有树事实，包含文件字节与 POSIX 模式观察。
 
 **变更**
 
-- 将 skill-family-contracts 精确依赖更新为 0.12.0，支持 Engineering Kit 的五平台验证扩展。
+- 为 superviseProcess 增加 stdout/stderr 独立字节上限，复用既有终止路径；等于上限允许，未设置上限保持旧行为。
 
 **升级说明**
 
-本版本不新增 Harness API，也不改变运行行为。进程监督、原始字节输出、绑定读取和摘要继续复用既有机制；宿主专属的协议规则由 Engineering Kit 实现。
+Contracts 与 Harness 须精确锁步。树观察不执行载荷接受政策，也不承诺事务快照。候选准备不代表发布完成。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,15 +37,17 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
+0.13.0 尚未发布。下面的 registry 安装命令供发布后使用；本轮验证应在隔离目录安装三个本地候选 tarball。
+
 ```sh
-npm install skill-family-harness-node@0.12.0
+npm install skill-family-harness-node@0.13.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.12.0
+// 从空目录运行：npm install skill-family-harness-node@0.13.0
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -218,3 +224,9 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 - 包内源：`src/*.mjs`。
 - 包内 Candidate 源：`candidate/quickstart-profile.mjs`；规范公共导入：`skill-family-harness-node/quickstart-profile`；历史迁移别名：`skill-family-harness-node/candidate/quickstart-profile`。
 <!-- agent-quick-reference:end -->
+
+## 完整插件候选能力
+
+新增候选 observeFilesystemTree({ root, rootBinding }) 读取完整树事实；既有 superviseProcess 支持可选每流原始字节上限。观察完成不等于接受载荷。
+
+0.13.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball，不能把版本标记、单元测试或安装成功当作完整宿主资格与发布批准。

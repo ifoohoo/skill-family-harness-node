@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const PACKAGE_ROOT = path.dirname(fileURLToPath(import.meta.url));
 const MANIFEST_PATH = path.join(PACKAGE_ROOT, "prebuild-manifest.json");
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
-const EXPECTED_EXPORTS = Object.freeze(["closeParentDirectory", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]);
+const EXPECTED_EXPORTS = Object.freeze(["closeParentDirectory", "observeFilesystemTreeNative", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]);
 const PLATFORM_KEYS = Object.freeze(["darwin-arm64", "darwin-x64", "linux-arm64-gnu", "linux-x64-gnu"]);
 
 function fail(message) {

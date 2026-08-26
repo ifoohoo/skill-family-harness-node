@@ -11,6 +11,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
 #include <unistd.h>
 
 #if defined(__APPLE__)
@@ -254,6 +255,8 @@ static napi_value ReadFileBoundNative(napi_env env, napi_callback_info info) {
   NAPI_OK(napi_set_named_property(env, result, "rootMode", value), "cannot set root mode");
   NAPI_OK(napi_create_int64(env, (int64_t)(leaf_stat.st_mode & 0777), &value), "cannot encode leaf mode");
   NAPI_OK(napi_set_named_property(env, result, "leafMode", value), "cannot set leaf mode");
+  NAPI_OK(napi_create_int64(env, (int64_t)leaf_stat.st_mode, &value), "cannot encode leaf stat mode");
+  NAPI_OK(napi_set_named_property(env, result, "statMode", value), "cannot set leaf stat mode");
   char decimal[64];
   snprintf(decimal, sizeof(decimal), "%llu", (unsigned long long)root_stat.st_dev);
   if (set_string(env, result, "rootDevice", decimal) == NULL) return NULL;
@@ -418,10 +421,151 @@ static napi_value RenameDirectoryNoReplace(napi_env env, napi_callback_info info
   return result;
 }
 
+/* A complete bound-tree observation is deliberately implemented beside the
+ * existing descriptor-relative reader.  Every regular member is opened with
+ * openat(O_NOFOLLOW), fstat'd on that descriptor, read from that descriptor,
+ * and fstat'd again before the descriptor is closed.  JavaScript only receives
+ * the bytes and facts from that one descriptor; it never supplements them
+ * with path-based lstat calls. */
+static int same_member_stat(const struct stat *before, const struct stat *after) {
+  return before->st_dev == after->st_dev && before->st_ino == after->st_ino &&
+    before->st_mode == after->st_mode && before->st_nlink == after->st_nlink &&
+    before->st_size == after->st_size && before->st_mtime == after->st_mtime &&
+    before->st_ctime == after->st_ctime;
+}
+
+static int set_int64(napi_env env, napi_value object, const char *name, int64_t value) {
+  napi_value encoded;
+  if (napi_create_int64(env, value, &encoded) != napi_ok ||
+      napi_set_named_property(env, object, name, encoded) != napi_ok) {
+    napi_throw_error(env, NULL, "cannot encode filesystem observation fact");
+    return 0;
+  }
+  return 1;
+}
+
+static int set_member_string(napi_env env, napi_value object, const char *name, const char *value) {
+  return set_string(env, object, name, value) != NULL;
+}
+
+static int append_directory_member(napi_env env, napi_value members, uint32_t *count,
+                                   const char *relative, const struct stat *st) {
+  napi_value member;
+  if (napi_create_object(env, &member) != napi_ok) { napi_throw_error(env, NULL, "cannot create directory observation"); return 0; }
+  if (!set_member_string(env, member, "path", relative) ||
+      !set_member_string(env, member, "type", "directory") ||
+      !set_int64(env, member, "statMode", (int64_t)st->st_mode)) return 0;
+  if (napi_set_element(env, members, (*count)++, member) != napi_ok) { napi_throw_error(env, NULL, "cannot append directory observation"); return 0; }
+  return 1;
+}
+
+static int append_file_member(napi_env env, napi_value members, uint32_t *count,
+                              const char *relative, const struct stat *st,
+                              const unsigned char *bytes, size_t length) {
+  napi_value member, buffer;
+  if (napi_create_object(env, &member) != napi_ok) { napi_throw_error(env, NULL, "cannot create file observation"); return 0; }
+  if (!set_member_string(env, member, "path", relative) ||
+      !set_member_string(env, member, "type", "file") ||
+      !set_int64(env, member, "statMode", (int64_t)st->st_mode) ||
+      !set_int64(env, member, "bytes", (int64_t)length)) return 0;
+  if (napi_create_buffer_copy(env, length, bytes, NULL, &buffer) != napi_ok ||
+      napi_set_named_property(env, member, "content", buffer) != napi_ok ||
+      napi_set_element(env, members, (*count)++, member) != napi_ok) { napi_throw_error(env, NULL, "cannot append file observation"); return 0; }
+  return 1;
+}
+
+static int observe_directory(napi_env env, int dir_fd, const char *prefix,
+                             napi_value members, uint32_t *count) {
+  int scan_fd = dup(dir_fd);
+  if (scan_fd < 0) { napi_throw_error(env, NULL, "filesystem observation directory duplication failed"); return 0; }
+  DIR *directory = fdopendir(scan_fd);
+  if (directory == NULL) { close(scan_fd); napi_throw_error(env, NULL, "filesystem observation directory open failed"); return 0; }
+  struct dirent *entry;
+  while ((entry = readdir(directory)) != NULL) {
+    if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) continue;
+    char relative[PATH_MAX];
+    int written = snprintf(relative, sizeof(relative), "%s%s%s", prefix,
+                           prefix[0] == '\0' ? "" : "/", entry->d_name);
+    if (written < 1 || (size_t)written >= sizeof(relative)) {
+      closedir(directory); napi_throw_error(env, NULL, "filesystem observation path is too long"); return 0;
+    }
+    struct stat named_stat;
+    if (fstatat(dir_fd, entry->d_name, &named_stat, AT_SYMLINK_NOFOLLOW) != 0 ||
+        (!S_ISDIR(named_stat.st_mode) && !S_ISREG(named_stat.st_mode))) {
+      closedir(directory); napi_throw_error(env, NULL, "filesystem observation encountered a symlink, special file, or changed member"); return 0;
+    }
+    int child_fd = openat(dir_fd, entry->d_name, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    if (child_fd < 0) { closedir(directory); napi_throw_error(env, NULL, "filesystem observation member changed or cannot be opened"); return 0; }
+    struct stat before;
+    if (fstat(child_fd, &before) != 0) { close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation member cannot be stat'd"); return 0; }
+    if (S_ISDIR(before.st_mode)) {
+      if (!append_directory_member(env, members, count, relative, &before) ||
+          !observe_directory(env, child_fd, relative, members, count)) {
+        close(child_fd); closedir(directory); return 0;
+      }
+      close(child_fd);
+      continue;
+    }
+    if (!S_ISREG(before.st_mode) || before.st_nlink != 1 || before.st_size < 0) {
+      close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation encountered an unsupported member"); return 0;
+    }
+    size_t length = 0, capacity = before.st_size > 0 ? (size_t)before.st_size : 1;
+    unsigned char *bytes = malloc(capacity);
+    if (bytes == NULL) { close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation allocation failed"); return 0; }
+    for (;;) {
+      if (length == capacity) {
+        if (capacity > SIZE_MAX / 2) { free(bytes); close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation file is too large"); return 0; }
+        size_t next = capacity * 2; unsigned char *grown = realloc(bytes, next);
+        if (grown == NULL) { free(bytes); close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation allocation failed"); return 0; }
+        bytes = grown; capacity = next;
+      }
+      ssize_t read_count = read(child_fd, bytes + length, capacity - length);
+      if (read_count < 0) { free(bytes); close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation read failed"); return 0; }
+      if (read_count == 0) break;
+      length += (size_t)read_count;
+    }
+    struct stat after;
+    if (fstat(child_fd, &after) != 0 || !same_member_stat(&before, &after) || (size_t)after.st_size != length) {
+      free(bytes); close(child_fd); closedir(directory); napi_throw_error(env, NULL, "filesystem observation member changed while being read"); return 0;
+    }
+    int ok = append_file_member(env, members, count, relative, &after, bytes, length);
+    free(bytes); close(child_fd);
+    if (!ok) { closedir(directory); return 0; }
+  }
+  if (closedir(directory) != 0) { napi_throw_error(env, NULL, "filesystem observation directory close failed"); return 0; }
+  return 1;
+}
+
+static napi_value ObserveFilesystemTreeNative(napi_env env, napi_callback_info info) {
+  size_t argc = 1; napi_value argv[1], result, members;
+  char root[PATH_MAX];
+  NAPI_OK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL), "cannot read native arguments");
+  if (argc != 1 || !read_string(env, argv[0], root, sizeof(root), "root must be a bounded absolute path") || root[0] != '/') return NULL;
+  int root_fd = open(root, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  if (root_fd < 0) return throw_last(env, "filesystem observation root cannot be opened");
+  struct stat root_stat;
+  if (fstat(root_fd, &root_stat) != 0 || !S_ISDIR(root_stat.st_mode)) { close(root_fd); return throw_last(env, "filesystem observation root is not a directory"); }
+  NAPI_OK(napi_create_object(env, &result), "cannot create filesystem observation");
+  NAPI_OK(napi_create_array(env, &members), "cannot create filesystem observation members");
+  uint32_t count = 0;
+  if (!observe_directory(env, root_fd, "", members, &count)) { close(root_fd); return NULL; }
+  close(root_fd);
+  NAPI_OK(napi_set_named_property(env, result, "members", members), "cannot set filesystem observation members");
+  if (!set_int64(env, result, "rootMode", (int64_t)root_stat.st_mode)) return NULL;
+  char decimal[64];
+  snprintf(decimal, sizeof(decimal), "%llu", (unsigned long long)root_stat.st_dev);
+  if (!set_member_string(env, result, "rootDevice", decimal)) return NULL;
+  snprintf(decimal, sizeof(decimal), "%llu", (unsigned long long)root_stat.st_ino);
+  if (!set_member_string(env, result, "rootInode", decimal)) return NULL;
+  return result;
+}
+
 static napi_value Init(napi_env env, napi_value exports) {
   napi_value value;
   NAPI_OK(napi_create_function(env, "readFileBoundNative", NAPI_AUTO_LENGTH, ReadFileBoundNative, NULL, &value), "cannot export bound read");
   NAPI_OK(napi_set_named_property(env, exports, "readFileBoundNative", value), "cannot export bound read");
+  NAPI_OK(napi_create_function(env, "observeFilesystemTreeNative", NAPI_AUTO_LENGTH, ObserveFilesystemTreeNative, NULL, &value), "cannot export filesystem observation");
+  NAPI_OK(napi_set_named_property(env, exports, "observeFilesystemTreeNative", value), "cannot export filesystem observation");
   NAPI_OK(napi_create_function(env, "openParentDirectory", NAPI_AUTO_LENGTH, OpenParentDirectory, NULL, &value), "cannot export openParentDirectory");
   NAPI_OK(napi_set_named_property(env, exports, "openParentDirectory", value), "cannot export openParentDirectory");
   NAPI_OK(napi_create_function(env, "closeParentDirectory", NAPI_AUTO_LENGTH, CloseParentDirectory, NULL, &value), "cannot export closeParentDirectory");

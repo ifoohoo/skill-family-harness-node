@@ -8,33 +8,33 @@
   },
   "source": {
     "path": "packages/skill-family-harness-node/src/native/bound_read.c",
-    "sha256": "58928393adc6921a399685446784efc7eead3987b99378ffd7ac23287d4ccf74"
+    "sha256": "10cfc3ff44343a532629879841f9ae7a12b78d818d596f85af3915cea9832c15"
   },
   "buildRecipe": {
     "path": "packages/skill-family-harness-node/src/native/binding.gyp",
     "sha256": "1631420afe903b1978a856dbeadd37a655a704cd7ded9d1ab6696f87e1116d7f"
   },
-  "manifestSha256": "1ded122cb8692d7ec6038bf79b11baaa330d94e3407cff159b9d94f61ee8337e",
+  "manifestSha256": "76a1e6f99ef5980043df4f328bbe9623dfc8cbba6655e008a8bb1d53d9e49ace",
   "inputs": [
     {
       "platformKey": "darwin-arm64",
-      "platformReceiptSha256": "43a7f1ba15b9811f115bcd4868a8e63e79472731c8027d7744a6db04e69fb2e2",
-      "binarySha256": "edf0be6988f0c0d26ec03860e55d81be8ddf85fd82d29aba4ab6963bd58f9651"
+      "platformReceiptSha256": "eff6c0350d7cb7f949346593af1b65f5791b5545e67eba192ef66bd7af7db93d",
+      "binarySha256": "19ce71026b737ba6b56da78ffabca4bb25f21249c30b545d68633d4b77547fde"
     },
     {
       "platformKey": "darwin-x64",
-      "platformReceiptSha256": "4f1db41cd657ddfdf3a10926f7372674b36072bb395ee7b3f2f2851b5b7c0b8d",
-      "binarySha256": "cf11633c8ea804a4c9af58eb205852d38eb6f49979bdad21abc93ba49184ac41"
+      "platformReceiptSha256": "55254e51f14fbe7fa5e6d5a64bf23db3926a49758fbe6afb20bc4c8dbc8b30bb",
+      "binarySha256": "e01e4a1df3554da857189f483174d0480eb36063ce17b5857a23fa8a02f4a664"
     },
     {
       "platformKey": "linux-arm64-gnu",
-      "platformReceiptSha256": "f024e7f765ffcd8162fc2d7accc60806a337ff7945315dbbaf2609bdea87001a",
-      "binarySha256": "577db2c4b200ecddf0e5807034a57afa0f4d98fd6ee7cdbaeb358f3ff05313ae"
+      "platformReceiptSha256": "3e4df89d8b211d0700f436314ec6302999e086602bf26d68797d285d40ab7941",
+      "binarySha256": "7b7fd1188d2bbf356fe8c44690fd80bc7fb02e9f6f9dc7ee1c10834bf1c519b1"
     },
     {
       "platformKey": "linux-x64-gnu",
-      "platformReceiptSha256": "aca0b64b4943dfdae39a2870d75a745088694a84f27b7ceafbfded4234a5fb73",
-      "binarySha256": "f12ed96d4b5a338d87232a074b5d95117d81c5fdeb31f79c664a93c17f28a809"
+      "platformReceiptSha256": "672d066df845073da0999f69659e772dec3cf0d6b3e34bf74907a5e7fd5190c9",
+      "binarySha256": "749b69ba1b7da3496e59f92f2ca8d04800031b2479c13b3ca63555ee69671acc"
     }
   ]
 }
