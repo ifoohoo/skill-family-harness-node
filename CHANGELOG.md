@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.14.0 locale=en baseline=sha256:23ac2de57433409f1dafac90d7bdd130fd10bd399fd188d7d848a49320b86f30 -->
+## [0.14.0] - 2026-08-28
+
+Harness 0.14.0 adds an official atomic-write fake, a synchronized package version export, and canonical temporary workspace roots for safe raw sinks.
+
+### Added
+
+- Adds createAtomicWriteFake({ vector }) with deterministic write, replace, and observation facts and no filesystem side effects.
+- Exposes FOUNDATION_PACKAGE_VERSION for lockstep consumers.
+- Returns canonical realpaths from TemporaryWorkspace.create() and fromBaseline(). A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+
+### Changed
+
+- Documents that the fake verifies adapter wiring, not the domain guarantee or real-host qualification.
+
+### Upgrade Notes
+
+Pin Contracts, Harness, and Engineering Kit to 0.14.0 together. Use the official fake with the Contracts vectors; retain real filesystem and domain tests for production guarantees. Temporary workspace roots are canonical. A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+<!-- release-skill:changelog:end version=0.14.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.13.0 locale=en baseline=sha256:ba0667eb4b4805aafc2423cd79c04df3c835b8ae9bb07391867175f6ad96c36b -->
 ## [0.13.0] - 2026-08-26
 

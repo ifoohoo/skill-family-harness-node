@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.14.0 locale=zh-CN baseline=sha256:11857b4e61d5111fab3dbc5eb1afcf99fd8fd6fd41f190bad5a5e16c09633e25 -->
+## [0.14.0] - 2026-08-28
+
+Harness 0.14.0 增加消费者契约测试用正式 atomic-write 测试替身（`fake`）、同步公开包版本导出，并让临时工作区根目录返回 canonical realpath。
+
+### 新增
+
+- 新增 `createAtomicWriteFake({ vector })`，提供确定性的写入、替换和观察事实且不触碰文件系统。
+- 公开 `FOUNDATION_PACKAGE_VERSION`，供锁步消费者使用。
+- `TemporaryWorkspace.create()` 与 `fromBaseline()` 返回 canonical realpath。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
+
+### 变更
+
+- 明确测试替身用于验证适配器接线，不代表领域保证或真实宿主资格。
+
+### 升级说明
+
+Contracts、Harness 与 Engineering Kit 须一起精确锁定到 0.14.0。用正式测试替身配合 Contracts 向量；生产保证仍须由真实文件系统和领域测试覆盖。临时工作区根目录已经 canonical。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
+<!-- release-skill:changelog:end version=0.14.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.13.0 locale=zh-CN baseline=sha256:1356b2ecff87da4a8bbe5bc04980b125ddf181873ff2b536be87a2e246b59609 -->
 ## [0.13.0] - 2026-08-26
 

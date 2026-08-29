@@ -4,26 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.13.0 -->
+<!-- release-skill:release-version: 0.14.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.13.0** (2026-08-26)
+**0.14.0** (2026-08-28)
 
-Harness 0.13.0 is a source candidate for complete bound-tree observations and optional subprocess output limits.
+Harness 0.14.0 adds an official atomic-write fake, a synchronized package version export, and canonical temporary workspace roots for safe raw sinks.
 
 **Added**
 
-- Adds observeFilesystemTree({ root, rootBinding }) as a public candidate entry for fresh private tree facts, including file bytes and POSIX mode observations.
+- Adds createAtomicWriteFake({ vector }) with deterministic write, replace, and observation facts and no filesystem side effects.
+- Exposes FOUNDATION_PACKAGE_VERSION for lockstep consumers.
+- Returns canonical realpaths from TemporaryWorkspace.create() and fromBaseline(). A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
 
 **Changed**
 
-- Extends superviseProcess with independent stdout/stderr byte limits using the existing termination path. Equal-to-limit output is allowed; uncapped behavior remains compatible.
+- Documents that the fake verifies adapter wiring, not the domain guarantee or real-host qualification.
 
 **Upgrade Notes**
 
-Pin Contracts and Harness together. Tree observation does not apply payload acceptance policy or promise a transaction snapshot. Candidate preparation is not publication.
+Pin Contracts, Harness, and Engineering Kit to 0.14.0 together. Use the official fake with the Contracts vectors; retain real filesystem and domain tests for production guarantees. Temporary workspace roots are canonical. A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -36,17 +38,28 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.13.0 is not published. The registry command below is for use after publication; this iteration installs the three local candidate tarballs in an isolated directory.
+Version 0.14.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
-npm install skill-family-harness-node@0.13.0
+pack_dir="$(mktemp -d)"
+(cd packages/skill-family-contracts && pnpm pack --pack-destination "$pack_dir")
+(cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
+(cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
+mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.14.0.tgz" "$pack_dir/skill-family-harness-node-0.14.0.tgz" "$pack_dir/skill-family-engineering-kit-0.14.0.tgz")
+```
+
+After publication, use the registry coordinate:
+
+```sh
+npm install skill-family-harness-node@0.14.0
 npm info skill-family-harness-node --help
 ```
 
 The minimal example shows validating a contract document inside Node:
 
 ```js
-// Run from an empty directory: npm install skill-family-harness-node@0.13.0
+// Run from an installed consumer directory after publication.
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -100,10 +113,12 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | Export | Responsibility |
 | --- | --- |
 | `HARNESS_CAPABILITIES` / `HARNESS_EXCLUSIONS` | Capability and exclusion lists (frozen constants). |
+| `FOUNDATION_PACKAGE_VERSION` | Exact Foundation package version used for lockstep checks. |
 | `HarnessError` / `HARNESS_ERROR_KINDS` / `mechanismError` | Mechanism failures uniformly carry the registered error code `SFC2004`; `details.kind` gives a stable subcategory. |
 | `validateContractDocument` / `getValidator` / `resolveSchemaContext` / `validatorCacheSize` | Routes and caches validators by Schema dialect; reuses Contracts' Ajv instances and dialect/policy semantics. |
 | `classifyPathInput` / `resolveContained` / `readFileContained` | Path containment: intercepts path overruns, symlink escapes, and realpath escapes. |
 | `writeFileAtomic` | Atomic write: leaves no half-written artifact on failure (temp file + fsync + rename). |
+| `createAtomicWriteFake({ vector })` | Official no-filesystem fake for consumer contract tests; emits deterministic write/replace/observation facts. |
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | Auto-cleanup temporary workspace, cleaned up even on exception paths. |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | Resource closure and deterministic sha256 digest. |
 | `superviseProcess` / `validateTimeoutPolicy` | The single bounded subprocess supervisor. Its 0.11.0 `rawSink` option writes raw stdout/stderr bytes only to a fresh canonical private root, then waits for child/stream close, queued writes, fsync, and handle close. The caller must exclusively control the sink namespace for the entire call; handle protection does not prove stable pathname/root identity. |
@@ -229,4 +244,4 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 The candidate observeFilesystemTree({ root, rootBinding }) reads complete tree facts. Existing superviseProcess accepts optional per-stream raw-byte caps. Observing a payload does not accept it.
 
-Version 0.13.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete host qualification or release approval.
+Version 0.14.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.

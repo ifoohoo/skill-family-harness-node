@@ -36,6 +36,8 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "url-credential-redaction",
 ]);
 
+export { FOUNDATION_PACKAGE_VERSION } from "./version.mjs";
+
 export const HARNESS_EXCLUSIONS = Object.freeze([
   "business-semantics",
   "workflow-orchestration",

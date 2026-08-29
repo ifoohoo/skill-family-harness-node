@@ -1,0 +1,23 @@
+version: 0.14.0
+date: 2026-08-28
+locales:
+  en:
+    summary: Harness 0.14.0 adds an official atomic-write fake, a synchronized package version export, and canonical temporary workspace roots for safe raw sinks.
+    changes:
+      added:
+        - Adds createAtomicWriteFake({ vector }) with deterministic write, replace, and observation facts and no filesystem side effects.
+        - Exposes FOUNDATION_PACKAGE_VERSION for lockstep consumers.
+        - Returns canonical realpaths from TemporaryWorkspace.create() and fromBaseline(). A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+      changed:
+        - Documents that the fake verifies adapter wiring, not the domain guarantee or real-host qualification.
+    upgradeNotes: Pin Contracts, Harness, and Engineering Kit to 0.14.0 together. Use the official fake with the Contracts vectors; retain real filesystem and domain tests for production guarantees. Temporary workspace roots are canonical. A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+  zh-CN:
+    summary: 'Harness 0.14.0 增加消费者契约测试用正式 atomic-write 测试替身（`fake`）、同步公开包版本导出，并让临时工作区根目录返回 canonical realpath。'
+    changes:
+      added:
+        - 新增 `createAtomicWriteFake({ vector })`，提供确定性的写入、替换和观察事实且不触碰文件系统。
+        - 公开 `FOUNDATION_PACKAGE_VERSION`，供锁步消费者使用。
+        - '`TemporaryWorkspace.create()` 与 `fromBaseline()` 返回 canonical realpath。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。'
+      changed:
+        - 明确测试替身用于验证适配器接线，不代表领域保证或真实宿主资格。
+    upgradeNotes: 'Contracts、Harness 与 Engineering Kit 须一起精确锁定到 0.14.0。用正式测试替身配合 Contracts 向量；生产保证仍须由真实文件系统和领域测试覆盖。临时工作区根目录已经 canonical。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。'

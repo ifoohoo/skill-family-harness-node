@@ -5,26 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.13.0 -->
+<!-- release-skill:release-version: 0.14.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.13.0** (2026-08-26)
+**0.14.0** (2026-08-28)
 
-Harness 0.13.0 源码候选增加完整绑定树观察与可选子进程输出上限。
+Harness 0.14.0 增加消费者契约测试用正式 atomic-write 测试替身（`fake`）、同步公开包版本导出，并让临时工作区根目录返回 canonical realpath。
 
 **新增**
 
-- 新增公开候选入口 observeFilesystemTree({ root, rootBinding })，每次读取私有树事实，包含文件字节与 POSIX 模式观察。
+- 新增 `createAtomicWriteFake({ vector })`，提供确定性的写入、替换和观察事实且不触碰文件系统。
+- 公开 `FOUNDATION_PACKAGE_VERSION`，供锁步消费者使用。
+- `TemporaryWorkspace.create()` 与 `fromBaseline()` 返回 canonical realpath。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
 
 **变更**
 
-- 为 superviseProcess 增加 stdout/stderr 独立字节上限，复用既有终止路径；等于上限允许，未设置上限保持旧行为。
+- 明确测试替身用于验证适配器接线，不代表领域保证或真实宿主资格。
 
 **升级说明**
 
-Contracts 与 Harness 须精确锁步。树观察不执行载荷接受政策，也不承诺事务快照。候选准备不代表发布完成。
+Contracts、Harness 与 Engineering Kit 须一起精确锁定到 0.14.0。用正式测试替身配合 Contracts 向量；生产保证仍须由真实文件系统和领域测试覆盖。临时工作区根目录已经 canonical。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -37,17 +39,28 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.13.0 尚未发布。下面的 registry 安装命令供发布后使用；本轮验证应在隔离目录安装三个本地候选 tarball。
+0.14.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
-npm install skill-family-harness-node@0.13.0
+pack_dir="$(mktemp -d)"
+(cd packages/skill-family-contracts && pnpm pack --pack-destination "$pack_dir")
+(cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
+(cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
+mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.14.0.tgz" "$pack_dir/skill-family-harness-node-0.14.0.tgz" "$pack_dir/skill-family-engineering-kit-0.14.0.tgz")
+```
+
+发布后再使用 registry 坐标：
+
+```sh
+npm install skill-family-harness-node@0.14.0
 npm info skill-family-harness-node --help
 ```
 
 最小示例演示在 Node 内校验一份契约文档：
 
 ```js
-// 从空目录运行：npm install skill-family-harness-node@0.13.0
+// 发布后从已安装的消费者目录运行。
 import { validateContractDocument } from "skill-family-harness-node";
 
 const document = {
@@ -101,10 +114,12 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 | 导出 | 职责 |
 | --- | --- |
 | `HARNESS_CAPABILITIES` / `HARNESS_EXCLUSIONS` | 能力与排除清单（冻结常量）。 |
+| `FOUNDATION_PACKAGE_VERSION` | 供锁步检查使用的精确 Foundation 包版本。 |
 | `HarnessError` / `HARNESS_ERROR_KINDS` / `mechanismError` | 机制失败统一携带注册错误码 `SFC2004`，`details.kind` 给出稳定细分。 |
 | `validateContractDocument` / `getValidator` / `resolveSchemaContext` / `validatorCacheSize` | 按 Schema 方言路由并缓存 validator；复用 Contracts 的 Ajv 实例与 dialect/policy 语义。 |
 | `classifyPathInput` / `resolveContained` / `readFileContained` | 路径收容：拦截路径越界、符号链接逃逸、真实路径逃逸。 |
 | `writeFileAtomic` | 原子写：失败不留半成品（临时文件 + fsync + rename）。 |
+| `createAtomicWriteFake({ vector })` | 消费者契约测试用正式无文件系统测试替身；产生确定性的写入/替换/观察事实。 |
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | 自动清理的临时工作区，异常路径也清理。 |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | 资源闭包与确定性 sha256 摘要。 |
 | `superviseProcess` / `validateTimeoutPolicy` | 唯一的受约束子进程监督器。0.11.0 的 `rawSink` 只向 fresh canonical 私有根写原始 stdout/stderr 字节，并等待子进程、流、排队写入、fsync 与句柄全部关闭。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。 |
@@ -229,4 +244,4 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 
 新增候选 observeFilesystemTree({ root, rootBinding }) 读取完整树事实；既有 superviseProcess 支持可选每流原始字节上限。观察完成不等于接受载荷。
 
-0.13.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball，不能把版本标记、单元测试或安装成功当作完整宿主资格与发布批准。
+0.14.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
