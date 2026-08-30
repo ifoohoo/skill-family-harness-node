@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.15.0 locale=en baseline=sha256:8c81395a147ed1e995e21ae0074f66d434b87070ea33350fa3e97cbcb5f2fa8e -->
+## [0.15.0] - 2026-08-29
+
+Harness 0.15.0 adds executable identity observation and a best-effort Node tree record mode.
+
+### Added
+
+- Records symlink target bytes without following links on a stable isolated tree.
+- Rechecks the original script after observing its interpreter and orders paths by Unicode code point.
+
+### Changed
+
+- Keeps omitted and reject symlink policy on the 0.14 native path.
+
+### Upgrade Notes
+
+Record mode is candidate best effort; it does not provide a transaction snapshot or hostile concurrent-writer safety.
+<!-- release-skill:changelog:end version=0.15.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.14.0 locale=en baseline=sha256:23ac2de57433409f1dafac90d7bdd130fd10bd399fd188d7d848a49320b86f30 -->
 ## [0.14.0] - 2026-08-28
 

@@ -30,6 +30,7 @@ export const HARNESS_CAPABILITIES = Object.freeze([
   "token-estimation",
   "upper-bound-guard",
   "supervise-process",
+  "executable-identity-observation",
   // Foundation capability completion (FG-1/FG-2): strict authority reads and
   // pre-persistence URL credential redaction.
   "strict-read",
@@ -54,6 +55,10 @@ export { classifyPathInput, resolveContained, readFileContained } from "./paths.
 // Complete bound-tree facts for plugin verification. The native reader owns
 // descriptor-relative traversal and same-descriptor fstat/read checks.
 export { observeFilesystemTree } from "./filesystem-observation.mjs";
+
+// Deterministic, per-call executable identity observation.  The caller owns
+// the explicit roots and PATH entries; no ambient PATH or cache is consulted.
+export { observeExecutableIdentity } from "./executable-identity.mjs";
 
 // Strict contained read (FG-1): no-follow, regular-file identity assertion,
 // and a post-read sha256 digest receipt for existing authority files.

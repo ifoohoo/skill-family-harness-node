@@ -5,28 +5,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.14.0 -->
+<!-- release-skill:release-version: 0.15.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.14.0** (2026-08-28)
+**0.15.0** (2026-08-29)
 
-Harness 0.14.0 增加消费者契约测试用正式 atomic-write 测试替身（`fake`）、同步公开包版本导出，并让临时工作区根目录返回 canonical realpath。
+Harness 0.15.0 增加可执行文件身份观察与 Node 树 best-effort 记录模式。
 
 **新增**
 
-- 新增 `createAtomicWriteFake({ vector })`，提供确定性的写入、替换和观察事实且不触碰文件系统。
-- 公开 `FOUNDATION_PACKAGE_VERSION`，供锁步消费者使用。
-- `TemporaryWorkspace.create()` 与 `fromBaseline()` 返回 canonical realpath。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
+- 在稳定隔离树上记录 symlink 自身与原始 target bytes，不跟随链接。
+- 观察解释器后重查原脚本，并按 Unicode code point 排序路径。
 
 **变更**
 
-- 明确测试替身用于验证适配器接线，不代表领域保证或真实宿主资格。
+- 省略或 reject symlinkPolicy 时继续使用 0.14 native 路径。
 
 **升级说明**
 
-Contracts、Harness 与 Engineering Kit 须一起精确锁定到 0.14.0。用正式测试替身配合 Contracts 向量；生产保证仍须由真实文件系统和领域测试覆盖。临时工作区根目录已经 canonical。`create()` 返回的根目录在保持 fresh 且为空时，可以直接传给 `superviseProcess` 的 `rawSink`。物化后的非空 baseline 根目录会被 `rawSink` 的 freshness 校验拒绝。
+record 模式仍为 candidate best-effort，不提供事务快照或恶意并发写者安全保证。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -39,7 +38,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.14.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+0.15.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -47,13 +46,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.14.0.tgz" "$pack_dir/skill-family-harness-node-0.14.0.tgz" "$pack_dir/skill-family-engineering-kit-0.14.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.15.0.tgz" "$pack_dir/skill-family-harness-node-0.15.0.tgz" "$pack_dir/skill-family-engineering-kit-0.15.0.tgz")
 ```
 
 发布后再使用 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.14.0
+npm install skill-family-harness-node@0.15.0
 npm info skill-family-harness-node --help
 ```
 
@@ -123,6 +122,8 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | 自动清理的临时工作区，异常路径也清理。 |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | 资源闭包与确定性 sha256 摘要。 |
 | `superviseProcess` / `validateTimeoutPolicy` | 唯一的受约束子进程监督器。0.11.0 的 `rawSink` 只向 fresh canonical 私有根写原始 stdout/stderr 字节，并等待子进程、流、排队写入、fsync 与句柄全部关闭。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。 |
+| `observeFilesystemTree` | 观察完整绑定树。默认/reject 保留既有 UTF-16 成员顺序；record 使用码点顺序，记录 symlink target bytes 且不跟随目标。 |
+| `observeExecutableIdentity` | 观察调用方绑定的可执行入口、符号链接链、启动字节和脚本解释器链，供每次 spawn 前紧邻重观察。 |
 | `parseRequest` / `processRequest` | 解析 `operation-request`，输出终态 `operation-result`。 |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | 消费经 Contracts 验证的 report model，确定性渲染中性 Markdown 并校验来源/结果/报告绑定；不解释业务输出。 |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | 通用文本 source closure、manifest 全摘要复验和目标集合原子落盘；具体 Profile/driver 不在 Harness。 |
@@ -184,7 +185,7 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 ### Do not use when
 
 - 需要把文件选择的业务规则放入 Foundation（业务规则由调用方拥有）。
-- 需要宿主身份策略、宿主 driver、远端发布、删除式 uninstall、Qoder 完整 driver 或二进制 adapter source（明确 unsupported）。
+- 需要宿主身份策略、宿主专属生命周期计划、远端发布、删除式 uninstall 或二进制 adapter source。宿主策略与生命周期计划归 Engineering Kit。
 - 需要领域审计语义、重试编排或兼容性已冻结的 Quickstart API。
 
 ### Capability selection
@@ -244,4 +245,12 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 
 新增候选 observeFilesystemTree({ root, rootBinding }) 读取完整树事实；既有 superviseProcess 支持可选每流原始字节上限。观察完成不等于接受载荷。
 
-0.14.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+`observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` 适用于宿主命令完成后、调用方已隔离且扫描期间没有并发 namespace writer 的稳定安装树、缓存树或投影树。它记录 symlink 自身的 `targetBase64`、`bytes` 和 `statMode`，只读取原始 target bytes，绝不跟随 target；普通文件仍复用 `readFileBound`。record 是 Node/JS best-effort candidate：发现扫描期间的漂移会失败关闭，但不提供事务快照、同 UID 恶意并发或 ABA 保证，这不改变稳定树结果的正常使用语义。release-skill 等消费者负责调用时机，并继续负责 npm `.bin` 等领域接受规则。
+
+成员排序按模式区分，以保留兼容性：省略策略或使用 reject 时沿用 0.14 的 UTF-16 关系顺序，record 使用 Unicode 码点顺序；`membersDigest` 也按对应顺序推导。
+
+真实威胁包含恶意并发时，应形成最小上游能力缺口并交回 Foundation 裁决；不要在技能族内复制通用 walker、native addon、Harness、schema、Registry、runner 或 receipt 链，也不要自行升级为四平台原生实现。
+
+另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
+
+0.15.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

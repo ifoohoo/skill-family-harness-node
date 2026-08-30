@@ -1,5 +1,25 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.15.0 locale=zh-CN baseline=sha256:945e9d06ed1cc8178ac13f3ec27ee753ec129d2f54ae59b59c6d8f4ec137d821 -->
+## [0.15.0] - 2026-08-29
+
+Harness 0.15.0 增加可执行文件身份观察与 Node 树 best-effort 记录模式。
+
+### 新增
+
+- 在稳定隔离树上记录 symlink 自身与原始 target bytes，不跟随链接。
+- 观察解释器后重查原脚本，并按 Unicode code point 排序路径。
+
+### 变更
+
+- 省略或 reject symlinkPolicy 时继续使用 0.14 native 路径。
+
+### 升级说明
+
+record 模式仍为 candidate best-effort，不提供事务快照或恶意并发写者安全保证。
+<!-- release-skill:changelog:end version=0.15.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.14.0 locale=zh-CN baseline=sha256:11857b4e61d5111fab3dbc5eb1afcf99fd8fd6fd41f190bad5a5e16c09633e25 -->
 ## [0.14.0] - 2026-08-28
 

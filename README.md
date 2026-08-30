@@ -4,28 +4,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.14.0 -->
+<!-- release-skill:release-version: 0.15.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.14.0** (2026-08-28)
+**0.15.0** (2026-08-29)
 
-Harness 0.14.0 adds an official atomic-write fake, a synchronized package version export, and canonical temporary workspace roots for safe raw sinks.
+Harness 0.15.0 adds executable identity observation and a best-effort Node tree record mode.
 
 **Added**
 
-- Adds createAtomicWriteFake({ vector }) with deterministic write, replace, and observation facts and no filesystem side effects.
-- Exposes FOUNDATION_PACKAGE_VERSION for lockstep consumers.
-- Returns canonical realpaths from TemporaryWorkspace.create() and fromBaseline(). A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+- Records symlink target bytes without following links on a stable isolated tree.
+- Rechecks the original script after observing its interpreter and orders paths by Unicode code point.
 
 **Changed**
 
-- Documents that the fake verifies adapter wiring, not the domain guarantee or real-host qualification.
+- Keeps omitted and reject symlink policy on the 0.14 native path.
 
 **Upgrade Notes**
 
-Pin Contracts, Harness, and Engineering Kit to 0.14.0 together. Use the official fake with the Contracts vectors; retain real filesystem and domain tests for production guarantees. Temporary workspace roots are canonical. A root returned by create() can be passed directly to superviseProcess rawSink while it remains fresh and empty. A materialized non-empty baseline root is rejected by rawSink freshness validation.
+Record mode is candidate best effort; it does not provide a transaction snapshot or hostile concurrent-writer safety.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -38,7 +37,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.14.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.15.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -46,13 +45,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.14.0.tgz" "$pack_dir/skill-family-harness-node-0.14.0.tgz" "$pack_dir/skill-family-engineering-kit-0.14.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.15.0.tgz" "$pack_dir/skill-family-harness-node-0.15.0.tgz" "$pack_dir/skill-family-engineering-kit-0.15.0.tgz")
 ```
 
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.14.0
+npm install skill-family-harness-node@0.15.0
 npm info skill-family-harness-node --help
 ```
 
@@ -122,6 +121,8 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | `TemporaryWorkspace` / `createTemporaryWorkspace` / `withTemporaryWorkspace` | Auto-cleanup temporary workspace, cleaned up even on exception paths. |
 | `digestBytes` / `computeResourceClosure` / `closureContains` | Resource closure and deterministic sha256 digest. |
 | `superviseProcess` / `validateTimeoutPolicy` | The single bounded subprocess supervisor. Its 0.11.0 `rawSink` option writes raw stdout/stderr bytes only to a fresh canonical private root, then waits for child/stream close, queued writes, fsync, and handle close. The caller must exclusively control the sink namespace for the entire call; handle protection does not prove stable pathname/root identity. |
+| `observeFilesystemTree` | Observe a complete bound tree. Default/reject preserves the existing UTF-16 member order; record uses code-point order and records symlink target bytes without following them. |
+| `observeExecutableIdentity` | Observe a caller-bound executable, its symlink chain, launch bytes, and any script interpreter chain for immediate pre-spawn re-observation. |
 | `parseRequest` / `processRequest` | Parse `operation-request`, output terminal `operation-result`. |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | Consume a Contracts-validated report model, deterministically render neutral Markdown, and verify source/result/report binding; does not interpret business output. |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | Generic text-source closure, full-manifest digest re-verification, and atomic landing of the target set; specific Profile/driver is not in the Harness. |
@@ -183,7 +184,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 ### Do not use when
 
 - You need to put file-selection business rules into the Foundation (business rules are owned by the caller).
-- You need host identity policy, host drivers, remote publication, uninstall deletion, a full Qoder driver, or binary adapter source (explicitly unsupported).
+- You need host identity policy, host-specific lifecycle plans, remote publication, deleting uninstall, or binary adapter source. Host policy and lifecycle plans belong to Engineering Kit.
 - You need domain audit semantics, retry orchestration, or a compatibility-frozen Quickstart API.
 
 ### Capability selection
@@ -244,4 +245,12 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 The candidate observeFilesystemTree({ root, rootBinding }) reads complete tree facts. Existing superviseProcess accepts optional per-stream raw-byte caps. Observing a payload does not accept it.
 
-Version 0.14.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.
+`observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` is for a stable installation, cache, or projection tree after the host command has completed, with caller isolation and no concurrent namespace writer during the scan. It records each symlink itself as `targetBase64`, `bytes`, and `statMode`, reads only the raw target bytes, and never follows the target; regular files continue to reuse `readFileBound`. Record is a Node/JS best-effort candidate: observed drift fails closed, but the mode does not provide a transaction snapshot, same-UID malicious-concurrency, or ABA guarantee. A stable-tree result remains a normal usable result. Consumers such as release-skill own invocation timing and domain acceptance rules such as npm `.bin`.
+
+Member ordering is mode-specific for compatibility: omitted/reject mode retains the 0.14 UTF-16 relational order, while record mode uses Unicode code-point order. The selected order is also the order used to derive `membersDigest`.
+
+When the actual threat includes malicious concurrency, return a minimal upstream capability gap to Foundation for a decision. Do not copy a generic walker, native addon, Harness, schema, Registry, runner, or receipt chain into a skill family, and do not independently upgrade ordinary consumers to a four-platform native implementation.
+
+The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
+
+Version 0.15.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.

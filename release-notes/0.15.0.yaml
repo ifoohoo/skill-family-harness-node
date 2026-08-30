@@ -1,0 +1,21 @@
+version: 0.15.0
+date: 2026-08-29
+locales:
+  en:
+    summary: Harness 0.15.0 adds executable identity observation and a best-effort Node tree record mode.
+    changes:
+      added:
+        - Records symlink target bytes without following links on a stable isolated tree.
+        - Rechecks the original script after observing its interpreter and orders paths by Unicode code point.
+      changed:
+        - Keeps omitted and reject symlink policy on the 0.14 native path.
+    upgradeNotes: Record mode is candidate best effort; it does not provide a transaction snapshot or hostile concurrent-writer safety.
+  zh-CN:
+    summary: Harness 0.15.0 增加可执行文件身份观察与 Node 树 best-effort 记录模式。
+    changes:
+      added:
+        - 在稳定隔离树上记录 symlink 自身与原始 target bytes，不跟随链接。
+        - 观察解释器后重查原脚本，并按 Unicode code point 排序路径。
+      changed:
+        - 省略或 reject symlinkPolicy 时继续使用 0.14 native 路径。
+    upgradeNotes: record 模式仍为 candidate best-effort，不提供事务快照或恶意并发写者安全保证。

@@ -59,6 +59,8 @@ export const HARNESS_ERROR_KINDS = Object.freeze({
   HOST_BUILD_FAILED: "host-build-failed",
   HOST_PROBE_FAILED: "host-probe-failed",
   UNTRUSTED_EXECUTABLE: "untrusted-executable",
+  EXECUTABLE_NOT_FOUND: "executable-not-found",
+  UNSUPPORTED_INTERPRETER: "unsupported-interpreter",
   PORTABLE_PATH_COLLISION: "portable-path-collision",
   MANIFEST_MISMATCH: "manifest-mismatch",
   BASELINE_MISMATCH: "baseline-mismatch",
