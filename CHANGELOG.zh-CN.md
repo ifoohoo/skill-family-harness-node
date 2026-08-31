@@ -1,5 +1,21 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.16.0 locale=zh-CN baseline=sha256:31d28348db231171b1ea5754c514d7fe3cc336c1063026af8763d92553d225de -->
+## [0.16.0] - 2026-08-31
+
+Harness 0.16.0 澄清现有 rawSink 边界，将输出脱敏留在 Foundation 之外。
+
+### 变更
+
+- 明确 rawSink 只适用于在 fresh canonical 临时根中以 0600 保存 stdout/stderr 原始文件的场景，不是脱敏接口。
+- 明确拒绝为单一消费者脱敏需求新增 rawStreamSink、transform sink、通用 sanitizer、第二个 runner 或新的 stdout 回调。
+
+### 升级说明
+
+需要硬性保证文件系统中不出现明文的消费者，应自行定义威胁模型并实现；本版本不增加脱敏或零明文保证。
+<!-- release-skill:changelog:end version=0.16.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.15.0 locale=zh-CN baseline=sha256:945e9d06ed1cc8178ac13f3ec27ee753ec129d2f54ae59b59c6d8f4ec137d821 -->
 ## [0.15.0] - 2026-08-29
 

@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.16.0 locale=en baseline=sha256:27fd0f5623d5c93b3076af93231101956233f179dd0cab3d1c74dae891668ea8 -->
+## [0.16.0] - 2026-08-31
+
+Harness 0.16.0 clarifies the existing rawSink boundary and keeps output redaction outside Foundation.
+
+### Changed
+
+- Documents rawSink as a protected 0600 raw stdout/stderr sink in a fresh canonical temporary root, not a redaction API.
+- Explicitly rejects rawStreamSink, transform sinks, generic sanitizers, second runners, and new stdout callbacks for a single-consumer redaction request.
+
+### Upgrade Notes
+
+Consumers that require zero plaintext on the filesystem must own the threat model and implementation; this release adds no redaction or zero-plaintext guarantee.
+<!-- release-skill:changelog:end version=0.16.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.15.0 locale=en baseline=sha256:8c81395a147ed1e995e21ae0074f66d434b87070ea33350fa3e97cbcb5f2fa8e -->
 ## [0.15.0] - 2026-08-29
 

@@ -1,0 +1,17 @@
+version: 0.16.0
+date: 2026-08-31
+locales:
+  en:
+    summary: Harness 0.16.0 clarifies the existing rawSink boundary and keeps output redaction outside Foundation.
+    changes:
+      changed:
+        - Documents rawSink as a protected 0600 raw stdout/stderr sink in a fresh canonical temporary root, not a redaction API.
+        - Explicitly rejects rawStreamSink, transform sinks, generic sanitizers, second runners, and new stdout callbacks for a single-consumer redaction request.
+    upgradeNotes: Consumers that require zero plaintext on the filesystem must own the threat model and implementation; this release adds no redaction or zero-plaintext guarantee.
+  zh-CN:
+    summary: Harness 0.16.0 澄清现有 rawSink 边界，将输出脱敏留在 Foundation 之外。
+    changes:
+      changed:
+        - 明确 rawSink 只适用于在 fresh canonical 临时根中以 0600 保存 stdout/stderr 原始文件的场景，不是脱敏接口。
+        - 明确拒绝为单一消费者脱敏需求新增 rawStreamSink、transform sink、通用 sanitizer、第二个 runner 或新的 stdout 回调。
+    upgradeNotes: 需要硬性保证文件系统中不出现明文的消费者，应自行定义威胁模型并实现；本版本不增加脱敏或零明文保证。
