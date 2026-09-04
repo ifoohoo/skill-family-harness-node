@@ -1,0 +1,15 @@
+version: 0.17.0
+date: 2026-09-01
+locales:
+  en:
+    summary: Harness 0.17.0 is a lockstep version update with no new mechanism, native source change, or public API.
+    changes:
+      changed:
+        - Moves the package version to 0.17.0 together with Contracts and Engineering Kit while preserving the existing Harness capability and native prebuild surfaces.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.17.0. Engineering-baseline validation and structural comparison belong to Contracts and Engineering Kit; no Harness migration is required.
+  zh-CN:
+    summary: Harness 0.17.0 随 Foundation 锁步升版，不新增机制，不修改原生源码或公共 API。
+    changes:
+      changed:
+        - 包版本与 Contracts、Engineering Kit 一同升至 0.17.0，既有 Harness 能力和原生预构建表面保持不变。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.17.0。工程基线校验与结构比较分别归 Contracts 和 Engineering Kit 负责，无需迁移 Harness API。

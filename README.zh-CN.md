@@ -5,23 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.16.0 -->
+<!-- release-skill:release-version: 0.17.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.16.0** (2026-08-31)
+**0.17.0** (2026-09-01)
 
-Harness 0.16.0 澄清现有 rawSink 边界，将输出脱敏留在 Foundation 之外。
+Harness 0.17.0 随 Foundation 锁步升版，不新增机制，不修改原生源码或公共 API。
 
 **变更**
 
-- 明确 rawSink 只适用于在 fresh canonical 临时根中以 0600 保存 stdout/stderr 原始文件的场景，不是脱敏接口。
-- 明确拒绝为单一消费者脱敏需求新增 rawStreamSink、transform sink、通用 sanitizer、第二个 runner 或新的 stdout 回调。
+- 包版本与 Contracts、Engineering Kit 一同升至 0.17.0，既有 Harness 能力和原生预构建表面保持不变。
 
 **升级说明**
 
-需要硬性保证文件系统中不出现明文的消费者，应自行定义威胁模型并实现；本版本不增加脱敏或零明文保证。
+三个 Foundation 包须一起精确锁定到 0.17.0。工程基线校验与结构比较分别归 Contracts 和 Engineering Kit 负责，无需迁移 Harness API。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -34,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.16.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+0.17.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -42,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.16.0.tgz" "$pack_dir/skill-family-harness-node-0.16.0.tgz" "$pack_dir/skill-family-engineering-kit-0.16.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.17.0.tgz" "$pack_dir/skill-family-harness-node-0.17.0.tgz" "$pack_dir/skill-family-engineering-kit-0.17.0.tgz")
 ```
 
 发布后再使用 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.16.0
+npm install skill-family-harness-node@0.17.0
 npm info skill-family-harness-node --help
 ```
 
@@ -249,4 +248,4 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
-0.16.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+0.17.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

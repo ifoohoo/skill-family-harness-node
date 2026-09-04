@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.17.0 locale=en baseline=sha256:5c685956ff1920dccdd91198687dbc1414bfef474a0d297bbcb7704014c549bd -->
+## [0.17.0] - 2026-09-01
+
+Harness 0.17.0 is a lockstep version update with no new mechanism, native source change, or public API.
+
+### Changed
+
+- Moves the package version to 0.17.0 together with Contracts and Engineering Kit while preserving the existing Harness capability and native prebuild surfaces.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.17.0. Engineering-baseline validation and structural comparison belong to Contracts and Engineering Kit; no Harness migration is required.
+<!-- release-skill:changelog:end version=0.17.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.16.0 locale=en baseline=sha256:27fd0f5623d5c93b3076af93231101956233f179dd0cab3d1c74dae891668ea8 -->
 ## [0.16.0] - 2026-08-31
 

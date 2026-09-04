@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.17.0 locale=zh-CN baseline=sha256:fc1c5f48463b2d62363952f566011600a8a84b11456519507c8dc03bf58756d5 -->
+## [0.17.0] - 2026-09-01
+
+Harness 0.17.0 随 Foundation 锁步升版，不新增机制，不修改原生源码或公共 API。
+
+### 变更
+
+- 包版本与 Contracts、Engineering Kit 一同升至 0.17.0，既有 Harness 能力和原生预构建表面保持不变。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.17.0。工程基线校验与结构比较分别归 Contracts 和 Engineering Kit 负责，无需迁移 Harness API。
+<!-- release-skill:changelog:end version=0.17.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.16.0 locale=zh-CN baseline=sha256:31d28348db231171b1ea5754c514d7fe3cc336c1063026af8763d92553d225de -->
 ## [0.16.0] - 2026-08-31
 
