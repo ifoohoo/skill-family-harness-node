@@ -19,12 +19,18 @@
 #ifndef RENAME_EXCL
 #error "RENAME_EXCL is unavailable"
 #endif
+#ifndef RENAME_SWAP
+#error "RENAME_SWAP is unavailable"
+#endif
 #define PLATFORM_NAME "darwin"
 #elif defined(__linux__)
 #include <linux/fs.h>
 #include <sys/syscall.h>
 #ifndef RENAME_NOREPLACE
 #error "RENAME_NOREPLACE is unavailable"
+#endif
+#ifndef RENAME_EXCHANGE
+#error "RENAME_EXCHANGE is unavailable"
 #endif
 #ifndef SYS_renameat2
 #error "SYS_renameat2 is unavailable"
@@ -331,6 +337,38 @@ static int read_decimal_property(napi_env env, napi_value object, const char *na
   return 1;
 }
 
+static int read_directory_identity(napi_env env, napi_value object, uint64_t *device,
+                                   uint64_t *inode, int32_t *mode) {
+  napi_value value;
+  if (!read_decimal_property(env, object, "device", device) ||
+      !read_decimal_property(env, object, "inode", inode) ||
+      napi_get_named_property(env, object, "mode", &value) != napi_ok ||
+      napi_get_value_int32(env, value, mode) != napi_ok || *mode < 0 || *mode > 0777) {
+    napi_throw_type_error(env, NULL, "expected directory identity requires device, inode, and mode");
+    return 0;
+  }
+  return 1;
+}
+
+static int matches_directory_identity(const struct stat *actual, uint64_t device,
+                                      uint64_t inode, int32_t mode) {
+  return S_ISDIR(actual->st_mode) && (uint64_t)actual->st_dev == device &&
+    (uint64_t)actual->st_ino == inode &&
+    (actual->st_mode & 0777) == (mode_t)mode;
+}
+
+static napi_value rename_success_result(napi_env env) {
+  napi_value result, value;
+  NAPI_OK(napi_create_object(env, &result), "cannot create native result");
+  NAPI_OK(napi_create_int32(env, 0, &value), "cannot encode native status");
+  NAPI_OK(napi_set_named_property(env, result, "status", value), "cannot set native status");
+  NAPI_OK(napi_get_boolean(env, true, &value), "cannot encode commit state");
+  NAPI_OK(napi_set_named_property(env, result, "committed", value), "cannot set commit state");
+  NAPI_OK(napi_create_string_utf8(env, PLATFORM_NAME, NAPI_AUTO_LENGTH, &value), "cannot encode platform");
+  NAPI_OK(napi_set_named_property(env, result, "platform", value), "cannot set platform");
+  return result;
+}
+
 static int unwrap_parent(napi_env env, napi_value value, parent_handle **output) {
   bool tagged = false;
   if (napi_check_object_type_tag(env, value, &PARENT_HANDLE_TAG, &tagged) != napi_ok || !tagged ||
@@ -356,8 +394,13 @@ static napi_value OpenParentDirectory(napi_env env, napi_callback_info info) {
   parent_handle *handle = calloc(1, sizeof(*handle));
   if (handle == NULL) { close(fd); return throw_last(env, "cannot allocate parent directory handle"); }
   handle->fd = fd;
-  if (napi_create_object(env, &result) != napi_ok || napi_wrap(env, result, handle, finalize_parent, NULL, NULL) != napi_ok ||
-      napi_type_tag_object(env, result, &PARENT_HANDLE_TAG) != napi_ok) {
+  if (napi_create_object(env, &result) != napi_ok) {
+    close(fd); free(handle); return throw_last(env, "cannot create parent directory handle");
+  }
+  if (napi_type_tag_object(env, result, &PARENT_HANDLE_TAG) != napi_ok) {
+    close(fd); free(handle); return throw_last(env, "cannot tag parent directory handle");
+  }
+  if (napi_wrap(env, result, handle, finalize_parent, NULL, NULL) != napi_ok) {
     close(fd); free(handle); return throw_last(env, "cannot create parent directory handle");
   }
   return result;
@@ -369,15 +412,17 @@ static napi_value CloseParentDirectory(napi_env env, napi_callback_info info) {
   parent_handle *handle = NULL;
   NAPI_OK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL), "cannot read arguments");
   if (argc != 1 || !unwrap_parent(env, argv[0], &handle)) return NULL;
-  if (close(handle->fd) != 0) return rename_errno_result(env, errno, 0, strerror(errno));
+  int fd = handle->fd;
   handle->closed = 1;
+  handle->fd = -1;
+  if (close(fd) != 0) return rename_errno_result(env, errno, 0, strerror(errno));
   NAPI_OK(napi_get_boolean(env, true, &result), "cannot encode close result");
   return result;
 }
 
 static napi_value RenameDirectoryNoReplace(napi_env env, napi_callback_info info) {
   size_t argc = 4;
-  napi_value argv[4], value, result;
+  napi_value argv[4], value;
   parent_handle *parent = NULL;
   char source[NAME_MAX + 1], target[NAME_MAX + 1];
   uint64_t expected_device = 0, expected_inode = 0;
@@ -411,14 +456,63 @@ static napi_value RenameDirectoryNoReplace(napi_env env, napi_callback_info info
   if (fstatat(parent->fd, target, &target_after, AT_SYMLINK_NOFOLLOW) != 0 || !S_ISDIR(target_after.st_mode) ||
       target_after.st_dev != source_stat.st_dev || target_after.st_ino != source_stat.st_ino ||
       (target_after.st_mode & 0777) != (source_stat.st_mode & 0777)) return rename_errno_result(env, EIO, 1, "target identity mismatch after committed rename");
-  NAPI_OK(napi_create_object(env, &result), "cannot create native result");
-  NAPI_OK(napi_create_int32(env, 0, &value), "cannot encode native status");
-  NAPI_OK(napi_set_named_property(env, result, "status", value), "cannot set native status");
-  NAPI_OK(napi_get_boolean(env, true, &value), "cannot encode commit state");
-  NAPI_OK(napi_set_named_property(env, result, "committed", value), "cannot set commit state");
-  NAPI_OK(napi_create_string_utf8(env, PLATFORM_NAME, NAPI_AUTO_LENGTH, &value), "cannot encode platform");
-  NAPI_OK(napi_set_named_property(env, result, "platform", value), "cannot set platform");
-  return result;
+  return rename_success_result(env);
+}
+
+static napi_value ExchangeDirectories(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  parent_handle *parent = NULL;
+  char source[NAME_MAX + 1], target[NAME_MAX + 1];
+  uint64_t parent_device = 0, parent_inode = 0;
+  uint64_t source_device = 0, source_inode = 0;
+  uint64_t target_device = 0, target_inode = 0;
+  int32_t parent_mode = 0, source_mode = 0, target_mode = 0;
+  NAPI_OK(napi_get_cb_info(env, info, &argc, argv, NULL, NULL), "cannot read arguments");
+  if (argc != 6 || !unwrap_parent(env, argv[0], &parent) ||
+      !read_parent_segment(env, argv[1], source) ||
+      !read_parent_segment(env, argv[2], target)) return NULL;
+  if (strcmp(source, target) == 0) return throw_last(env, "sourceSegment and targetSegment must differ");
+  if (!read_directory_identity(env, argv[3], &parent_device, &parent_inode, &parent_mode) ||
+      !read_directory_identity(env, argv[4], &source_device, &source_inode, &source_mode) ||
+      !read_directory_identity(env, argv[5], &target_device, &target_inode, &target_mode)) return NULL;
+
+  struct stat parent_stat, source_stat, target_stat;
+  if (fstat(parent->fd, &parent_stat) != 0) return rename_errno_result(env, errno, 0, strerror(errno));
+  if (!matches_directory_identity(&parent_stat, parent_device, parent_inode, parent_mode)) {
+    return rename_errno_result(env, EPROTO, 0, "parent identity changed before exchange");
+  }
+  if (fstatat(parent->fd, source, &source_stat, AT_SYMLINK_NOFOLLOW) != 0) {
+    return rename_errno_result(env, errno, 0, strerror(errno));
+  }
+  if (!matches_directory_identity(&source_stat, source_device, source_inode, source_mode)) {
+    return rename_errno_result(env, EPROTO, 0, "source identity changed before exchange");
+  }
+  if (fstatat(parent->fd, target, &target_stat, AT_SYMLINK_NOFOLLOW) != 0) {
+    return rename_errno_result(env, errno, 0, strerror(errno));
+  }
+  if (!matches_directory_identity(&target_stat, target_device, target_inode, target_mode)) {
+    return rename_errno_result(env, EPROTO, 0, "target identity changed before exchange");
+  }
+
+  int rc;
+#if defined(__APPLE__)
+  rc = renameatx_np(parent->fd, source, parent->fd, target, RENAME_SWAP);
+#else
+  rc = (int)syscall(SYS_renameat2, parent->fd, source, parent->fd, target, RENAME_EXCHANGE);
+#endif
+  if (rc != 0) return rename_errno_result(env, errno, 0, strerror(errno));
+
+  struct stat source_after, target_after;
+  if (fstatat(parent->fd, source, &source_after, AT_SYMLINK_NOFOLLOW) != 0 ||
+      !matches_directory_identity(&source_after, target_device, target_inode, target_mode)) {
+    return rename_errno_result(env, EIO, 1, "source identity mismatch after committed exchange");
+  }
+  if (fstatat(parent->fd, target, &target_after, AT_SYMLINK_NOFOLLOW) != 0 ||
+      !matches_directory_identity(&target_after, source_device, source_inode, source_mode)) {
+    return rename_errno_result(env, EIO, 1, "target identity mismatch after committed exchange");
+  }
+  return rename_success_result(env);
 }
 
 /* A complete bound-tree observation is deliberately implemented beside the
@@ -570,6 +664,8 @@ static napi_value Init(napi_env env, napi_value exports) {
   NAPI_OK(napi_set_named_property(env, exports, "openParentDirectory", value), "cannot export openParentDirectory");
   NAPI_OK(napi_create_function(env, "closeParentDirectory", NAPI_AUTO_LENGTH, CloseParentDirectory, NULL, &value), "cannot export closeParentDirectory");
   NAPI_OK(napi_set_named_property(env, exports, "closeParentDirectory", value), "cannot export closeParentDirectory");
+  NAPI_OK(napi_create_function(env, "exchangeDirectories", NAPI_AUTO_LENGTH, ExchangeDirectories, NULL, &value), "cannot export exchangeDirectories");
+  NAPI_OK(napi_set_named_property(env, exports, "exchangeDirectories", value), "cannot export exchangeDirectories");
   NAPI_OK(napi_create_function(env, "renameDirectoryNoReplace", NAPI_AUTO_LENGTH, RenameDirectoryNoReplace, NULL, &value), "cannot export renameDirectoryNoReplace");
   NAPI_OK(napi_set_named_property(env, exports, "renameDirectoryNoReplace", value), "cannot export renameDirectoryNoReplace");
   NAPI_OK(napi_create_string_utf8(env, PLATFORM_NAME, NAPI_AUTO_LENGTH, &value), "cannot encode platform");

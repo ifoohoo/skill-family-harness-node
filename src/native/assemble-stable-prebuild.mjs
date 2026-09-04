@@ -16,7 +16,7 @@ const PLATFORMS = Object.freeze({
   "linux-arm64-gnu": { os: "linux", arch: "arm64", libc: "glibc" },
   "linux-x64-gnu": { os: "linux", arch: "x64", libc: "glibc" },
 });
-const EXPORTS = Object.freeze(["closeParentDirectory", "observeFilesystemTreeNative", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]);
+const EXPORTS = Object.freeze(["closeParentDirectory", "exchangeDirectories", "observeFilesystemTreeNative", "openParentDirectory", "platform", "readFileBoundNative", "renameDirectoryNoReplace"]);
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const bindingGypSha256 = sha256(readFileSync(BINDING_GYP));
 

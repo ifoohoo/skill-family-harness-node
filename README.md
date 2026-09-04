@@ -4,22 +4,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.17.0 -->
+<!-- release-skill:release-version: 0.18.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.17.0** (2026-09-01)
+**0.18.0** (2026-09-05)
 
-Harness 0.17.0 is a lockstep version update with no new mechanism, native source change, or public API.
+Harness 0.18.0 adds the stable replaceFixedSetAtomic operation for replacing one existing fixed-set directory with one complete staged sibling.
+
+**Added**
+
+- Adds replaceFixedSetAtomic to the package root and fixed-set-publication subpath. Source and target must be real sibling directories under the same canonical parent.
+- Uses one Darwin RENAME_SWAP or Linux RENAME_EXCHANGE commit. On success, the complete new set occupies the target and the displaced old target remains at sourceRoot.
 
 **Changed**
 
-- Moves the package version to 0.17.0 together with Contracts and Engineering Kit while preserving the existing Harness capability and native prebuild surfaces.
+- Reports pre-commit, post-commit, publication, verification, commit, and durability state through the existing SFC2004 mechanism-error surface when replacement cannot return a verified success.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.17.0. Engineering-baseline validation and structural comparison belong to Contracts and Engineering Kit; no Harness migration is required.
+Pin all three Foundation packages to exactly 0.18.0. replaceFixedSetAtomic is not idempotent: calling it again with the same paths exchanges the directories back. Never retry blindly after success or a post-commit or indeterminate error. The caller owns cleanup of the displaced target after a verified success.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,7 +37,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.17.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.18.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -40,13 +45,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.17.0.tgz" "$pack_dir/skill-family-harness-node-0.17.0.tgz" "$pack_dir/skill-family-engineering-kit-0.17.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.18.0.tgz" "$pack_dir/skill-family-harness-node-0.18.0.tgz" "$pack_dir/skill-family-engineering-kit-0.18.0.tgz")
 ```
 
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.17.0
+npm install skill-family-harness-node@0.18.0
 npm info skill-family-harness-node --help
 ```
 
@@ -118,6 +123,7 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | `superviseProcess` / `validateTimeoutPolicy` | The single bounded subprocess supervisor. Its 0.11.0 `rawSink` option writes raw stdout/stderr bytes only to a fresh canonical private root, then waits for child/stream close, queued writes, fsync, and handle close. The caller must exclusively control the sink namespace for the entire call; handle protection does not prove stable pathname/root identity. |
 | `observeFilesystemTree` | Observe a complete bound tree. Default/reject preserves the existing UTF-16 member order; record uses code-point order and records symlink target bytes without following them. |
 | `observeExecutableIdentity` | Observe a caller-bound executable, its symlink chain, launch bytes, and any script interpreter chain for immediate pre-spawn re-observation. |
+| `createFixedSetPublicationManifest` / `publishFixedSet` / `replaceFixedSetAtomic` | Publish a complete fixed set without replacement, or atomically exchange a complete staged sibling with one existing target. |
 | `parseRequest` / `processRequest` | Parse `operation-request`, output terminal `operation-result`. |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | Consume a Contracts-validated report model, deterministically render neutral Markdown, and verify source/result/report binding; does not interpret business output. |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | Generic text-source closure, full-manifest digest re-verification, and atomic landing of the target set; specific Profile/driver is not in the Harness. |
@@ -125,6 +131,12 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | `openStateStore` / `appendEvent` / `readEvents` / `verifyStateStore` / `closeStateStore` | Strict single-writer append-only event store; the event directory is the sole state authority, `chain-head.json` is only a cache. |
 | `readSnapshot` / `writeSnapshot` / `rebuildSnapshot` | Atomic derived snapshots and full-event rebuild; a bad event cannot be masked by an old snapshot, and a bad snapshot can be ignored by rebuild. |
 | `inspectStateStoreLock` / `recoverStateStoreLock` | Read-only lock diagnostics and explicit recovery; recovery must precisely match the observed owner + fencing. |
+
+## Replacing an Existing Fixed Set
+
+`replaceFixedSetAtomic({ sourceRoot, targetParent, targetSegment })` requires `sourceRoot` and the existing target to be real sibling directories under the same canonical parent. It verifies both complete trees, then commits one Darwin `RENAME_SWAP` or Linux `RENAME_EXCHANGE`. A verified success leaves the new set at the target and the displaced old target at `sourceRoot`; Foundation does not delete either directory.
+
+The operation is not idempotent: a second call with the same paths exchanges the directories back. Do not retry blindly after a verified success or an error whose state is post-commit or indeterminate. Mechanism failures use `SFC2004` with `details.kind: "atomic-replace-failed"` and include the phase, publication, commit, verification, and durability state needed for caller-controlled recovery.
 
 ## State Store Lock and Recovery Boundaries
 
@@ -248,4 +260,4 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
-Version 0.17.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.
+Version 0.18.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.

@@ -5,22 +5,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.17.0 -->
+<!-- release-skill:release-version: 0.18.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.17.0** (2026-09-01)
+**0.18.0** (2026-09-05)
 
-Harness 0.17.0 随 Foundation 锁步升版，不新增机制，不修改原生源码或公共 API。
+Harness 0.18.0 新增稳定的 replaceFixedSetAtomic，用一个完整暂存目录替换一个既有固定集合目录。
+
+**新增**
+
+- 包根与 fixed-set-publication 子路径新增 replaceFixedSetAtomic。源目录和目标目录必须是同一规范父目录下的真实兄弟目录。
+- 提交只执行一次 Darwin RENAME_SWAP 或 Linux RENAME_EXCHANGE。成功后，新集合完整位于目标路径，被置换的旧目标留在 sourceRoot。
 
 **变更**
 
-- 包版本与 Contracts、Engineering Kit 一同升至 0.17.0，既有 Harness 能力和原生预构建表面保持不变。
+- 替换无法返回已验证成功时，沿用 SFC2004 机制错误表面，报告提交前后、发布、验证、提交和持久化状态。
 
 **升级说明**
 
-三个 Foundation 包须一起精确锁定到 0.17.0。工程基线校验与结构比较分别归 Contracts 和 Engineering Kit 负责，无需迁移 Harness API。
+三个 Foundation 包须一起精确锁定到 0.18.0。replaceFixedSetAtomic 不是幂等操作：相同路径再次调用会把两个目录交换回去。成功后，或收到提交后及不确定错误时，均不得盲目重试。调用方只在确认成功后负责清理被置换的旧目标。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +38,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.17.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+0.18.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +46,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.17.0.tgz" "$pack_dir/skill-family-harness-node-0.17.0.tgz" "$pack_dir/skill-family-engineering-kit-0.17.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.18.0.tgz" "$pack_dir/skill-family-harness-node-0.18.0.tgz" "$pack_dir/skill-family-engineering-kit-0.18.0.tgz")
 ```
 
 发布后再使用 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.17.0
+npm install skill-family-harness-node@0.18.0
 npm info skill-family-harness-node --help
 ```
 
@@ -119,6 +124,7 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 | `superviseProcess` / `validateTimeoutPolicy` | 唯一的受约束子进程监督器。0.11.0 的 `rawSink` 只向 fresh canonical 私有根写原始 stdout/stderr 字节，并等待子进程、流、排队写入、fsync 与句柄全部关闭。调用方必须在整个调用期间独占 sink 命名空间；句柄保护不证明 pathname 或根目录身份始终不变。 |
 | `observeFilesystemTree` | 观察完整绑定树。默认/reject 保留既有 UTF-16 成员顺序；record 使用码点顺序，记录 symlink target bytes 且不跟随目标。 |
 | `observeExecutableIdentity` | 观察调用方绑定的可执行入口、符号链接链、启动字节和脚本解释器链，供每次 spawn 前紧邻重观察。 |
+| `createFixedSetPublicationManifest` / `publishFixedSet` / `replaceFixedSetAtomic` | 发布不替换的完整固定集合，或把完整暂存兄弟目录与一个既有目标原子交换。 |
 | `parseRequest` / `processRequest` | 解析 `operation-request`，输出终态 `operation-result`。 |
 | `validateReportModel` / `renderReportMarkdown` / `buildBinding` / `checkReport` | 消费经 Contracts 验证的 report model，确定性渲染中性 Markdown 并校验来源/结果/报告绑定；不解释业务输出。 |
 | `normalizeAdapterSource` / `buildAdapterClosure` / `verifyAdapterBuildManifest` / `materializeAdapterBuild` | 通用文本 source closure、manifest 全摘要复验和目标集合原子落盘；具体 Profile/driver 不在 Harness。 |
@@ -126,6 +132,12 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 | `openStateStore` / `appendEvent` / `readEvents` / `verifyStateStore` / `closeStateStore` | 严格单写者的 append-only 事件存储；事件目录是唯一状态权威，`chain-head.json` 只是缓存。 |
 | `readSnapshot` / `writeSnapshot` / `rebuildSnapshot` | 原子派生快照与完整事件重建；坏事件不能被旧快照掩盖，坏快照可被重建忽略。 |
 | `inspectStateStoreLock` / `recoverStateStoreLock` | 只读锁诊断与显式恢复；恢复必须对观测到的 owner + fencing 做精确匹配。 |
+
+## 替换既有固定集合
+
+`replaceFixedSetAtomic({ sourceRoot, targetParent, targetSegment })` 要求 `sourceRoot` 与既有目标是同一规范父目录下的真实兄弟目录。它先复验两棵完整目录树，再执行一次 Darwin `RENAME_SWAP` 或 Linux `RENAME_EXCHANGE`。确认成功后，新集合位于目标路径，被置换的旧目标留在 `sourceRoot`；Foundation 不删除任一目录。
+
+该操作不是幂等操作：相同路径再次调用会把两个目录交换回去。确认成功后，或错误状态为提交后及不确定时，不得盲目重试。机制失败使用 `SFC2004` 与 `details.kind: "atomic-replace-failed"`，并给出提交阶段、发布、提交、验证和持久化状态，供调用方自行恢复。
 
 ## 状态存储的锁与恢复边界
 
@@ -248,4 +260,4 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
-0.17.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+0.18.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

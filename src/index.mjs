@@ -199,4 +199,4 @@ export {
   close,
 } from "./state-store.mjs";
 export { createFilesystemRootBinding, readFileBound } from "./bound-read.mjs";
-export { createFixedSetPublicationManifest, publishFixedSet } from "./fixed-set-publication.mjs";
+export { createFixedSetPublicationManifest, publishFixedSet, replaceFixedSetAtomic } from "./fixed-set-publication.mjs";

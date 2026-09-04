@@ -1,0 +1,21 @@
+version: 0.18.0
+date: 2026-09-05
+locales:
+  en:
+    summary: Harness 0.18.0 adds the stable replaceFixedSetAtomic operation for replacing one existing fixed-set directory with one complete staged sibling.
+    changes:
+      added:
+        - Adds replaceFixedSetAtomic to the package root and fixed-set-publication subpath. Source and target must be real sibling directories under the same canonical parent.
+        - Uses one Darwin RENAME_SWAP or Linux RENAME_EXCHANGE commit. On success, the complete new set occupies the target and the displaced old target remains at sourceRoot.
+      changed:
+        - Reports pre-commit, post-commit, publication, verification, commit, and durability state through the existing SFC2004 mechanism-error surface when replacement cannot return a verified success.
+    upgradeNotes: "Pin all three Foundation packages to exactly 0.18.0. replaceFixedSetAtomic is not idempotent: calling it again with the same paths exchanges the directories back. Never retry blindly after success or a post-commit or indeterminate error. The caller owns cleanup of the displaced target after a verified success."
+  zh-CN:
+    summary: Harness 0.18.0 新增稳定的 replaceFixedSetAtomic，用一个完整暂存目录替换一个既有固定集合目录。
+    changes:
+      added:
+        - 包根与 fixed-set-publication 子路径新增 replaceFixedSetAtomic。源目录和目标目录必须是同一规范父目录下的真实兄弟目录。
+        - 提交只执行一次 Darwin RENAME_SWAP 或 Linux RENAME_EXCHANGE。成功后，新集合完整位于目标路径，被置换的旧目标留在 sourceRoot。
+      changed:
+        - 替换无法返回已验证成功时，沿用 SFC2004 机制错误表面，报告提交前后、发布、验证、提交和持久化状态。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.18.0。replaceFixedSetAtomic 不是幂等操作：相同路径再次调用会把两个目录交换回去。成功后，或收到提交后及不确定错误时，均不得盲目重试。调用方只在确认成功后负责清理被置换的旧目标。

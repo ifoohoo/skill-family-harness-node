@@ -1,5 +1,25 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.18.0 locale=zh-CN baseline=sha256:ba40c3c901c8f717b18d131344fe94a470c149ddb1d0f96e5611d38bf1c70d3d -->
+## [0.18.0] - 2026-09-05
+
+Harness 0.18.0 新增稳定的 replaceFixedSetAtomic，用一个完整暂存目录替换一个既有固定集合目录。
+
+### 新增
+
+- 包根与 fixed-set-publication 子路径新增 replaceFixedSetAtomic。源目录和目标目录必须是同一规范父目录下的真实兄弟目录。
+- 提交只执行一次 Darwin RENAME_SWAP 或 Linux RENAME_EXCHANGE。成功后，新集合完整位于目标路径，被置换的旧目标留在 sourceRoot。
+
+### 变更
+
+- 替换无法返回已验证成功时，沿用 SFC2004 机制错误表面，报告提交前后、发布、验证、提交和持久化状态。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.18.0。replaceFixedSetAtomic 不是幂等操作：相同路径再次调用会把两个目录交换回去。成功后，或收到提交后及不确定错误时，均不得盲目重试。调用方只在确认成功后负责清理被置换的旧目标。
+<!-- release-skill:changelog:end version=0.18.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.17.0 locale=zh-CN baseline=sha256:fc1c5f48463b2d62363952f566011600a8a84b11456519507c8dc03bf58756d5 -->
 ## [0.17.0] - 2026-09-01
 

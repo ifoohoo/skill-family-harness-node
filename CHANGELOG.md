@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.18.0 locale=en baseline=sha256:ca3679574ea53013c830563ae818326062794aec1f486e6953e89fa8937be644 -->
+## [0.18.0] - 2026-09-05
+
+Harness 0.18.0 adds the stable replaceFixedSetAtomic operation for replacing one existing fixed-set directory with one complete staged sibling.
+
+### Added
+
+- Adds replaceFixedSetAtomic to the package root and fixed-set-publication subpath. Source and target must be real sibling directories under the same canonical parent.
+- Uses one Darwin RENAME_SWAP or Linux RENAME_EXCHANGE commit. On success, the complete new set occupies the target and the displaced old target remains at sourceRoot.
+
+### Changed
+
+- Reports pre-commit, post-commit, publication, verification, commit, and durability state through the existing SFC2004 mechanism-error surface when replacement cannot return a verified success.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.18.0. replaceFixedSetAtomic is not idempotent: calling it again with the same paths exchanges the directories back. Never retry blindly after success or a post-commit or indeterminate error. The caller owns cleanup of the displaced target after a verified success.
+<!-- release-skill:changelog:end version=0.18.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.17.0 locale=en baseline=sha256:5c685956ff1920dccdd91198687dbc1414bfef474a0d297bbcb7704014c549bd -->
 ## [0.17.0] - 2026-09-01
 

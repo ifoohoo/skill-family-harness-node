@@ -1,2 +1,2 @@
 /** Exact Foundation release coordinate shared by the public Harness exports. */
-export const FOUNDATION_PACKAGE_VERSION = "0.17.0";
+export const FOUNDATION_PACKAGE_VERSION = "0.18.0";
