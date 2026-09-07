@@ -1,5 +1,26 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.19.0 locale=zh-CN baseline=sha256:e0a716c69bbc9033af79ab9b1d1b607ba997b5324bb8301dfc8e0b7f4072dab2 -->
+## [0.19.0] - 2026-09-07
+
+Harness 0.19.0 在既有固定机制 CLI 上新增 runMechanismCliBatch 与显式 --batch 模式，提供有界、有序、同操作批量传输，首批操作 canonical-json。
+
+### 新增
+
+- 新增 runMechanismCliBatch({input, output, error})：读入一个批量请求，逐项返回 inputIndex、exitCode 与原单请求响应。
+- 官方 Bundle 投影的 mechanisms-cli.mjs 新增显式 --batch 模式。不带 --batch 时旧单请求路径不变。
+
+### 变更
+
+- 批量结构与容量拒绝使用 TypeError，error.details.kind 封闭为 batch-structure-invalid、batch-item-limit、batch-input-limit、batch-output-limit。
+- 单项机制失败写入该项结果位置，其余项继续执行；任一机制项失败时整批退出码为 2。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.19.0。固定容量政策为 256 项、16 MiB 输入字节、32 MiB 输出字节；相互独立请求的分组与超限切分由消费者负责。该入口为候选能力，升级后须重新验证。旧单请求 CLI 合同保持不变。
+<!-- release-skill:changelog:end version=0.19.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.18.0 locale=zh-CN baseline=sha256:ba40c3c901c8f717b18d131344fe94a470c149ddb1d0f96e5611d38bf1c70d3d -->
 ## [0.18.0] - 2026-09-05
 

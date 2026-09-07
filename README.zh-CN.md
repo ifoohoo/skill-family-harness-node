@@ -5,27 +5,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.18.0 -->
+<!-- release-skill:release-version: 0.19.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.18.0** (2026-09-05)
+**0.19.0** (2026-09-07)
 
-Harness 0.18.0 新增稳定的 replaceFixedSetAtomic，用一个完整暂存目录替换一个既有固定集合目录。
+Harness 0.19.0 在既有固定机制 CLI 上新增 runMechanismCliBatch 与显式 --batch 模式，提供有界、有序、同操作批量传输，首批操作 canonical-json。
 
 **新增**
 
-- 包根与 fixed-set-publication 子路径新增 replaceFixedSetAtomic。源目录和目标目录必须是同一规范父目录下的真实兄弟目录。
-- 提交只执行一次 Darwin RENAME_SWAP 或 Linux RENAME_EXCHANGE。成功后，新集合完整位于目标路径，被置换的旧目标留在 sourceRoot。
+- 新增 runMechanismCliBatch({input, output, error})：读入一个批量请求，逐项返回 inputIndex、exitCode 与原单请求响应。
+- 官方 Bundle 投影的 mechanisms-cli.mjs 新增显式 --batch 模式。不带 --batch 时旧单请求路径不变。
 
 **变更**
 
-- 替换无法返回已验证成功时，沿用 SFC2004 机制错误表面，报告提交前后、发布、验证、提交和持久化状态。
+- 批量结构与容量拒绝使用 TypeError，error.details.kind 封闭为 batch-structure-invalid、batch-item-limit、batch-input-limit、batch-output-limit。
+- 单项机制失败写入该项结果位置，其余项继续执行；任一机制项失败时整批退出码为 2。
 
 **升级说明**
 
-三个 Foundation 包须一起精确锁定到 0.18.0。replaceFixedSetAtomic 不是幂等操作：相同路径再次调用会把两个目录交换回去。成功后，或收到提交后及不确定错误时，均不得盲目重试。调用方只在确认成功后负责清理被置换的旧目标。
+三个 Foundation 包须一起精确锁定到 0.19.0。固定容量政策为 256 项、16 MiB 输入字节、32 MiB 输出字节；相互独立请求的分组与超限切分由消费者负责。该入口为候选能力，升级后须重新验证。旧单请求 CLI 合同保持不变。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -52,7 +53,7 @@ mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
 发布后再使用 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.18.0
+npm install skill-family-harness-node@0.19.0
 npm info skill-family-harness-node --help
 ```
 

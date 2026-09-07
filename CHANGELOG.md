@@ -1,5 +1,26 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.19.0 locale=en baseline=sha256:c3b3a06b509cc53719c2de75d1edacd22c1711c99c5f7687ad91f350976262e3 -->
+## [0.19.0] - 2026-09-07
+
+Harness 0.19.0 adds runMechanismCliBatch and the explicit --batch CLI mode for bounded, ordered, same-operation batch transport, with canonical-json as the first operation.
+
+### Added
+
+- Adds runMechanismCliBatch({input, output, error}) on the existing fixed mechanism CLI, reading one batch request and returning per-item results with inputIndex, exitCode, and the original single-request response.
+- Adds the explicit --batch mode to the official Bundle-projected mechanisms-cli.mjs. Without --batch the old single-request path is unchanged.
+
+### Changed
+
+- Batch structure and capacity refusals use TypeError with error.details.kind from the closed set batch-structure-invalid, batch-item-limit, batch-input-limit, and batch-output-limit.
+- A single item's mechanism failure is recorded in its result position and sibling items continue; the whole batch exits 2 when any item failed.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.19.0. The fixed capacity policy is 256 items, 16 MiB input bytes, and 32 MiB output bytes; consumers own grouping independent requests and splitting oversized batches. This entry is candidate: re-verify after upgrading. The old single-request CLI keeps its previous contract.
+<!-- release-skill:changelog:end version=0.19.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.18.0 locale=en baseline=sha256:ca3679574ea53013c830563ae818326062794aec1f486e6953e89fa8937be644 -->
 ## [0.18.0] - 2026-09-05
 

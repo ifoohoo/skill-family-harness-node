@@ -1,0 +1,23 @@
+version: 0.19.0
+date: 2026-09-07
+locales:
+  en:
+    summary: Harness 0.19.0 adds runMechanismCliBatch and the explicit --batch CLI mode for bounded, ordered, same-operation batch transport, with canonical-json as the first operation.
+    changes:
+      added:
+        - Adds runMechanismCliBatch({input, output, error}) on the existing fixed mechanism CLI, reading one batch request and returning per-item results with inputIndex, exitCode, and the original single-request response.
+        - Adds the explicit --batch mode to the official Bundle-projected mechanisms-cli.mjs. Without --batch the old single-request path is unchanged.
+      changed:
+        - Batch structure and capacity refusals use TypeError with error.details.kind from the closed set batch-structure-invalid, batch-item-limit, batch-input-limit, and batch-output-limit.
+        - A single item's mechanism failure is recorded in its result position and sibling items continue; the whole batch exits 2 when any item failed.
+    upgradeNotes: "Pin all three Foundation packages to exactly 0.19.0. The fixed capacity policy is 256 items, 16 MiB input bytes, and 32 MiB output bytes; consumers own grouping independent requests and splitting oversized batches. This entry is candidate: re-verify after upgrading. The old single-request CLI keeps its previous contract."
+  zh-CN:
+    summary: Harness 0.19.0 在既有固定机制 CLI 上新增 runMechanismCliBatch 与显式 --batch 模式，提供有界、有序、同操作批量传输，首批操作 canonical-json。
+    changes:
+      added:
+        - 新增 runMechanismCliBatch({input, output, error})：读入一个批量请求，逐项返回 inputIndex、exitCode 与原单请求响应。
+        - 官方 Bundle 投影的 mechanisms-cli.mjs 新增显式 --batch 模式。不带 --batch 时旧单请求路径不变。
+      changed:
+        - 批量结构与容量拒绝使用 TypeError，error.details.kind 封闭为 batch-structure-invalid、batch-item-limit、batch-input-limit、batch-output-limit。
+        - 单项机制失败写入该项结果位置，其余项继续执行；任一机制项失败时整批退出码为 2。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.19.0。固定容量政策为 256 项、16 MiB 输入字节、32 MiB 输出字节；相互独立请求的分组与超限切分由消费者负责。该入口为候选能力，升级后须重新验证。旧单请求 CLI 合同保持不变。

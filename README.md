@@ -4,27 +4,28 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.18.0 -->
+<!-- release-skill:release-version: 0.19.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.18.0** (2026-09-05)
+**0.19.0** (2026-09-07)
 
-Harness 0.18.0 adds the stable replaceFixedSetAtomic operation for replacing one existing fixed-set directory with one complete staged sibling.
+Harness 0.19.0 adds runMechanismCliBatch and the explicit --batch CLI mode for bounded, ordered, same-operation batch transport, with canonical-json as the first operation.
 
 **Added**
 
-- Adds replaceFixedSetAtomic to the package root and fixed-set-publication subpath. Source and target must be real sibling directories under the same canonical parent.
-- Uses one Darwin RENAME_SWAP or Linux RENAME_EXCHANGE commit. On success, the complete new set occupies the target and the displaced old target remains at sourceRoot.
+- Adds runMechanismCliBatch({input, output, error}) on the existing fixed mechanism CLI, reading one batch request and returning per-item results with inputIndex, exitCode, and the original single-request response.
+- Adds the explicit --batch mode to the official Bundle-projected mechanisms-cli.mjs. Without --batch the old single-request path is unchanged.
 
 **Changed**
 
-- Reports pre-commit, post-commit, publication, verification, commit, and durability state through the existing SFC2004 mechanism-error surface when replacement cannot return a verified success.
+- Batch structure and capacity refusals use TypeError with error.details.kind from the closed set batch-structure-invalid, batch-item-limit, batch-input-limit, and batch-output-limit.
+- A single item's mechanism failure is recorded in its result position and sibling items continue; the whole batch exits 2 when any item failed.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.18.0. replaceFixedSetAtomic is not idempotent: calling it again with the same paths exchanges the directories back. Never retry blindly after success or a post-commit or indeterminate error. The caller owns cleanup of the displaced target after a verified success.
+Pin all three Foundation packages to exactly 0.19.0. The fixed capacity policy is 256 items, 16 MiB input bytes, and 32 MiB output bytes; consumers own grouping independent requests and splitting oversized batches. This entry is candidate: re-verify after upgrading. The old single-request CLI keeps its previous contract.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -51,7 +52,7 @@ mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.18.0
+npm install skill-family-harness-node@0.19.0
 npm info skill-family-harness-node --help
 ```
 
