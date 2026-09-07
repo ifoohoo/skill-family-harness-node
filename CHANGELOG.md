@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.19.2 locale=en baseline=sha256:ac3f4b15f249649e6bbae8c6a21e48f28fa206346108b21958a8daa22d85f243 -->
+## [0.19.2] - 2026-09-08
+
+Harness 0.19.2 aligns its package version with the Foundation Adoption Review distribution patch. Existing mechanisms and runtime behavior are unchanged.
+
+### Changed
+
+- Aligns the package version and release documentation with Foundation 0.19.2 without changing Harness implementation or driver behavior.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.19.2. This patch adds no Harness capability and does not change host descriptors, drivers, since values, or maturity.
+<!-- release-skill:changelog:end version=0.19.2 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.19.1 locale=en baseline=sha256:76ded57ddca31105929a12a1b198bd6da407090e353dbf90096c17da5532a3ea -->
 ## [0.19.1] - 2026-09-08
 

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.19.2 locale=zh-CN baseline=sha256:aef79e7341fbe6581d798fd5d7371315c023b4a0c1733b094b13ce4166bfbcf3 -->
+## [0.19.2] - 2026-09-08
+
+Harness 0.19.2 将包版本与 Foundation Adoption Review 分发补丁对齐。既有机制和运行时行为保持不变。
+
+### 变更
+
+- 包版本和发布说明与 Foundation 0.19.2 数值对齐；Harness 实现和 driver 行为不变。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.19.2。本补丁不增加 Harness 能力，不改变宿主 descriptor、driver、since 字段或成熟度。
+<!-- release-skill:changelog:end version=0.19.2 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.19.1 locale=zh-CN baseline=sha256:398aacf147e429237ff5b72fa1d22652afb76eb49da388eeb333d073bbd0a032 -->
 ## [0.19.1] - 2026-09-08
 

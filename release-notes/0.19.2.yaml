@@ -1,0 +1,15 @@
+version: 0.19.2
+date: 2026-09-08
+locales:
+  en:
+    summary: Harness 0.19.2 aligns its package version with the Foundation Adoption Review distribution patch. Existing mechanisms and runtime behavior are unchanged.
+    changes:
+      changed:
+        - Aligns the package version and release documentation with Foundation 0.19.2 without changing Harness implementation or driver behavior.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.19.2. This patch adds no Harness capability and does not change host descriptors, drivers, since values, or maturity.
+  zh-CN:
+    summary: Harness 0.19.2 将包版本与 Foundation Adoption Review 分发补丁对齐。既有机制和运行时行为保持不变。
+    changes:
+      changed:
+        - 包版本和发布说明与 Foundation 0.19.2 数值对齐；Harness 实现和 driver 行为不变。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.19.2。本补丁不增加 Harness 能力，不改变宿主 descriptor、driver、since 字段或成熟度。
