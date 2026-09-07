@@ -4,28 +4,24 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.19.0 -->
+<!-- release-skill:release-version: 0.19.1 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.19.0** (2026-09-07)
+**0.19.1** (2026-09-08)
 
-Harness 0.19.0 adds runMechanismCliBatch and the explicit --batch CLI mode for bounded, ordered, same-operation batch transport, with canonical-json as the first operation.
+Harness 0.19.1 makes the candidate mechanism-batch entry point settle on the current transfer's actual completion or failure while preserving caller ownership of programmatic streams.
 
-**Added**
+**Fixed**
 
-- Adds runMechanismCliBatch({input, output, error}) on the existing fixed mechanism CLI, reading one batch request and returning per-item results with inputIndex, exitCode, and the original single-request response.
-- Adds the explicit --batch mode to the official Bundle-projected mechanisms-cli.mjs. Without --batch the old single-request path is unchanged.
-
-**Changed**
-
-- Batch structure and capacity refusals use TypeError with error.details.kind from the closed set batch-structure-invalid, batch-item-limit, batch-input-limit, and batch-output-limit.
-- A single item's mechanism failure is recorded in its result position and sibling items continue; the whole batch exits 2 when any item failed.
+- Waits for the current write callback, handles premature input and output closure, and removes only listeners installed by the batch helper.
+- Stops the library helper's own reading and releases its buffer after input overflow without destroying a caller-owned stream.
+- Releases CLI-owned standard input after an oversized request is reported, allowing the process to exit 2 while the upstream pipe remains open.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.19.0. The fixed capacity policy is 256 items, 16 MiB input bytes, and 32 MiB output bytes; consumers own grouping independent requests and splitting oversized batches. This entry is candidate: re-verify after upgrading. The old single-request CLI keeps its previous contract.
+Pin all three Foundation packages to exactly 0.19.1. The batch operation, capacity policy, per-item order, and single-request CLI remain unchanged. This entry is candidate and requires re-verification after an upgrade.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -38,7 +34,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.18.0 is a local candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.19.1 is the local source candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -46,13 +42,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.18.0.tgz" "$pack_dir/skill-family-harness-node-0.18.0.tgz" "$pack_dir/skill-family-engineering-kit-0.18.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.19.1.tgz" "$pack_dir/skill-family-harness-node-0.19.1.tgz" "$pack_dir/skill-family-engineering-kit-0.19.1.tgz")
 ```
 
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.19.0
+npm install skill-family-harness-node@0.19.1
 npm info skill-family-harness-node --help
 ```
 
@@ -261,4 +257,4 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
-Version 0.18.0 is a local source candidate and is not published. Consume the three locally verified tarballs; a version marker, unit test or successful install is not complete contract integration, migration completion, or real-host qualification.
+Version 0.19.1 is the local source candidate. Remote availability must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.

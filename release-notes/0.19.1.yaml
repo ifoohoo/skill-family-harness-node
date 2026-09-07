@@ -1,0 +1,19 @@
+version: 0.19.1
+date: 2026-09-08
+locales:
+  en:
+    summary: Harness 0.19.1 makes the candidate mechanism-batch entry point settle on the current transfer's actual completion or failure while preserving caller ownership of programmatic streams.
+    changes:
+      fixed:
+        - Waits for the current write callback, handles premature input and output closure, and removes only listeners installed by the batch helper.
+        - Stops the library helper's own reading and releases its buffer after input overflow without destroying a caller-owned stream.
+        - Releases CLI-owned standard input after an oversized request is reported, allowing the process to exit 2 while the upstream pipe remains open.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.19.1. The batch operation, capacity policy, per-item order, and single-request CLI remain unchanged. This entry is candidate and requires re-verification after an upgrade.
+  zh-CN:
+    summary: Harness 0.19.1 让候选机制批量入口等待本次传输真正完成或失败，同时保留程序化入口中调用方对流的所有权。
+    changes:
+      fixed:
+        - 等待本次写入回调，处理输入与输出提前关闭，并且只移除批量辅助函数自己安装的监听器。
+        - 输入超限后停止库辅助函数自己的读取并释放缓存，不销毁调用方拥有的流。
+        - 超限错误写出后释放 CLI 自己拥有的标准输入，使上游管道保持打开时进程仍能自行退出 2。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.19.1。批量操作、容量政策、逐项顺序和旧单请求 CLI 保持不变。该入口仍是候选能力，升级后须重新验证。

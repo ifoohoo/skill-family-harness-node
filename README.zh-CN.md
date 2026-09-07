@@ -5,28 +5,24 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.19.0 -->
+<!-- release-skill:release-version: 0.19.1 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.19.0** (2026-09-07)
+**0.19.1** (2026-09-08)
 
-Harness 0.19.0 在既有固定机制 CLI 上新增 runMechanismCliBatch 与显式 --batch 模式，提供有界、有序、同操作批量传输，首批操作 canonical-json。
+Harness 0.19.1 让候选机制批量入口等待本次传输真正完成或失败，同时保留程序化入口中调用方对流的所有权。
 
-**新增**
+**修复**
 
-- 新增 runMechanismCliBatch({input, output, error})：读入一个批量请求，逐项返回 inputIndex、exitCode 与原单请求响应。
-- 官方 Bundle 投影的 mechanisms-cli.mjs 新增显式 --batch 模式。不带 --batch 时旧单请求路径不变。
-
-**变更**
-
-- 批量结构与容量拒绝使用 TypeError，error.details.kind 封闭为 batch-structure-invalid、batch-item-limit、batch-input-limit、batch-output-limit。
-- 单项机制失败写入该项结果位置，其余项继续执行；任一机制项失败时整批退出码为 2。
+- 等待本次写入回调，处理输入与输出提前关闭，并且只移除批量辅助函数自己安装的监听器。
+- 输入超限后停止库辅助函数自己的读取并释放缓存，不销毁调用方拥有的流。
+- 超限错误写出后释放 CLI 自己拥有的标准输入，使上游管道保持打开时进程仍能自行退出 2。
 
 **升级说明**
 
-三个 Foundation 包须一起精确锁定到 0.19.0。固定容量政策为 256 项、16 MiB 输入字节、32 MiB 输出字节；相互独立请求的分组与超限切分由消费者负责。该入口为候选能力，升级后须重新验证。旧单请求 CLI 合同保持不变。
+三个 Foundation 包须一起精确锁定到 0.19.1。批量操作、容量政策、逐项顺序和旧单请求 CLI 保持不变。该入口仍是候选能力，升级后须重新验证。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -39,7 +35,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.18.0 是本地候选版本。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+0.19.1 是本地源码候选。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -47,13 +43,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.18.0.tgz" "$pack_dir/skill-family-harness-node-0.18.0.tgz" "$pack_dir/skill-family-engineering-kit-0.18.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.19.1.tgz" "$pack_dir/skill-family-harness-node-0.19.1.tgz" "$pack_dir/skill-family-engineering-kit-0.19.1.tgz")
 ```
 
 发布后再使用 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.19.0
+npm install skill-family-harness-node@0.19.1
 npm info skill-family-harness-node --help
 ```
 
@@ -261,4 +257,4 @@ v2 机制会重算每个 path-backed output 和 evidence Resource 的真实字�
 
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
-0.18.0 为本地源码候选，尚未发布。消费本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+0.19.1 是本地源码候选，远端可用性须由对应的 release-skill 发布后证据证明。候选检查使用本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

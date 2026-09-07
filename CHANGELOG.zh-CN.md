@@ -1,5 +1,22 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.19.1 locale=zh-CN baseline=sha256:398aacf147e429237ff5b72fa1d22652afb76eb49da388eeb333d073bbd0a032 -->
+## [0.19.1] - 2026-09-08
+
+Harness 0.19.1 让候选机制批量入口等待本次传输真正完成或失败，同时保留程序化入口中调用方对流的所有权。
+
+### 修复
+
+- 等待本次写入回调，处理输入与输出提前关闭，并且只移除批量辅助函数自己安装的监听器。
+- 输入超限后停止库辅助函数自己的读取并释放缓存，不销毁调用方拥有的流。
+- 超限错误写出后释放 CLI 自己拥有的标准输入，使上游管道保持打开时进程仍能自行退出 2。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.19.1。批量操作、容量政策、逐项顺序和旧单请求 CLI 保持不变。该入口仍是候选能力，升级后须重新验证。
+<!-- release-skill:changelog:end version=0.19.1 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.19.0 locale=zh-CN baseline=sha256:e0a716c69bbc9033af79ab9b1d1b607ba997b5324bb8301dfc8e0b7f4072dab2 -->
 ## [0.19.0] - 2026-09-07
 

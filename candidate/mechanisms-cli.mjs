@@ -176,21 +176,45 @@ function batchRefusal(kind, message) {
  * path releases this function's listeners; refusal never terminates the
  * caller process.
  */
-function readBoundedBatchInput(input, byteLimit) {
+function readBoundedBatchInput(input, byteLimit, outputWatch) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let received = 0;
+    let settled = false;
+    let preexistingErrorFallback;
+    let deferredFailure;
+    let stopWatchingOutput = () => {};
+    const startedFlowing = input.readableFlowing !== true && input.listenerCount("data") === 0;
     const cleanup = () => {
       input.removeListener("data", onData);
       input.removeListener("end", onEnd);
       input.removeListener("error", onError);
+      input.removeListener("close", onClose);
+      stopWatchingOutput();
+      if (preexistingErrorFallback !== undefined) {
+        clearImmediate(preexistingErrorFallback);
+        preexistingErrorFallback = undefined;
+      }
+    };
+    const rejectRead = (cause) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      chunks.length = 0;
+      if (
+        startedFlowing &&
+        input.readableFlowing === true &&
+        input.listenerCount("data") === 0
+      ) {
+        input.pause();
+      }
+      reject(cause);
     };
     const onData = (chunk) => {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       const next = received + bytes.length;
       if (next > byteLimit) {
-        cleanup();
-        reject(
+        rejectRead(
           batchRefusal(
             "batch-input-limit",
             `mechanism batch input exceeds ${byteLimit} raw UTF-8 bytes`,
@@ -202,16 +226,45 @@ function readBoundedBatchInput(input, byteLimit) {
       chunks.push(bytes);
     };
     const onEnd = () => {
+      if (settled) return;
+      settled = true;
       cleanup();
-      resolve(Buffer.concat(chunks));
+      const bytes = Buffer.concat(chunks, received);
+      chunks.length = 0;
+      resolve(bytes);
     };
     const onError = (cause) => {
-      cleanup();
-      reject(cause);
+      rejectRead(deferredFailure ?? cause);
+    };
+    const onClose = () => {
+      rejectRead(
+        deferredFailure ?? input.errored ?? new Error("mechanism batch input closed before the request ended"),
+      );
+    };
+    const onOutputFailure = (cause) => {
+      if (input.errored) {
+        deferredFailure ??= cause;
+        if (preexistingErrorFallback === undefined) {
+          preexistingErrorFallback = setImmediate(() => rejectRead(deferredFailure));
+        }
+        return;
+      }
+      rejectRead(cause);
     };
     input.on("data", onData);
     input.on("end", onEnd);
     input.on("error", onError);
+    input.on("close", onClose);
+    // A destroy(error) may have set `closed` while its public error event is
+    // still queued. Keep our listener through that event; the immediate also
+    // handles a stream whose error event had already been observed by callers.
+    if (input.errored) {
+      preexistingErrorFallback = setImmediate(() => rejectRead(deferredFailure ?? input.errored));
+    } else if (input.closed || input.readableEnded || input.destroyed) {
+      onClose();
+    }
+    stopWatchingOutput = outputWatch.onFailure(onOutputFailure);
+    if (settled) stopWatchingOutput();
   });
 }
 
@@ -250,31 +303,121 @@ function assertMechanismBatchShape(request) {
   }
 }
 
+// Keeps only the batch call's short-lived listeners active before the actual
+// write begins. This closes the gap where an already-destroyed Writable still
+// owes its public error event, without ending or otherwise managing the stream.
+function watchBatchWritable(stream, channelName) {
+  let failure = stream.errored;
+  let failureListener;
+  let pendingErrorFallback;
+  let resolvePendingError;
+  const pendingError = failure
+    ? new Promise((resolve) => {
+      resolvePendingError = resolve;
+      pendingErrorFallback = setImmediate(resolve);
+    })
+    : undefined;
+  const onError = (cause) => {
+    failure ??= cause;
+    failureListener?.(failure);
+    if (resolvePendingError) {
+      clearImmediate(pendingErrorFallback);
+      pendingErrorFallback = undefined;
+      const resolve = resolvePendingError;
+      resolvePendingError = undefined;
+      resolve();
+    }
+  };
+  const onClose = () => {
+    failure ??= stream.errored ?? new Error(
+      `mechanism batch ${channelName} closed before its write completed`,
+    );
+    failureListener?.(failure);
+  };
+  stream.on("error", onError);
+  stream.on("close", onClose);
+  if (!failure && (stream.closed || stream.writableEnded || stream.destroyed)) onClose();
+  return {
+    pendingError,
+    failure: () => failure,
+    onFailure(listener) {
+      failureListener = listener;
+      if (failure) listener(failure);
+      return () => {
+        if (failureListener === listener) failureListener = undefined;
+      };
+    },
+    release() {
+      failureListener = undefined;
+      stream.removeListener("error", onError);
+      stream.removeListener("close", onClose);
+      if (pendingErrorFallback !== undefined) clearImmediate(pendingErrorFallback);
+    },
+  };
+}
+
 /**
- * Waits until the writable accepted the whole payload, propagating both
- * synchronous write throws and asynchronous stream errors.
+ * Waits for this write's callback rather than treating the writable's buffer
+ * signal as delivery completion. The caller retains ownership of the stream,
+ * so completion neither ends it nor waits for the whole stream to finish.
  */
-function writeAll(stream, text) {
+function writeAll(stream, text, channelName) {
   return new Promise((resolve, reject) => {
-    const onError = (cause) => {
-      stream.removeListener("drain", onDrain);
+    let settled = false;
+    let callbackFailureFallback;
+    const cleanup = () => {
+      stream.removeListener("error", onError);
+      stream.removeListener("close", onClose);
+      if (callbackFailureFallback !== undefined) {
+        clearImmediate(callbackFailureFallback);
+        callbackFailureFallback = undefined;
+      }
+    };
+    const rejectWrite = (cause) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
       reject(cause);
     };
-    const onDrain = () => {
-      stream.removeListener("error", onError);
+    const onError = (cause) => {
+      rejectWrite(cause);
+    };
+    const onClose = () => {
+      rejectWrite(
+        stream.errored ?? new Error(`mechanism batch ${channelName} closed before its write completed`),
+      );
+    };
+    const onWrite = (cause) => {
+      if (settled) return;
+      if (cause) {
+        // A standard Writable emits its matching error just after invoking the
+        // write callback. Keep our listener through that event so the failure
+        // cannot become an unhandled error; the immediate is a fallback for a
+        // writable-like caller that reports only through the callback.
+        callbackFailureFallback = setImmediate(() => rejectWrite(cause));
+        return;
+      }
+      settled = true;
+      cleanup();
       resolve();
     };
     stream.on("error", onError);
+    stream.on("close", onClose);
+    // As with input, an errored destroy may still owe its public error event.
+    // Waiting for that event preserves the cause and prevents it from becoming
+    // unhandled after an eager preflight rejection.
+    if (stream.errored) {
+      callbackFailureFallback = setImmediate(() => rejectWrite(stream.errored));
+      return;
+    }
+    if (stream.closed || stream.writableEnded || stream.destroyed) {
+      onClose();
+      return;
+    }
     try {
-      if (stream.write(text)) {
-        stream.removeListener("error", onError);
-        resolve();
-        return;
-      }
-      stream.once("drain", onDrain);
+      stream.write(text, onWrite);
     } catch (cause) {
-      stream.removeListener("error", onError);
-      reject(cause);
+      rejectWrite(cause);
     }
   });
 }
@@ -298,8 +441,16 @@ export async function runMechanismCliBatch({
   error = stderr,
   invoke = invokeFoundationMechanism,
 } = {}) {
+  const outputWatch = watchBatchWritable(output, "output");
+  const errorWatch = watchBatchWritable(error, "error output");
   try {
-    const bytes = await readBoundedBatchInput(input, MECHANISM_BATCH_POLICY.inputByteLimit);
+    // Start the input read synchronously so a queued input error is covered
+    // before any output preflight can await or fail this batch.
+    const bytes = await readBoundedBatchInput(
+      input,
+      MECHANISM_BATCH_POLICY.inputByteLimit,
+      outputWatch,
+    );
     const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
     const request = JSON.parse(text);
     assertMechanismBatchShape(request);
@@ -337,18 +488,34 @@ export async function runMechanismCliBatch({
       fragments.push(fragment);
       if (exitCode === 2) anyItemFailure = true;
     }
+    const outputFailure = outputWatch.failure();
+    outputWatch.release();
+    if (outputFailure) throw outputFailure;
     await writeAll(
       output,
       `${BATCH_OUTPUT_PREFIX}${fragments.join(",")}${BATCH_OUTPUT_SUFFIX}`,
+      "output",
     );
+    if (errorWatch.pendingError) await errorWatch.pendingError;
+    errorWatch.release();
     return anyItemFailure ? 2 : 0;
   } catch (cause) {
-    try {
-      await writeAll(error, `${JSON.stringify(errorResponse(cause))}\n`);
-    } catch {
-      // The error channel itself failed; the batch still exits failed.
+    const pendingErrors = [outputWatch.pendingError, errorWatch.pendingError].filter(Boolean);
+    if (pendingErrors.length > 0) await Promise.all(pendingErrors);
+    outputWatch.release();
+    const errorFailure = errorWatch.failure();
+    errorWatch.release();
+    if (!errorFailure) {
+      try {
+        await writeAll(error, `${JSON.stringify(errorResponse(cause))}\n`, "error output");
+      } catch {
+        // The error channel itself failed; the batch still exits failed.
+      }
     }
     return 2;
+  } finally {
+    outputWatch.release();
+    errorWatch.release();
   }
 }
 
@@ -363,7 +530,9 @@ if (process.argv[1] && realpathSync(fileURLToPath(import.meta.url)) === realpath
       );
       process.exitCode = 2;
     } else {
-      process.exitCode = await runMechanismCliBatch();
+      const exitCode = await runMechanismCliBatch();
+      if (exitCode === 2 && !stdin.destroyed) stdin.destroy();
+      process.exitCode = exitCode;
     }
   } else {
     process.exitCode = await runMechanismCli();

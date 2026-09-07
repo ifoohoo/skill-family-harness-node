@@ -1,5 +1,22 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.19.1 locale=en baseline=sha256:76ded57ddca31105929a12a1b198bd6da407090e353dbf90096c17da5532a3ea -->
+## [0.19.1] - 2026-09-08
+
+Harness 0.19.1 makes the candidate mechanism-batch entry point settle on the current transfer's actual completion or failure while preserving caller ownership of programmatic streams.
+
+### Fixed
+
+- Waits for the current write callback, handles premature input and output closure, and removes only listeners installed by the batch helper.
+- Stops the library helper's own reading and releases its buffer after input overflow without destroying a caller-owned stream.
+- Releases CLI-owned standard input after an oversized request is reported, allowing the process to exit 2 while the upstream pipe remains open.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.19.1. The batch operation, capacity policy, per-item order, and single-request CLI remain unchanged. This entry is candidate and requires re-verification after an upgrade.
+<!-- release-skill:changelog:end version=0.19.1 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.19.0 locale=en baseline=sha256:c3b3a06b509cc53719c2de75d1edacd22c1711c99c5f7687ad91f350976262e3 -->
 ## [0.19.0] - 2026-09-07
 
