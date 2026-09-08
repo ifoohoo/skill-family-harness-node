@@ -1,0 +1,15 @@
+version: 0.19.3
+date: 2026-09-08
+locales:
+  en:
+    summary: Harness 0.19.3 aligns its package and release documentation with the Foundation Adoption Review Qoder distribution patch. Existing mechanisms and runtime behavior are unchanged.
+    changes:
+      changed:
+        - Aligns the package version, release documentation, and verified public package projection with Foundation 0.19.3 without changing Harness implementation or driver behavior.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.19.3. This patch adds no Harness capability and does not change host descriptors, drivers, since values, or maturity.
+  zh-CN:
+    summary: Harness 0.19.3 将包版本和发布文档与 Foundation Adoption Review 的 Qoder 分发补丁对齐。既有机制和运行时行为保持不变。
+    changes:
+      changed:
+        - 包版本、发布文档和经验证的公开 package.json 投影与 Foundation 0.19.3 数值对齐；Harness 实现和 driver 行为不变。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.19.3。本补丁不增加 Harness 能力，不改变宿主 descriptor、driver、since 字段或成熟度。

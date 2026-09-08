@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.19.3 locale=en baseline=sha256:097787640991b8387edbe6a292c2c3249b6cfe51502288f4b186daaa8e42163c -->
+## [0.19.3] - 2026-09-08
+
+Harness 0.19.3 aligns its package and release documentation with the Foundation Adoption Review Qoder distribution patch. Existing mechanisms and runtime behavior are unchanged.
+
+### Changed
+
+- Aligns the package version, release documentation, and verified public package projection with Foundation 0.19.3 without changing Harness implementation or driver behavior.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.19.3. This patch adds no Harness capability and does not change host descriptors, drivers, since values, or maturity.
+<!-- release-skill:changelog:end version=0.19.3 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.19.2 locale=en baseline=sha256:ac3f4b15f249649e6bbae8c6a21e48f28fa206346108b21958a8daa22d85f243 -->
 ## [0.19.2] - 2026-09-08
 

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.19.3 locale=zh-CN baseline=sha256:bd93b40eb86b9acf3deb13b5f8f905f6c26ae4aa36da17a2045c3d51dac2f7c3 -->
+## [0.19.3] - 2026-09-08
+
+Harness 0.19.3 将包版本和发布文档与 Foundation Adoption Review 的 Qoder 分发补丁对齐。既有机制和运行时行为保持不变。
+
+### 变更
+
+- 包版本、发布文档和经验证的公开 package.json 投影与 Foundation 0.19.3 数值对齐；Harness 实现和 driver 行为不变。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.19.3。本补丁不增加 Harness 能力，不改变宿主 descriptor、driver、since 字段或成熟度。
+<!-- release-skill:changelog:end version=0.19.3 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.19.2 locale=zh-CN baseline=sha256:aef79e7341fbe6581d798fd5d7371315c023b4a0c1733b094b13ce4166bfbcf3 -->
 ## [0.19.2] - 2026-09-08
 
