@@ -1,5 +1,21 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.20.0 locale=zh-CN baseline=sha256:b02138525f60fd7aed125a9f0712090cf3d918e109b7e86361b86e6d044330cf -->
+## [0.20.0] - 2026-09-10
+
+Harness 0.20.0 与 Contracts 1.18.0 和 Foundation 0.20.0 对齐，不增加新的运行时机制。
+
+### 变更
+
+- 包身份和公开投影与 Foundation 0.20.0 锁步版本对齐。
+- Engineering Kit 的 Cursor 驱动继续复用既有进程监督、绑定、快照和私有输出机制。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.20.0。Harness 不增加 Cursor 专属运行层，也不增加自动信任行为。
+<!-- release-skill:changelog:end version=0.20.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.19.3 locale=zh-CN baseline=sha256:bd93b40eb86b9acf3deb13b5f8f905f6c26ae4aa36da17a2045c3d51dac2f7c3 -->
 ## [0.19.3] - 2026-09-08
 

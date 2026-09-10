@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.20.0 locale=en baseline=sha256:07e569fb3b5eb03df9a79953aec17b84d25b433b6b031da4cae9e757d60e3f4e -->
+## [0.20.0] - 2026-09-10
+
+Harness 0.20.0 aligns with Contracts 1.18.0 and Foundation 0.20.0 without adding a new runtime mechanism.
+
+### Changed
+
+- Aligns package identity and published projections with the lockstep Foundation 0.20.0 release.
+- Reuses the existing process supervision, binding, snapshot, and private-output mechanisms for the Cursor driver implemented by Engineering Kit.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.20.0. Harness adds no Cursor-specific runtime layer or automatic trust behavior.
+<!-- release-skill:changelog:end version=0.20.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.19.3 locale=en baseline=sha256:097787640991b8387edbe6a292c2c3249b6cfe51502288f4b186daaa8e42163c -->
 ## [0.19.3] - 2026-09-08
 

@@ -1,0 +1,17 @@
+version: 0.20.0
+date: 2026-09-10
+locales:
+  en:
+    summary: Harness 0.20.0 aligns with Contracts 1.18.0 and Foundation 0.20.0 without adding a new runtime mechanism.
+    changes:
+      changed:
+        - Aligns package identity and published projections with the lockstep Foundation 0.20.0 release.
+        - Reuses the existing process supervision, binding, snapshot, and private-output mechanisms for the Cursor driver implemented by Engineering Kit.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.20.0. Harness adds no Cursor-specific runtime layer or automatic trust behavior.
+  zh-CN:
+    summary: Harness 0.20.0 与 Contracts 1.18.0 和 Foundation 0.20.0 对齐，不增加新的运行时机制。
+    changes:
+      changed:
+        - 包身份和公开投影与 Foundation 0.20.0 锁步版本对齐。
+        - Engineering Kit 的 Cursor 驱动继续复用既有进程监督、绑定、快照和私有输出机制。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.20.0。Harness 不增加 Cursor 专属运行层，也不增加自动信任行为。
