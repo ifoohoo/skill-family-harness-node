@@ -1,0 +1,15 @@
+version: 0.21.0
+date: 2026-09-11
+locales:
+  en:
+    summary: Harness 0.21.0 aligns with Foundation 0.21.0 and reuses the existing binding, contained publication, bound-read, digest, and process-supervision mechanisms without adding a runtime mechanism.
+    changes:
+      changed:
+        - Aligns package identity and published projections with the lockstep Foundation 0.21.0 release while leaving the Harness capability surface unchanged.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.21.0. Host-verification invocation preparation remains an Engineering Kit composition over existing Harness mechanisms.
+  zh-CN:
+    summary: Harness 0.21.0 与 Foundation 0.21.0 对齐，复用既有绑定、受收容发布、绑定读取、摘要和进程监督机制，不增加运行时机制。
+    changes:
+      changed:
+        - 包身份和公开投影与 Foundation 0.21.0 锁步版本对齐，Harness 能力面保持不变。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.21.0。宿主验证调用准备仍由 Engineering Kit 组合既有 Harness 机制完成。

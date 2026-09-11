@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.21.0 locale=en baseline=sha256:18c4e6ddfd3e1ac0b4ac4848620854e250b653b1f95fe47920625ac40629df84 -->
+## [0.21.0] - 2026-09-11
+
+Harness 0.21.0 aligns with Foundation 0.21.0 and reuses the existing binding, contained publication, bound-read, digest, and process-supervision mechanisms without adding a runtime mechanism.
+
+### Changed
+
+- Aligns package identity and published projections with the lockstep Foundation 0.21.0 release while leaving the Harness capability surface unchanged.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.21.0. Host-verification invocation preparation remains an Engineering Kit composition over existing Harness mechanisms.
+<!-- release-skill:changelog:end version=0.21.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.20.0 locale=en baseline=sha256:07e569fb3b5eb03df9a79953aec17b84d25b433b6b031da4cae9e757d60e3f4e -->
 ## [0.20.0] - 2026-09-10
 

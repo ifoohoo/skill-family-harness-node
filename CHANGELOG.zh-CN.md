@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.21.0 locale=zh-CN baseline=sha256:9e19e64d15bb9c04d91b66876cf2e7666e4af8ad909bdddfefe88852669ef147 -->
+## [0.21.0] - 2026-09-11
+
+Harness 0.21.0 与 Foundation 0.21.0 对齐，复用既有绑定、受收容发布、绑定读取、摘要和进程监督机制，不增加运行时机制。
+
+### 变更
+
+- 包身份和公开投影与 Foundation 0.21.0 锁步版本对齐，Harness 能力面保持不变。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.21.0。宿主验证调用准备仍由 Engineering Kit 组合既有 Harness 机制完成。
+<!-- release-skill:changelog:end version=0.21.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.20.0 locale=zh-CN baseline=sha256:b02138525f60fd7aed125a9f0712090cf3d918e109b7e86361b86e6d044330cf -->
 ## [0.20.0] - 2026-09-10
 

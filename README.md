@@ -4,23 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.20.0 -->
+<!-- release-skill:release-version: 0.21.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.20.0** (2026-09-10)
+**0.21.0** (2026-09-11)
 
-Harness 0.20.0 aligns with Contracts 1.18.0 and Foundation 0.20.0 without adding a new runtime mechanism.
+Harness 0.21.0 aligns with Foundation 0.21.0 and reuses the existing binding, contained publication, bound-read, digest, and process-supervision mechanisms without adding a runtime mechanism.
 
 **Changed**
 
-- Aligns package identity and published projections with the lockstep Foundation 0.20.0 release.
-- Reuses the existing process supervision, binding, snapshot, and private-output mechanisms for the Cursor driver implemented by Engineering Kit.
+- Aligns package identity and published projections with the lockstep Foundation 0.21.0 release while leaving the Harness capability surface unchanged.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.20.0. Harness adds no Cursor-specific runtime layer or automatic trust behavior.
+Pin all three Foundation packages to exactly 0.21.0. Host-verification invocation preparation remains an Engineering Kit composition over existing Harness mechanisms.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -33,7 +32,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.20.0 is the local source candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.21.0 is the local source candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +40,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.20.0.tgz" "$pack_dir/skill-family-harness-node-0.20.0.tgz" "$pack_dir/skill-family-engineering-kit-0.20.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.21.0.tgz" "$pack_dir/skill-family-harness-node-0.21.0.tgz" "$pack_dir/skill-family-engineering-kit-0.21.0.tgz")
 ```
 
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.20.0
+npm install skill-family-harness-node@0.21.0
 npm info skill-family-harness-node --help
 ```
 
@@ -256,4 +255,4 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
-Version 0.20.0 is the local source candidate. Remote availability must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
+Version 0.21.0 is the local source candidate. Remote availability must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
