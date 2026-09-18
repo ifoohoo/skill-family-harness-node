@@ -1,5 +1,25 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.22.0 locale=zh-CN baseline=sha256:c06c001717b465cbff9ff239961fc3c873a2c0d39e09594ed885b84323da5bb5 -->
+## [0.22.0] - 2026-09-18
+
+Harness 0.22.0 通过三个包根导出增加多路径普通文件的应用、恢复与材料清理机制，并给持久状态底座增加有界的锁观察与锁恢复扩展。
+
+### 新增
+
+- 增加 `applyFileSet`、`recoverFileSet`、`pruneFileSetRecovery` 三个 `skill-family-harness-node` 包根导出，组合既有的严格单文件原语、绑定读取和持久状态底座。
+- 增加 `inspectStateStoreLock` 与 `recoverStateStoreLock`，调用方可以观察锁状态并修复被中断的状态底座操作，而不清理其内部文件。
+
+### 变更
+
+- 记录整组前检、逆操作、严格同步和逐路径未知事实，同时保持调用方持有的领域验证只读。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.22.0。恢复前调用方必须停止旧参与者并建立外部排他维护区间；领域判定、业务计划和清理授权仍由调用方负责。本机制不新增第二套日志或锁算法、不扩大为目录操作，也不在 darwin/arm64 APFS 之外承诺平台资格。
+<!-- release-skill:changelog:end version=0.22.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.21.0 locale=zh-CN baseline=sha256:9e19e64d15bb9c04d91b66876cf2e7666e4af8ad909bdddfefe88852669ef147 -->
 ## [0.21.0] - 2026-09-11
 

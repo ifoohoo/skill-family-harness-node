@@ -1,0 +1,21 @@
+version: 0.22.0
+date: 2026-09-18
+locales:
+  en:
+    summary: Harness 0.22.0 adds the multi-path ordinary-file apply, recovery, and material-cleanup mechanism through three package-root exports, and gives the durable state store a bounded lock-inspection and lock-recovery extension.
+    changes:
+      added:
+        - Adds `applyFileSet`, `recoverFileSet`, and `pruneFileSetRecovery` as package-root exports of `skill-family-harness-node`, composing the existing strict single-file primitives, bound read, and durable state store.
+        - Adds `inspectStateStoreLock` and `recoverStateStoreLock` so a caller can observe lock state and repair an interrupted state-store operation without clearing the store's internal files.
+      changed:
+        - Records whole-set preflight, inverse operations, strict synchronization, and per-path unknown facts while keeping caller-owned domain validation read-only.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.22.0. Callers must stop old participants and establish an external exclusive maintenance window before recovery; domain verdicts, business plans, and cleanup authorization remain caller responsibilities. The mechanism does not add a second logging or locking algorithm, directory operations, or a platform guarantee beyond darwin/arm64 APFS.
+  zh-CN:
+    summary: Harness 0.22.0 通过三个包根导出增加多路径普通文件的应用、恢复与材料清理机制，并给持久状态底座增加有界的锁观察与锁恢复扩展。
+    changes:
+      added:
+        - 增加 `applyFileSet`、`recoverFileSet`、`pruneFileSetRecovery` 三个 `skill-family-harness-node` 包根导出，组合既有的严格单文件原语、绑定读取和持久状态底座。
+        - 增加 `inspectStateStoreLock` 与 `recoverStateStoreLock`，调用方可以观察锁状态并修复被中断的状态底座操作，而不清理其内部文件。
+      changed:
+        - 记录整组前检、逆操作、严格同步和逐路径未知事实，同时保持调用方持有的领域验证只读。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.22.0。恢复前调用方必须停止旧参与者并建立外部排他维护区间；领域判定、业务计划和清理授权仍由调用方负责。本机制不新增第二套日志或锁算法、不扩大为目录操作，也不在 darwin/arm64 APFS 之外承诺平台资格。

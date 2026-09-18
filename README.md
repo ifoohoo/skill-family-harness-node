@@ -4,22 +4,27 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.21.0 -->
+<!-- release-skill:release-version: 0.22.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.21.0** (2026-09-11)
+**0.22.0** (2026-09-18)
 
-Harness 0.21.0 aligns with Foundation 0.21.0 and reuses the existing binding, contained publication, bound-read, digest, and process-supervision mechanisms without adding a runtime mechanism.
+Harness 0.22.0 adds the multi-path ordinary-file apply, recovery, and material-cleanup mechanism through three package-root exports, and gives the durable state store a bounded lock-inspection and lock-recovery extension.
+
+**Added**
+
+- Adds `applyFileSet`, `recoverFileSet`, and `pruneFileSetRecovery` as package-root exports of `skill-family-harness-node`, composing the existing strict single-file primitives, bound read, and durable state store.
+- Adds `inspectStateStoreLock` and `recoverStateStoreLock` so a caller can observe lock state and repair an interrupted state-store operation without clearing the store's internal files.
 
 **Changed**
 
-- Aligns package identity and published projections with the lockstep Foundation 0.21.0 release while leaving the Harness capability surface unchanged.
+- Records whole-set preflight, inverse operations, strict synchronization, and per-path unknown facts while keeping caller-owned domain validation read-only.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.21.0. Host-verification invocation preparation remains an Engineering Kit composition over existing Harness mechanisms.
+Pin all three Foundation packages to exactly 0.22.0. Callers must stop old participants and establish an external exclusive maintenance window before recovery; domain verdicts, business plans, and cleanup authorization remain caller responsibilities. The mechanism does not add a second logging or locking algorithm, directory operations, or a platform guarantee beyond darwin/arm64 APFS.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,7 +37,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.21.0 is the local source candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.22.0 is the local source candidate. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -40,13 +45,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.21.0.tgz" "$pack_dir/skill-family-harness-node-0.21.0.tgz" "$pack_dir/skill-family-engineering-kit-0.21.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.22.0.tgz" "$pack_dir/skill-family-harness-node-0.22.0.tgz" "$pack_dir/skill-family-engineering-kit-0.22.0.tgz")
 ```
 
 After publication, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.21.0
+npm install skill-family-harness-node@0.22.0
 npm info skill-family-harness-node --help
 ```
 
@@ -95,6 +100,7 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 - Need to normalize resources into a recomputable closure or generate a digest: use resource closure.
 - Need to generate a human report from a machine result: use report model/render/binding/check.
 - Need to persist an event log with derived snapshots: use state-store (event meaning is owned by the caller).
+- Need to apply one ordered group of ordinary files across scattered paths with restart recovery and explicit pruning: use the file-set apply/recovery entries.
 
 ## Boundaries
 
@@ -125,7 +131,8 @@ The capability remains **candidate**. Pin all three Foundation packages exactly 
 | `probeVersionVector` | A version-probe mechanism that disables spawn by default; when explicitly enabled, executes only absolute, symlink-free, audited vectors, using no PATH/shell. |
 | `openStateStore` / `appendEvent` / `readEvents` / `verifyStateStore` / `closeStateStore` | Strict single-writer append-only event store; the event directory is the sole state authority, `chain-head.json` is only a cache. |
 | `readSnapshot` / `writeSnapshot` / `rebuildSnapshot` | Atomic derived snapshots and full-event rebuild; a bad event cannot be masked by an old snapshot, and a bad snapshot can be ignored by rebuild. |
-| `inspectStateStoreLock` / `recoverStateStoreLock` | Read-only lock diagnostics and explicit recovery; recovery must precisely match the observed owner + fencing. |
+| `inspectStateStoreLock` / `recoverStateStoreLock` | Read-only lock diagnostics and explicit recovery; recovery has **two mutually exclusive takeover modes** — the legacy mode precisely matches the observed owner + fencing, while the maintenance mode requires a complete observation of that root plus both explicit confirmations; mixing fields of the two modes (including legacy fields explicitly present as `undefined`) is rejected. |
+| `applyFileSet` / `recoverFileSet` / `pruneFileSetRecovery` | One ordered create/replace/delete group over scattered ordinary files under a bound root, restart recovery of an uncommitted operation through an explicit public entry point, and exact pruning of a terminal operation's materials. Cooperative-exclusion precondition, per-path intent facts, no instantaneous multi-file visibility. |
 
 ## Replacing an Existing Fixed Set
 
@@ -136,12 +143,37 @@ The operation is not idempotent: a second call with the same paths exchanges the
 ## State Store Lock and Recovery Boundaries
 
 - The lock uses exclusive create; a second writer immediately receives `store-locked`; it does not queue, nor steals the lock by time, PID, or lease expiry.
-- `inspectStateStoreLock` creates no file, only returns `owner`, monotonic `fencing`, `ageMs`, and an in-recovery flag. `ageMs` is for diagnostics only and never participates in correctness decisions.
-- A crash-left lock can only be recovered by the caller, after confirming outside Foundation that the old writer has terminated, by calling `recoverStateStoreLock` while submitting the precisely matching `expectedOwner`, `expectedFencing`, and `confirmOwnerTerminated: true`. A mismatch or missing confirmation fails closed.
+- `inspectStateStoreLock` creates no file. By default it returns `owner`, monotonic `fencing`, `ageMs`, and an in-recovery flag, where `ageMs` is for diagnostics only and never participates in correctness decisions; only an explicit `{ recoveryObservation: true }` returns the complete `state-store-recovery-observation` object instead (the maintenance mode needs it). A default diagnostic result is not a valid observation.
+- A crash-left lock can only be recovered by the caller, after confirming outside Foundation that the old writer has terminated. `recoverStateStoreLock` has two **mutually exclusive** modes; pick exactly one. Both modes require `payloadSchemas` (the same eventType → version → JSON Schema registry as a normal open, with at least one entry — the new writer handle returned by recovery uses it to validate later event payloads); `newOwner` and `clock` are optional:
+  - Legacy mode: `recoverStateStoreLock(root, { expectedOwner, expectedFencing, confirmOwnerTerminated: true, payloadSchemas })`, where owner and fencing must precisely match the currently observed values; a mismatch, a missing confirmation, or a missing `payloadSchemas` fails closed.
+  - Maintenance mode: `recoverStateStoreLock(root, { observation, confirmAllParticipantsStopped: true, confirmExclusiveMaintenance: true, payloadSchemas })`. `observation` must be the complete observation obtained by calling `inspectStateStoreLock(root, { recoveryObservation: true })` on the same root; it covers a missing writer and partially written control files, not just owner/fencing.
+  Fields of the two modes must not be mixed: a legacy field that is explicitly present with the value `undefined` still counts as mixing and is rejected, so maintenance-mode options must omit legacy fields entirely.
+- The maintenance mode's two confirmations are external trust preconditions, not a lock implemented by the boolean fields: `confirmAllParticipantsStopped` states that the old writer, old recoverers, and their child processes have stopped, and `confirmExclusiveMaintenance` states that the exclusive maintenance interval still holds. The interval starts **before** the observation is taken and ends when this call obtains a new writer handle or returns a failure; during it, other recoveries, normal opens, state-store writes, and related business writes are forbidden. PID, age, or owner/fencing comparisons cannot replace that precondition; once the handle is obtained the normal writer contract applies again.
+
+```js
+// Maintenance takeover: take the complete observation inside the external maintenance interval,
+// then submit maintenance-mode fields only.
+const observation = await inspectStateStoreLock(stateStoreRoot, { recoveryObservation: true });
+const store = await recoverStateStoreLock(stateStoreRoot, {
+  observation,
+  confirmAllParticipantsStopped: true,
+  confirmExclusiveMaintenance: true,
+  payloadSchemas, // required: the returned writer handle validates later event payloads with it
+});
+```
 - Recovery produces a larger fencing. The old handle re-checks owner, fencing, and acquisition id on every append; final event publication uses a same-directory temporary regular file, fsync, and exclusive link, never overwriting an existing sequence.
 - Append, snapshot, close, and recovery are serialized by a short-lived `writer-mutation.lock`; recovery cannot cross an authoritative write that already holds the mutation guard.
-- If the recovering process itself crashes while holding `writer-recovery.lock`, the system stays in a diagnosable deadlock state and does not auto-delete that guard. It requires fresh external forensics and manual handling; the current API does not claim to solve the scenario where an untrusted caller falsely reports "old writer terminated".
+- If the recovering process itself crashes while holding `writer-recovery.lock`, the system stays in a diagnosable deadlock state and the normal paths never auto-delete that guard: only a freshly established exclusive maintenance interval, a fresh observation, and the maintenance mode reorganize the reclaimable event temporary alias and the three control residues `writer.lock`, `writer-mutation.lock`, and `writer-recovery.lock`. Control records or fencing counters in unknown formats are refused rather than guessed or zeroed, and unknown files are never deleted. The current API does not claim to solve the scenario where an untrusted caller falsely reports "old writer terminated".
 - The state root, `events/`, `snapshots/`, events, and snapshots reject symlinks, hard links, FIFOs, devices, and other non-regular entries. Payload must be pure JSON, and `eventType + payloadSchemaVersion` must hit the Schema pair frozen by the caller at open/recover.
+
+## Multi-Path File-Set Apply and Recovery Boundaries
+
+- `applyFileSet(request, { validate })` applies one ordered create/replace/delete group over scattered ordinary files under a bound root. `validate` is a caller-supplied read-only function; recovery and pruning use the public entries `recoverFileSet(request)` and `pruneFileSetRecovery(request)` rather than a private path.
+- Recovery materials live under the fixed in-root `.foundation-file-apply/` (`journal/` plus `operations/<id>/{before,after}/<index>`). They are retained by default; only an explicit prune removes the exact materials of a terminal operation and keeps the journal. Materials of unfinished or conflicting operations are never cleaned, and unknown adjacent staging files are never deleted by suffix — they are only reported as `possible-unknown`.
+- Preflight (whole-group rejection, unsupported environment, capacity breach) returns before any business write, leaving zero business writes. No business path is touched before a durable `apply-intent` fact exists for that path.
+- Domain validation that returns false, throws, times out, or returns an invalid result triggers automatic recovery, with validation state reported separately from recovery state. A valid commit event is never rolled back; if target re-verification or durability stays unconfirmed the outcome is `commit-unconfirmed` and the materials are retained.
+- The lock is cooperative-exclusion only: recovery requires the caller to have established an exclusive maintenance interval outside Foundation and to submit the complete `maintenance` observation of that interval (obtained by calling `inspectStateStoreLock(journalRoot, { recoveryObservation: true })` on the fixed in-root `.foundation-file-apply/journal`, whose path must equal `observation.root`; a default diagnostic result cannot be used for a fault takeover); prune takes the normal writer when nothing is left over and requires that same `maintenance` observation only for a fault takeover. Instantaneous multi-file visibility is not promised, and uncooperative concurrent writers are not resisted.
+- Catchable failures return a `file-set-result`; the outer error code stays `SFC2004` with closed `details.kind` and `details.phase` enums, and the result's `outcome`, `paths`, and `materials` fields report per-path facts. A failed lock release is reported through `errors` rather than raised.
 
 ## Stable Error Codes
 
@@ -162,7 +194,7 @@ Comparison is based on the canonical root after `realpath`, avoiding misjudgment
 
 ## Testing
 
-`node --test` covers: full Contracts fixture replay, security negative cases, atomic-failure paths, temporary workspaces, closure determinism, raw sink delayed-stream and failure paths, report fact binding and Markdown injection, host manifest/path/command trust, and state-store crashes, concurrency, corruption, fencing, explicit recovery, symlinks, hard links, and FIFO negative cases.
+`node --test` covers: full Contracts fixture replay, security negative cases, atomic-failure paths, temporary workspaces, closure determinism, raw sink delayed-stream and failure paths, report fact binding and Markdown injection, host manifest/path/command trust, and state-store crashes, concurrency, corruption, fencing, explicit recovery, symlinks, hard links, and FIFO negative cases. The file-set apply/recovery family adds crash-restart recovery, validation-failure auto-recovery, prune, and conflict-retention negative cases.
 
 ## Troubleshooting
 
@@ -201,6 +233,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 - `foundation.harness.report`: report-model validation/render/binding/check.
 - `foundation.harness.host-adapter`: adapter source closure/build/materialize, version probe, and read-only peer adapter verification.
 - `foundation.harness.state-store`: append-only events, hash chain, snapshots, and lock recovery.
+- `foundation.harness.file-set-recovery`: ordered multi-path create/replace/delete apply over scattered ordinary files, restart recovery of an uncommitted operation, and exact pruning of terminal materials.
 - `foundation.harness.errors`: mechanism error types and stable error classes.
 - `foundation.harness.quickstart-profile-candidate`: exact-version observation/task/result construction and binding verification.
 
@@ -208,11 +241,12 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 - The contained root directory (the boundary for path containment).
 - The document, resource, or event payload to validate/write.
+- For a multi-path file set: the ordered operation group bound to one root and environment plus the caller's read-only `validate` function for apply, and the complete `maintenance` observation for recover or a fault-takeover prune.
 
 ### Outputs and evidence
 
 - Validation result, contained absolute path, atomically written file, closure digest, terminal result, report text, events/snapshots.
-- Evidence: `packages/skill-family-harness-node/test/validation.test.mjs`, `atomic.test.mjs`, `containment.test.mjs`, `closure.test.mjs`, `report.test.mjs`, `state-store.test.mjs`.
+- Evidence: `packages/skill-family-harness-node/test/validation.test.mjs`, `atomic.test.mjs`, `containment.test.mjs`, `closure.test.mjs`, `report.test.mjs`, `state-store.test.mjs`, `file-set-recovery.test.mjs`, `file-set-recovery-crash.test.mjs`.
 
 ### Side effects
 
@@ -223,10 +257,12 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 - Mechanism failures are uniformly `SFC2004`, with `details.kind` as a stable subcategory (e.g., `path-traversal`, `atomic-write-failed`).
 - Residual state after failure: atomic write rolls back the temp file; a broken state-store hash chain throws, and old snapshots can be ignored by rebuild.
+- File-set residual state after failure: the recovery materials stay under the fixed in-root `.foundation-file-apply`, a validation failure triggers automatic recovery with validation and recovery state reported separately, and an unconfirmed commit reports `commit-unconfirmed` with the materials retained.
 
 ### Architectural invariants
 
 - Event meaning and reducer transitions remain consumer-owned; state-store only provides the base.
+- The file-set protocol adds no second event log, lock, sequence, or digest chain: it reuses the existing publication, atomic-replace, bound-read, and digest mechanisms, requires exactly one cooperative writer per bound root at any time, and never cleans the state-store's internal files.
 - Only text adapter source (utf8) is supported; binary projection is not supported.
 - `verifyPeerAdapterDirectories` enumerates and reads two or more real peer roots, reuses bound-read/path containment/closure/manifest primitives, and fails closed on symlinks, escapes, byte drift, member drift, or incomplete mappings.
 
@@ -255,4 +291,4 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
-Version 0.21.0 is the local source candidate. Remote availability must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
+Version 0.22.0 is the local source candidate. Remote availability must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.

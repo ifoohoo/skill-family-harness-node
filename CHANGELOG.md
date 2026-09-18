@@ -1,5 +1,25 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.22.0 locale=en baseline=sha256:704d9a47cc28bc1f7358e2817b266cbc83c27a5d3bded306299705a59f7bb05b -->
+## [0.22.0] - 2026-09-18
+
+Harness 0.22.0 adds the multi-path ordinary-file apply, recovery, and material-cleanup mechanism through three package-root exports, and gives the durable state store a bounded lock-inspection and lock-recovery extension.
+
+### Added
+
+- Adds `applyFileSet`, `recoverFileSet`, and `pruneFileSetRecovery` as package-root exports of `skill-family-harness-node`, composing the existing strict single-file primitives, bound read, and durable state store.
+- Adds `inspectStateStoreLock` and `recoverStateStoreLock` so a caller can observe lock state and repair an interrupted state-store operation without clearing the store's internal files.
+
+### Changed
+
+- Records whole-set preflight, inverse operations, strict synchronization, and per-path unknown facts while keeping caller-owned domain validation read-only.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.22.0. Callers must stop old participants and establish an external exclusive maintenance window before recovery; domain verdicts, business plans, and cleanup authorization remain caller responsibilities. The mechanism does not add a second logging or locking algorithm, directory operations, or a platform guarantee beyond darwin/arm64 APFS.
+<!-- release-skill:changelog:end version=0.22.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.21.0 locale=en baseline=sha256:18c4e6ddfd3e1ac0b4ac4848620854e250b653b1f95fe47920625ac40629df84 -->
 ## [0.21.0] - 2026-09-11
 
