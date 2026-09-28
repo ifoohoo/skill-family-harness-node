@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.23.0 locale=en baseline=sha256:e4a97088bca9e0c1f48f2bfd5860dbd8be041a9d0a5e42051422767b3b284303 -->
+## [0.23.0] - 2026-09-26
+
+Harness 0.23.0 aligns its package coordinate with Foundation 0.23.0 and adds no runtime mechanism. This note records the local lockstep candidate and does not claim remote publication or real-host acceptance.
+
+### Changed
+
+- Aligns package identity and `FOUNDATION_PACKAGE_VERSION` with the lockstep Foundation 0.23.0 coordinate. The exported file-set apply, recovery, and material-cleanup surface, and the bounded state-store lock inspection and recovery extension, stay as published in 0.22.0.
+- Adds no root export, locking algorithm, directory operation, or platform qualification.
+
+### Upgrade Notes
+
+Pin all three Foundation packages to exactly 0.23.0. Callers keep the 0.22.0 Harness mechanism. Contracts remains specification 1.20.0. Remote publication and real-host verification are outside this note.
+<!-- release-skill:changelog:end version=0.23.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.22.0 locale=en baseline=sha256:704d9a47cc28bc1f7358e2817b266cbc83c27a5d3bded306299705a59f7bb05b -->
 ## [0.22.0] - 2026-09-18
 

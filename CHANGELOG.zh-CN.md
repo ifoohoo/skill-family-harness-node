@@ -1,5 +1,21 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.23.0 locale=zh-CN baseline=sha256:4cfe7a3090bb5589fdbfec555506c0f6a6c668aa872c85c627153e7efa8a6371 -->
+## [0.23.0] - 2026-09-26
+
+Harness 0.23.0 与 Foundation 0.23.0 对齐包坐标，不增加运行时机制。本说明只记录本地锁步候选，不表示已经远端发布，也不表示真实宿主已经接受。
+
+### 变更
+
+- 包身份和 `FOUNDATION_PACKAGE_VERSION` 与 Foundation 0.23.0 锁步坐标对齐。0.22.0 已发布的文件集合应用、恢复和材料清理导出，以及状态底座上有界的锁观察与锁恢复扩展，保持不变。
+- 不新增包根导出、锁算法、目录操作或平台资格。
+
+### 升级说明
+
+三个 Foundation 包须一起精确锁定到 0.23.0。调用方继续使用 0.22.0 的 Harness 机制。Contracts 规格仍是 1.20.0。远端发布和真实宿主验证不在本说明范围内。
+<!-- release-skill:changelog:end version=0.23.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.22.0 locale=zh-CN baseline=sha256:c06c001717b465cbff9ff239961fc3c873a2c0d39e09594ed885b84323da5bb5 -->
 ## [0.22.0] - 2026-09-18
 

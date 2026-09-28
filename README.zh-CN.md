@@ -5,27 +5,23 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.22.0 -->
+<!-- release-skill:release-version: 0.23.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.22.0** (2026-09-18)
+**0.23.0** (2026-09-26)
 
-Harness 0.22.0 通过三个包根导出增加多路径普通文件的应用、恢复与材料清理机制，并给持久状态底座增加有界的锁观察与锁恢复扩展。
-
-**新增**
-
-- 增加 `applyFileSet`、`recoverFileSet`、`pruneFileSetRecovery` 三个 `skill-family-harness-node` 包根导出，组合既有的严格单文件原语、绑定读取和持久状态底座。
-- 增加 `inspectStateStoreLock` 与 `recoverStateStoreLock`，调用方可以观察锁状态并修复被中断的状态底座操作，而不清理其内部文件。
+Harness 0.23.0 与 Foundation 0.23.0 对齐包坐标，不增加运行时机制。本说明只记录本地锁步候选，不表示已经远端发布，也不表示真实宿主已经接受。
 
 **变更**
 
-- 记录整组前检、逆操作、严格同步和逐路径未知事实，同时保持调用方持有的领域验证只读。
+- 包身份和 `FOUNDATION_PACKAGE_VERSION` 与 Foundation 0.23.0 锁步坐标对齐。0.22.0 已发布的文件集合应用、恢复和材料清理导出，以及状态底座上有界的锁观察与锁恢复扩展，保持不变。
+- 不新增包根导出、锁算法、目录操作或平台资格。
 
 **升级说明**
 
-三个 Foundation 包须一起精确锁定到 0.22.0。恢复前调用方必须停止旧参与者并建立外部排他维护区间；领域判定、业务计划和清理授权仍由调用方负责。本机制不新增第二套日志或锁算法、不扩大为目录操作，也不在 darwin/arm64 APFS 之外承诺平台资格。
+三个 Foundation 包须一起精确锁定到 0.23.0。调用方继续使用 0.22.0 的 Harness 机制。Contracts 规格仍是 1.20.0。远端发布和真实宿主验证不在本说明范围内。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -38,7 +34,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.22.0 是本地源码候选。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+0.23.0 是尚未正式发布的本地源码候选；0.22.0 是已发布包。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -46,13 +42,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.22.0.tgz" "$pack_dir/skill-family-harness-node-0.22.0.tgz" "$pack_dir/skill-family-engineering-kit-0.22.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.23.0.tgz" "$pack_dir/skill-family-harness-node-0.23.0.tgz" "$pack_dir/skill-family-engineering-kit-0.23.0.tgz")
 ```
 
-发布后再使用 registry 坐标：
+0.23.0 正式发布后，再使用对应的 registry 坐标：
 
 ```sh
-npm install skill-family-harness-node@0.22.0
+npm install skill-family-harness-node@0.23.0
 npm info skill-family-harness-node --help
 ```
 
@@ -290,4 +286,4 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
-0.22.0 是本地源码候选，远端可用性须由对应的 release-skill 发布后证据证明。候选检查使用本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+0.23.0 是尚未正式发布的本地源码候选；0.22.0 是已发布包。0.23.0 的远端可用性须由对应的 release-skill 发布后证据证明。候选检查使用本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

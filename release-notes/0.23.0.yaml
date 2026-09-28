@@ -1,0 +1,17 @@
+version: 0.23.0
+date: 2026-09-26
+locales:
+  en:
+    summary: Harness 0.23.0 aligns its package coordinate with Foundation 0.23.0 and adds no runtime mechanism. This note records the local lockstep candidate and does not claim remote publication or real-host acceptance.
+    changes:
+      changed:
+        - Aligns package identity and `FOUNDATION_PACKAGE_VERSION` with the lockstep Foundation 0.23.0 coordinate. The exported file-set apply, recovery, and material-cleanup surface, and the bounded state-store lock inspection and recovery extension, stay as published in 0.22.0.
+        - Adds no root export, locking algorithm, directory operation, or platform qualification.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.23.0. Callers keep the 0.22.0 Harness mechanism. Contracts remains specification 1.20.0. Remote publication and real-host verification are outside this note.
+  zh-CN:
+    summary: Harness 0.23.0 与 Foundation 0.23.0 对齐包坐标，不增加运行时机制。本说明只记录本地锁步候选，不表示已经远端发布，也不表示真实宿主已经接受。
+    changes:
+      changed:
+        - 包身份和 `FOUNDATION_PACKAGE_VERSION` 与 Foundation 0.23.0 锁步坐标对齐。0.22.0 已发布的文件集合应用、恢复和材料清理导出，以及状态底座上有界的锁观察与锁恢复扩展，保持不变。
+        - 不新增包根导出、锁算法、目录操作或平台资格。
+    upgradeNotes: 三个 Foundation 包须一起精确锁定到 0.23.0。调用方继续使用 0.22.0 的 Harness 机制。Contracts 规格仍是 1.20.0。远端发布和真实宿主验证不在本说明范围内。
