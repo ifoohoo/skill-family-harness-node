@@ -1,5 +1,21 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.24.0 locale=en baseline=sha256:0d8e21f061044903f540c1084ba6c9a1e0892239365557c61f1ca172c8cea48e -->
+## [0.24.0] - 2026-10-07
+
+Harness 0.24.0 moves the package coordinate in lockstep with the four Foundation release units and adds no runtime mechanism. This note records the local candidate, not completed remote publication or real-host acceptance.
+
+### Changed
+
+- Package identity and the managed FOUNDATION_PACKAGE_VERSION align with 0.24.0. Existing file-set apply, recovery, and material-cleanup exports, and bounded state-store lock inspection and recovery retain their responsibilities.
+- Adds no root export, locking algorithm, directory operation, or platform qualification. Fixes from the 0.23.1 candidate are carried forward within their actual source scope, not as new runtime capabilities; this note does not claim a byte-for-byte public-payload recheck.
+
+### Upgrade Notes
+
+Pin all three Foundation npm packages to exactly 0.24.0; the independent Plugin ships at the same version. Contracts remains specification 1.20.0. 0.24.0 remains a local candidate; publication and post-publish verification of all four units are unfinished.
+<!-- release-skill:changelog:end version=0.24.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.23.0 locale=en baseline=sha256:e4a97088bca9e0c1f48f2bfd5860dbd8be041a9d0a5e42051422767b3b284303 -->
 ## [0.23.0] - 2026-09-26
 

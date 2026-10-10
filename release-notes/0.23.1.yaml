@@ -1,0 +1,17 @@
+version: 0.23.1
+date: 2026-10-05
+locales:
+  en:
+    summary: Harness 0.23.1 moves the package coordinate to 0.23.1 under the existing lockstep contract. This round adds no runtime mechanism. This note does not say that remote publication or real-host acceptance has happened.
+    changes:
+      changed:
+        - Aligns package identity and `FOUNDATION_PACKAGE_VERSION` with Foundation 0.23.1. The file-set apply, recovery, and material-cleanup exports published in 0.23.0, and the bounded lock inspection and lock recovery extension on the state store, stay unchanged this round.
+        - This round adds no root export, locking algorithm, directory operation, or platform qualification. This note does not include a byte-for-byte recheck of the published payload.
+    upgradeNotes: Pin all three Foundation packages to exactly 0.23.1. Callers keep the Harness mechanism published in 0.23.0. The Contracts specification remains 1.20.0. Remote publication and real-host verification are outside this note.
+  zh-CN:
+    summary: Harness 0.23.1 只按既有锁步合同把包坐标前移到 0.23.1。这一轮没有新增运行时机制。本说明不表示已经远端发布，也不表示真实宿主已经接受。
+    changes:
+      changed:
+        - 包身份和 `FOUNDATION_PACKAGE_VERSION` 与 Foundation 0.23.1 对齐。0.23.0 已发布的文件集合应用、恢复和材料清理导出，以及状态底座上有界的锁观察与锁恢复扩展，这一轮不改。
+        - 这一轮不新增包根导出、锁算法、目录操作或平台资格。本说明没有逐字节重核已发布载荷。
+    upgradeNotes: 三个 Foundation 包必须一起精确锁定到 0.23.1。调用方继续使用 0.23.0 已发布的 Harness 机制。Contracts 规格仍是 1.20.0。远端发布和真实宿主验证不在本说明范围内。

@@ -1,5 +1,21 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.24.0 locale=zh-CN baseline=sha256:9634be5d79a5781addb5c49401b382415afbff049b8976e6b79cfa3c27c78ebb -->
+## [0.24.0] - 2026-10-07
+
+Harness 0.24.0 随本轮 Foundation 四单元锁步前移包坐标，未新增运行时机制。本说明记录本地锁步候选，不证明远端发布或真实宿主验收已完成。
+
+### 变更
+
+- 包身份与受管 `FOUNDATION_PACKAGE_VERSION` 对齐至 0.24.0；既有文件集合的应用、恢复与材料清理导出，以及状态底座的有界锁观察和锁恢复扩展职责保持不变。
+- 不新增包根导出、锁算法、目录操作或平台资格。原 0.23.1 候选修复按实际源码范围承接，不构成新运行时能力，也不宣称已逐字节复核公开载荷。
+
+### 升级说明
+
+三个 Foundation npm 包须精确锁定至 0.24.0，独立 Plugin 与三包同版交付。Contracts 规格继续为 1.20.0。0.24.0 仍为本地候选，四单元发布与发布后验证尚未完成。
+<!-- release-skill:changelog:end version=0.24.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.23.0 locale=zh-CN baseline=sha256:4cfe7a3090bb5589fdbfec555506c0f6a6c668aa872c85c627153e7efa8a6371 -->
 ## [0.23.0] - 2026-09-26
 

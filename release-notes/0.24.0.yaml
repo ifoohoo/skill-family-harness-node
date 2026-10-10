@@ -1,0 +1,17 @@
+version: 0.24.0
+date: 2026-10-07
+locales:
+  en:
+    summary: "Harness 0.24.0 moves the package coordinate in lockstep with the four Foundation release units and adds no runtime mechanism. This note records the local candidate, not completed remote publication or real-host acceptance."
+    changes:
+      changed:
+        - "Package identity and the managed FOUNDATION_PACKAGE_VERSION align with 0.24.0. Existing file-set apply, recovery, and material-cleanup exports, and bounded state-store lock inspection and recovery retain their responsibilities."
+        - "Adds no root export, locking algorithm, directory operation, or platform qualification. Fixes from the 0.23.1 candidate are carried forward within their actual source scope, not as new runtime capabilities; this note does not claim a byte-for-byte public-payload recheck."
+    upgradeNotes: "Pin all three Foundation npm packages to exactly 0.24.0; the independent Plugin ships at the same version. Contracts remains specification 1.20.0. 0.24.0 remains a local candidate; publication and post-publish verification of all four units are unfinished."
+  zh-CN:
+    summary: "Harness 0.24.0 随本轮 Foundation 四单元锁步前移包坐标，未新增运行时机制。本说明记录本地锁步候选，不证明远端发布或真实宿主验收已完成。"
+    changes:
+      changed:
+        - "包身份与受管 `FOUNDATION_PACKAGE_VERSION` 对齐至 0.24.0；既有文件集合的应用、恢复与材料清理导出，以及状态底座的有界锁观察和锁恢复扩展职责保持不变。"
+        - "不新增包根导出、锁算法、目录操作或平台资格。原 0.23.1 候选修复按实际源码范围承接，不构成新运行时能力，也不宣称已逐字节复核公开载荷。"
+    upgradeNotes: "三个 Foundation npm 包须精确锁定至 0.24.0，独立 Plugin 与三包同版交付。Contracts 规格继续为 1.20.0。0.24.0 仍为本地候选，四单元发布与发布后验证尚未完成。"

@@ -4,23 +4,23 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.23.0 -->
+<!-- release-skill:release-version: 0.24.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.23.0** (2026-09-26)
+**0.24.0** (2026-10-07)
 
-Harness 0.23.0 aligns its package coordinate with Foundation 0.23.0 and adds no runtime mechanism. This note records the local lockstep candidate and does not claim remote publication or real-host acceptance.
+Harness 0.24.0 moves the package coordinate in lockstep with the four Foundation release units and adds no runtime mechanism. This note records the local candidate, not completed remote publication or real-host acceptance.
 
 **Changed**
 
-- Aligns package identity and `FOUNDATION_PACKAGE_VERSION` with the lockstep Foundation 0.23.0 coordinate. The exported file-set apply, recovery, and material-cleanup surface, and the bounded state-store lock inspection and recovery extension, stay as published in 0.22.0.
-- Adds no root export, locking algorithm, directory operation, or platform qualification.
+- Package identity and the managed FOUNDATION_PACKAGE_VERSION align with 0.24.0. Existing file-set apply, recovery, and material-cleanup exports, and bounded state-store lock inspection and recovery retain their responsibilities.
+- Adds no root export, locking algorithm, directory operation, or platform qualification. Fixes from the 0.23.1 candidate are carried forward within their actual source scope, not as new runtime capabilities; this note does not claim a byte-for-byte public-payload recheck.
 
 **Upgrade Notes**
 
-Pin all three Foundation packages to exactly 0.23.0. Callers keep the 0.22.0 Harness mechanism. Contracts remains specification 1.20.0. Remote publication and real-host verification are outside this note.
+Pin all three Foundation npm packages to exactly 0.24.0; the independent Plugin ships at the same version. Contracts remains specification 1.20.0. 0.24.0 remains a local candidate; publication and post-publish verification of all four units are unfinished.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -33,7 +33,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Version 0.23.0 is the local source candidate and is not yet formally published. Version 0.22.0 remains the published package. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
+Version 0.24.0 is the local source candidate and is not yet formally published. Version 0.23.0 remains the published package. Build all three tarballs into one temporary directory and install those exact files for a candidate check:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.23.0.tgz" "$pack_dir/skill-family-harness-node-0.23.0.tgz" "$pack_dir/skill-family-engineering-kit-0.23.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.24.0.tgz" "$pack_dir/skill-family-harness-node-0.24.0.tgz" "$pack_dir/skill-family-engineering-kit-0.24.0.tgz")
 ```
 
-After 0.23.0 is formally published, use the registry coordinate:
+After 0.24.0 is formally published, use the registry coordinate:
 
 ```sh
-npm install skill-family-harness-node@0.23.0
+npm install skill-family-harness-node@0.24.0
 npm info skill-family-harness-node --help
 ```
 
@@ -287,4 +287,4 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
-Version 0.23.0 is the local source candidate and is not yet formally published. Version 0.22.0 remains the published package. Remote availability of 0.23.0 must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
+Version 0.24.0 is the local source candidate and is not yet formally published. Version 0.23.0 remains the published package. Remote availability of 0.24.0 must be established by the corresponding release-skill post-release evidence. Consume the three locally verified tarballs for candidate checks; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
