@@ -5,23 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.24.0 -->
+<!-- release-skill:release-version: 0.24.1 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.24.0** (2026-10-07)
+**0.24.1** (2026-10-12)
 
-Harness 0.24.0 随本轮 Foundation 四单元锁步前移包坐标，未新增运行时机制。本说明记录本地锁步候选，不证明远端发布或真实宿主验收已完成。
+Harness 0.24.1 仅随 Foundation 文档补丁按既有四单元合同锁步前移，没有新增能力、API、Schema、协议或机制。
 
 **变更**
 
-- 包身份与受管 `FOUNDATION_PACKAGE_VERSION` 对齐至 0.24.0；既有文件集合的应用、恢复与材料清理导出，以及状态底座的有界锁观察和锁恢复扩展职责保持不变。
-- 不新增包根导出、锁算法、目录操作或平台资格。原 0.23.1 候选修复按实际源码范围承接，不构成新运行时能力，也不宣称已逐字节复核公开载荷。
+- 仅更新包版本和相应受管版本派生；现有能力、参数与失败边界保持不变。
 
 **升级说明**
 
-三个 Foundation npm 包须精确锁定至 0.24.0，独立 Plugin 与三包同版交付。Contracts 规格继续为 1.20.0。0.24.0 仍为本地候选，四单元发布与发布后验证尚未完成。
+三个 Foundation npm 包须精确锁定同版，独立插件与三包保持相同发布版本。Contracts 规格仍为 1.20.0，与 npm 包版本分别处理；消费以实际发布版本的公开接口和来源为准，本说明不替代发布后验证。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -34,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-0.23.1 是尚未正式发布的本地源码候选；0.23.0 是已发布包。候选验证先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+本包版本为 0.24.1；0.24.0 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -42,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.23.1.tgz" "$pack_dir/skill-family-harness-node-0.23.1.tgz" "$pack_dir/skill-family-engineering-kit-0.23.1.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.24.1.tgz" "$pack_dir/skill-family-harness-node-0.24.1.tgz" "$pack_dir/skill-family-engineering-kit-0.24.1.tgz")
 ```
 
-0.23.1 正式发布后，再使用对应的 registry 坐标：
+以下 registry 安装方式以精确版本 0.24.1 已正式可用为前提：
 
 ```sh
-npm install skill-family-harness-node@0.23.1
+npm install skill-family-harness-node@0.24.1
 npm info skill-family-harness-node --help
 ```
 
@@ -286,4 +285,4 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
-0.23.1 是尚未正式发布的本地源码候选；0.23.0 是已发布包。0.23.1 的远端可用性须由对应的 release-skill 发布后证据证明。候选检查使用本地已验证的三包 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+精确包版本的远端可用性须由对应的 release-skill 发布后证据证明。验证未发布工作树时，使用本地已验证的三包精确 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。

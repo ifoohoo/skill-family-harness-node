@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.24.1 locale=en baseline=sha256:73f0e51c56467592631ca701b212b1ad55e9fd426d2cdef09b4d242954191cd0 -->
+## [0.24.1] - 2026-10-12
+
+Harness 0.24.1 advances only to keep the existing four-unit lockstep contract for the Foundation documentation patch. It adds no capability, API, Schema, protocol, or mechanism.
+
+### Changed
+
+- Update only the package coordinate and its managed version projections; existing capabilities, parameters, and failure boundaries remain unchanged.
+
+### Upgrade Notes
+
+Pin the three Foundation npm packages to the exact same version and keep the independent Plugin at that release version. Contracts specification 1.20.0 remains a separate coordinate from npm package versions. Use the actual published version's public interfaces and sources; this note does not replace post-publish verification.
+<!-- release-skill:changelog:end version=0.24.1 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.24.0 locale=en baseline=sha256:0d8e21f061044903f540c1084ba6c9a1e0892239365557c61f1ca172c8cea48e -->
 ## [0.24.0] - 2026-10-07
 
