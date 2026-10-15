@@ -1,0 +1,15 @@
+version: 0.25.0
+date: 2026-10-15
+locales:
+  en:
+    summary: "Harness 0.25.0 advances only to keep the existing four-unit lockstep contract. It adds no capability, API, Schema, protocol, or mechanism."
+    changes:
+      changed:
+        - "Update only the package coordinate and its managed version projections; existing capabilities, parameters, and failure boundaries remain unchanged. Published 0.24.1 functionality is not redone."
+    upgradeNotes: "Pin the three Foundation npm packages to exactly 0.25.0 and keep the independent Plugin at that release version. Contracts specification 1.20.0 remains a separate coordinate from npm package versions. Use the actual published version's public interfaces and sources. This note does not replace post-publish verification."
+  zh-CN:
+    summary: "Harness 0.25.0 仅随既有四单元合同锁步前移，没有新增能力、API、Schema、协议或机制。"
+    changes:
+      changed:
+        - "仅更新包版本和相应受管版本派生；现有能力、参数与失败边界保持不变。不重做 0.24.1 已发布功能。"
+    upgradeNotes: "三个 Foundation npm 包须精确锁定 0.25.0，独立插件与三包保持相同发布版本。Contracts 规格仍为 1.20.0，与 npm 包版本分别处理。消费以实际发布版本的公开接口和源码为准。本说明不替代发布后验证。"

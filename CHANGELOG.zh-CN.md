@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.25.0 locale=zh-CN baseline=sha256:b34e49b41878955d8fc41c7bc884634644e4cf27539cdc51a5afc73b43b7ed01 -->
+## [0.25.0] - 2026-10-15
+
+Harness 0.25.0 仅随既有四单元合同锁步前移，没有新增能力、API、Schema、协议或机制。
+
+### 变更
+
+- 仅更新包版本和相应受管版本派生；现有能力、参数与失败边界保持不变。不重做 0.24.1 已发布功能。
+
+### 升级说明
+
+三个 Foundation npm 包须精确锁定 0.25.0，独立插件与三包保持相同发布版本。Contracts 规格仍为 1.20.0，与 npm 包版本分别处理。消费以实际发布版本的公开接口和源码为准。本说明不替代发布后验证。
+<!-- release-skill:changelog:end version=0.25.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.24.1 locale=zh-CN baseline=sha256:43e94c26881b3941cc831c9212b4b7fe91ecbaed2cfdaf70c6b0b4dc28f08d35 -->
 ## [0.24.1] - 2026-10-12
 
