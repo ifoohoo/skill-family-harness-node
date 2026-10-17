@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.26.0 locale=zh-CN baseline=sha256:2a00977e349e6dacab128f17c8af95e18950bd2e8ed88102abb3778349536c91 -->
+## [0.26.0] - 2026-10-17
+
+Harness Node 0.26.0 仅随四发布单元锁步更新，未引入新能力、API、Schema、协议或机制。
+
+### 变更
+
+- 仅更新包版本及受管版本派生，保持既有受收容读取等机制不变，不重做 0.25.0 已发布功能。
+
+### 升级说明
+
+三个 Foundation npm 包及独立 Plugin 须精确同版为 0.26.0。Contracts 规格保持 1.20.0，与包版本独立管理。消费方应使用实际正式发布的公共接口与来源；本说明不替代发布后验证，也不宣称发布或消费者验收已经完成。
+<!-- release-skill:changelog:end version=0.26.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.25.0 locale=zh-CN baseline=sha256:b34e49b41878955d8fc41c7bc884634644e4cf27539cdc51a5afc73b43b7ed01 -->
 ## [0.25.0] - 2026-10-15
 
