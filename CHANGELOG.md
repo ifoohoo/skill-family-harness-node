@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.27.0 locale=en baseline=sha256:c89c95b50548cf51c346a15635e9c84b127adfde052234fd75fff8a7efdd5efa -->
+## [0.27.0] - 2026-10-21
+
+Harness Node 0.27.0 advances only in lockstep with the four release units. It introduces no capability, API, Schema, protocol, or mechanism.
+
+### Changed
+
+- Update only the package version and its managed version projections. Existing mechanisms, including contained reads and exclusive publication, remain unchanged; published 0.26.0 functionality is not reimplemented.
+
+### Upgrade Notes
+
+Pin the three Foundation npm packages and the independent Plugin to exactly 0.27.0. Contracts specification 1.20.0 remains independent of the package version. Consumers should use the actual officially published public interfaces and sources. This note does not replace post-publish verification or claim that publication or consumer acceptance is complete.
+<!-- release-skill:changelog:end version=0.27.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.26.0 locale=en baseline=sha256:055b274754a65437dcb2907b0a5bc46634bea0e13818367e3c367b184ae18bbf -->
 ## [0.26.0] - 2026-10-17
 

@@ -4,22 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.26.0 -->
+<!-- release-skill:release-version: 0.27.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.26.0** (2026-10-17)
+**0.27.0** (2026-10-21)
 
-Harness Node 0.26.0 advances only in lockstep with the four release units. It introduces no capability, API, Schema, protocol, or mechanism.
+Harness Node 0.27.0 advances only in lockstep with the four release units. It introduces no capability, API, Schema, protocol, or mechanism.
 
 **Changed**
 
-- Update only the package version and its managed version projections. Existing mechanisms, including contained reads, remain unchanged; published 0.25.0 functionality is not reimplemented.
+- Update only the package version and its managed version projections. Existing mechanisms, including contained reads and exclusive publication, remain unchanged; published 0.26.0 functionality is not reimplemented.
 
 **Upgrade Notes**
 
-Pin the three Foundation npm packages and the independent Plugin to exactly 0.26.0. Contracts specification 1.20.0 remains independent of the package version. Consumers should use the actual officially published public interfaces and sources. This note does not replace post-publish verification or claim that publication or consumer acceptance is complete.
+Pin the three Foundation npm packages and the independent Plugin to exactly 0.27.0. Contracts specification 1.20.0 remains independent of the package version. Consumers should use the actual officially published public interfaces and sources. This note does not replace post-publish verification or claim that publication or consumer acceptance is complete.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,7 +32,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-This package version is 0.26.0; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
+This package version is 0.27.0; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -40,13 +40,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.26.0.tgz" "$pack_dir/skill-family-harness-node-0.26.0.tgz" "$pack_dir/skill-family-engineering-kit-0.26.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.27.0.tgz" "$pack_dir/skill-family-harness-node-0.27.0.tgz" "$pack_dir/skill-family-engineering-kit-0.27.0.tgz")
 ```
 
-The registry installation below requires exact version 0.26.0 to be formally available:
+The registry installation below requires exact version 0.27.0 to be formally available:
 
 ```sh
-npm install skill-family-harness-node@0.26.0
+npm install skill-family-harness-node@0.27.0
 npm info skill-family-harness-node --help
 ```
 
