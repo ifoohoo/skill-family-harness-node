@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.27.1 locale=zh-CN baseline=sha256:2484ca823af98802716481c72390f15bfa9c4b15d93143ecac24ef16799a7fe5 -->
+## [0.27.1] - 2026-10-21
+
+skill-family-harness-node 0.27.1 与其他三个发布单元锁步前移，不新增 Harness 机制。已发布的 0.27.0 不改写。
+
+### 变更
+
+- 没有新增能力。本单元按 0.27.1 重新发布，使四个发布单元保持同一版本坐标。
+
+### 升级说明
+
+本包须与其他 Foundation 单元精确锁定 0.27.1。本说明不替代发布后验证。
+<!-- release-skill:changelog:end version=0.27.1 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.27.0 locale=zh-CN baseline=sha256:fb4440b8e7bcaa0d89520c445f4b03c7d7988591b506a6b137ea8aa8a496476c -->
 ## [0.27.0] - 2026-10-21
 

@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.27.1 locale=en baseline=sha256:b2009cf5a12508d64ec3c6236a7d0548c42bf580b0ecd50da19223716588724f -->
+## [0.27.1] - 2026-10-21
+
+skill-family-harness-node 0.27.1 moves in lockstep with the other three release units and adds no Harness mechanism. Published 0.27.0 is unchanged.
+
+### Changed
+
+- No new capability. This unit is republished at 0.27.1 so the four release units keep one version coordinate.
+
+### Upgrade Notes
+
+Pin this package to exactly 0.27.1 with the other Foundation units. This note does not replace post-publish verification.
+<!-- release-skill:changelog:end version=0.27.1 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.27.0 locale=en baseline=sha256:c89c95b50548cf51c346a15635e9c84b127adfde052234fd75fff8a7efdd5efa -->
 ## [0.27.0] - 2026-10-21
 
