@@ -4,22 +4,26 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.27.1 -->
+<!-- release-skill:release-version: 0.28.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.27.1** (2026-10-21)
+**0.28.0** (2026-10-24)
 
-skill-family-harness-node 0.27.1 moves in lockstep with the other three release units and adds no Harness mechanism. Published 0.27.0 is unchanged.
+Harness 0.28.0 enables native Windows 11 x64 support on local NTFS for ordinary users, with bound reads, file-set recovery, and Job-managed process supervision.
+
+**Added**
+
+- Adds publishFixedSetGeneration and resolveFixedSetGeneration as candidate APIs for publishing immutable generations and pinning a complete read closure.
 
 **Changed**
 
-- No new capability. This unit is republished at 0.27.1 so the four release units keep one version coordinate.
+- Windows operations bind real handles, file identity, and protected owner/DACL observations. The process supervisor uses a Job for descendant termination, bounded streams, and cleanup error propagation. Existing POSIX behavior is preserved.
 
 **Upgrade Notes**
 
-Pin this package to exactly 0.27.1 with the other Foundation units. This note does not replace post-publish verification.
+Use Windows generation publication for existing nonempty sets: the old two-directory exchange remains unsupported on Windows. Old generations require an explicit cleanup decision from the caller after readers finish. Keep all four release units at 0.28.0; local installation must use independent files, such as pnpm --package-import-method=copy, because hardlinked protected inputs are rejected.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,7 +36,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-This package version is 0.27.1; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
+This package version is 0.28.0; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -40,13 +44,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.27.1.tgz" "$pack_dir/skill-family-harness-node-0.27.1.tgz" "$pack_dir/skill-family-engineering-kit-0.27.1.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.28.0.tgz" "$pack_dir/skill-family-harness-node-0.28.0.tgz" "$pack_dir/skill-family-engineering-kit-0.28.0.tgz")
 ```
 
-The registry installation below requires exact version 0.27.1 to be formally available:
+The registry installation below requires exact version 0.28.0 to be formally available:
 
 ```sh
-npm install skill-family-harness-node@0.27.1
+npm install skill-family-harness-node@0.28.0
 npm info skill-family-harness-node --help
 ```
 
@@ -278,7 +282,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 The candidate observeFilesystemTree({ root, rootBinding }) reads complete tree facts. Existing superviseProcess accepts optional per-stream raw-byte caps. Observing a payload does not accept it.
 
-`observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` is for a stable installation, cache, or projection tree after the host command has completed, with caller isolation and no concurrent namespace writer during the scan. It records each symlink itself as `targetBase64`, `bytes`, and `statMode`, reads only the raw target bytes, and never follows the target; regular files continue to reuse `readFileBound`. Record is a Node/JS best-effort candidate: observed drift fails closed, but the mode does not provide a transaction snapshot, same-UID malicious-concurrency, or ABA guarantee. A stable-tree result remains a normal usable result. Consumers such as release-skill own invocation timing and domain acceptance rules such as npm `.bin`.
+On POSIX, `observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` is for a stable installation, cache, or projection tree after the host command has completed, with caller isolation and no concurrent namespace writer during the scan. It records each symlink itself as `targetBase64`, `bytes`, and `statMode`, reads only the raw target bytes, and never follows the target; regular files continue to reuse `readFileBound`. Record is a Node/JS best-effort candidate: observed drift fails closed, but the mode does not provide a transaction snapshot, same-UID malicious-concurrency, or ABA guarantee. A stable-tree result remains a normal usable result. Consumers such as release-skill own invocation timing and domain acceptance rules such as npm `.bin`.
 
 Member ordering is mode-specific for compatibility: omitted/reject mode retains the 0.14 UTF-16 relational order, while record mode uses Unicode code-point order. The selected order is also the order used to derive `membersDigest`.
 
@@ -287,3 +291,9 @@ When the actual threat includes malicious concurrency, return a minimal upstream
 The separate candidate `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` provides a read-only point-in-time observation of only the caller-explicit roots and lookup paths, for an immediate re-observation before launch. When an `/usr/bin/env` shebang resolves an interpreter through explicit `pathEntries`, the observation preserves the interpreter candidate's complete symlink chain rather than collapsing it to the final file. It is not part of `host-adapter` and does not prove wrapper control flow, ambient `PATH`, fd-exec/kernel image, signature trust, cross-call caching, host support/lifecycle, or domain acceptance; the caller owns those semantics. The candidate entry alone does not qualify a host.
 
 Remote availability of an exact package version must be established by the corresponding release-skill post-release evidence. To verify an unpublished working tree, consume the three exact, locally verified tarballs; a version marker, unit test, or successful install is not complete contract integration, migration completion, or real-host qualification.
+
+## Windows support and boundaries
+
+This Windows branch applies to Windows 11 x64, local NTFS, and ordinary users. Exact remote availability requires formal release evidence; it is separate from API maturity and real-host qualification.
+
+`foundation.harness.fixed-set-generation` is a candidate capability available from package coordinate 0.28.0, supporting `publishFixedSetGeneration` and `resolveFixedSetGeneration`. Runs on native Windows with local NTFS paths and standard user permissions, not WSL. Publishing writes a pointer and retains all generations; `resolve` is read-only. File sets report restoration or conflicts; Job cleanup requires zero active processes, both streams flushed and closed, and all handles closed. See [API reference](https://ifoohoo.github.io/skill-family-engineering-kit/reference/api/harness/).

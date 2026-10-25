@@ -1,5 +1,24 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.28.0 locale=en baseline=sha256:23b4a96be49b60adb9485b9b16a4301f13769d3ac2b1f8db5244ccf33713d6bb -->
+## [0.28.0] - 2026-10-24
+
+Harness 0.28.0 enables native Windows 11 x64 support on local NTFS for ordinary users, with bound reads, file-set recovery, and Job-managed process supervision.
+
+### Added
+
+- Adds publishFixedSetGeneration and resolveFixedSetGeneration as candidate APIs for publishing immutable generations and pinning a complete read closure.
+
+### Changed
+
+- Windows operations bind real handles, file identity, and protected owner/DACL observations. The process supervisor uses a Job for descendant termination, bounded streams, and cleanup error propagation. Existing POSIX behavior is preserved.
+
+### Upgrade Notes
+
+Use Windows generation publication for existing nonempty sets: the old two-directory exchange remains unsupported on Windows. Old generations require an explicit cleanup decision from the caller after readers finish. Keep all four release units at 0.28.0; local installation must use independent files, such as pnpm --package-import-method=copy, because hardlinked protected inputs are rejected.
+<!-- release-skill:changelog:end version=0.28.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.27.1 locale=en baseline=sha256:b2009cf5a12508d64ec3c6236a7d0548c42bf580b0ecd50da19223716588724f -->
 ## [0.27.1] - 2026-10-21
 

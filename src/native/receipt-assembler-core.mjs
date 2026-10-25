@@ -74,7 +74,9 @@ export function readJson(file) {
 export function verifyBinary(key, file, facts) {
   const link = lstatSync(file);
   if (!link.isFile() || link.isSymbolicLink() || link.nlink !== 1) throw new Error(`${key}: binary必须是单链接普通文件`);
-  if ((link.mode & 0o777) !== facts.binaryMode) throw new Error(`${key}: binary mode与receipt不匹配`);
+  // NTFS has no physical POSIX mode. The per-platform receipt validates the
+  // frozen distribution mode; retain the physical check on POSIX hosts.
+  if (process.platform !== "win32" && (link.mode & 0o777) !== facts.binaryMode) throw new Error(`${key}: binary mode与receipt不匹配`);
   if (facts.binarySize !== undefined && link.size !== facts.binarySize) throw new Error(`${key}: binary size与receipt不匹配`);
   if (sha256(readFileSync(file)) !== facts.binarySha) throw new Error(`${key}: binary SHA与receipt不匹配`);
 }
@@ -125,7 +127,7 @@ export function replaceManaged(outputRoot, stage, names) {
   rmSync(backup, { recursive: true, force: true });
 }
 
-function buildStage(config, outputRoot, inputs, sourceSha) {
+export function buildStage(config, outputRoot, inputs, sourceSha) {
   const stage = mkdtempSync(path.join(path.dirname(outputRoot), ".native-prebuild-stage-"));
   const entries = [];
   try {
@@ -145,7 +147,7 @@ function buildStage(config, outputRoot, inputs, sourceSha) {
         mode: config.mode,
         sha256: input.binarySha,
         napi: Number(config.napi),
-        exports: config.exports,
+        exports: input.exports ?? config.exports,
       });
     }
     const manifest = config.manifestDoc(entries);

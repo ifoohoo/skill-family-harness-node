@@ -75,6 +75,7 @@ function receiptFacts(key, receipt) {
         (single && (receipt.status !== "VERIFIED" || receipt.actualExecution !== true))) {
       throw new Error(`${key}: Darwin receipt平台或Node ABI不匹配`);
     }
+    if (process.platform === "win32" && candidate?.mode !== "0755") throw new Error(`${key}: Darwin receipt distribution mode不匹配`);
     return { sourceSha, binarySha: candidate.sha256, binaryMode: Number.parseInt(candidate.mode, 8), binarySize: candidate.size };
   }
   if (receipt.kind !== "skill-family-foundation.w3n3-linux-native-platform-receipt" || receipt.status !== "PASS" ||
@@ -82,6 +83,7 @@ function receiptFacts(key, receipt) {
       String(receipt.node?.napi) !== NAPI || !receipt.oracle?.results?.every((result) => result.status === "PASS")) {
     throw new Error(`${key}: Linux receipt平台、oracle或Node ABI不匹配`);
   }
+  if (process.platform === "win32" && receipt.addon?.mode !== "0644") throw new Error(`${key}: Linux receipt distribution mode不匹配`);
   return {
     sourceSha: receipt.source?.sha256,
     binarySha: receipt.addon?.sha256,

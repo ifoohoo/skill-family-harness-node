@@ -5,22 +5,26 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.27.1 -->
+<!-- release-skill:release-version: 0.28.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.27.1** (2026-10-21)
+**0.28.0** (2026-10-24)
 
-skill-family-harness-node 0.27.1 与其他三个发布单元锁步前移，不新增 Harness 机制。已发布的 0.27.0 不改写。
+Harness 0.28.0 为普通用户下的 Windows 11 x64、本地 NTFS 接通原生后端，覆盖绑定读取、文件集合恢复及 Job 管理进程。
+
+**新增**
+
+- 新增 candidate API publishFixedSetGeneration 与 resolveFixedSetGeneration，用于发布不可变世代并固定完整读取闭包。
 
 **变更**
 
-- 没有新增能力。本单元按 0.27.1 重新发布，使四个发布单元保持同一版本坐标。
+- Windows 操作核对真实句柄、文件身份及受保护的 owner/DACL 权限观察。进程监督以 Job 管理后代终止、有界输出及清理错误传播；既有 POSIX 行为保留。
 
 **升级说明**
 
-本包须与其他 Foundation 单元精确锁定 0.27.1。本说明不替代发布后验证。
+Windows 上更新既有非空集合应采用世代发布，旧双目录交换仍不支持。旧世代须在读取者结束后由调用方显式决定清理。四单元保持 0.28.0；本地安装须导入独立文件，例如 pnpm --package-import-method=copy，受保护输入仍拒绝硬链接。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +37,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-本包版本为 0.27.1；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+本包版本为 0.28.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +45,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.27.1.tgz" "$pack_dir/skill-family-harness-node-0.27.1.tgz" "$pack_dir/skill-family-engineering-kit-0.27.1.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.28.0.tgz" "$pack_dir/skill-family-harness-node-0.28.0.tgz" "$pack_dir/skill-family-engineering-kit-0.28.0.tgz")
 ```
 
-以下 registry 安装方式以精确版本 0.27.1 已正式可用为前提：
+以下 registry 安装方式以精确版本 0.28.0 已正式可用为前提：
 
 ```sh
-npm install skill-family-harness-node@0.27.1
+npm install skill-family-harness-node@0.28.0
 npm info skill-family-harness-node --help
 ```
 
@@ -277,7 +281,7 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 新增候选 observeFilesystemTree({ root, rootBinding }) 读取完整树事实；既有 superviseProcess 支持可选每流原始字节上限。观察完成不等于接受载荷。
 
-`observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` 适用于宿主命令完成后、调用方已隔离且扫描期间没有并发 namespace writer 的稳定安装树、缓存树或投影树。它记录 symlink 自身的 `targetBase64`、`bytes` 和 `statMode`，只读取原始 target bytes，绝不跟随 target；普通文件仍复用 `readFileBound`。record 是 Node/JS best-effort candidate：发现扫描期间的漂移会失败关闭，但不提供事务快照、同 UID 恶意并发或 ABA 保证，这不改变稳定树结果的正常使用语义。release-skill 等消费者负责调用时机，并继续负责 npm `.bin` 等领域接受规则。
+在 POSIX 平台，`observeFilesystemTree({ root, rootBinding, symlinkPolicy: { mode: "record" } })` 适用于宿主命令完成后、调用方已隔离且扫描期间没有并发 namespace writer 的稳定安装树、缓存树或投影树。它记录 symlink 自身的 `targetBase64`、`bytes` 和 `statMode`，只读取原始 target bytes，绝不跟随 target；普通文件仍复用 `readFileBound`。record 是 Node/JS best-effort candidate：发现扫描期间的漂移会失败关闭，但不提供事务快照、同 UID 恶意并发或 ABA 保证，这不改变稳定树结果的正常使用语义。release-skill 等消费者负责调用时机，并继续负责 npm `.bin` 等领域接受规则。
 
 成员排序按模式区分，以保留兼容性：省略策略或使用 reject 时沿用 0.14 的 UTF-16 关系顺序，record 使用 Unicode 码点顺序；`membersDigest` 也按对应顺序推导。
 
@@ -286,3 +290,9 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 另一个独立候选 `observeExecutableIdentity({ boundRoots, lookup, interpreterPolicy? })` 只对调用方显式提供的根和查找路径做逐次只读观察，供正式启动前紧邻重观察。`/usr/bin/env` shebang 通过显式 `pathEntries` 找到解释器时，结果保留解释器候选的完整 symlink chain，不折叠成最终文件。它不属于 `host-adapter`，也不证明 wrapper 控制流、ambient `PATH`、fd-exec/内核映像、签名信任、跨调用缓存、宿主支持/生命周期或领域接受；这些语义仍由调用方负责。候选入口存在不等于宿主已获资格。
 
 精确包版本的远端可用性须由对应的 release-skill 发布后证据证明。验证未发布工作树时，使用本地已验证的三包精确 tarball；版本标记、单元测试或安装成功都不等于契约接入完成、迁移完成或真实宿主资格。
+
+## Windows 支持与使用边界
+
+Windows 分支适用于 Windows 11 x64、本地 NTFS、普通用户。精确版本的远端可用性由正式发布凭据核实，与 API 成熟度及真实宿主资格分别判断。
+
+`foundation.harness.fixed-set-generation` 为 candidate 能力，自包坐标 0.28.0 起提供 `publishFixedSetGeneration` 与 `resolveFixedSetGeneration`。原生 Windows 环境下，路径为本地 NTFS，权限为普通用户，不依赖 WSL。发布写入指针并保留旧世代，`resolve` 为只读操作，文件集合按结果报告恢复或冲突；Job Object 清理需零活动进程、双流刷盘关闭与全部句柄关闭。详见 [API 文档](https://ifoohoo.github.io/skill-family-engineering-kit/reference/api/harness/)。

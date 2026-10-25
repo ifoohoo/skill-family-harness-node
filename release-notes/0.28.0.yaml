@@ -1,0 +1,19 @@
+version: 0.28.0
+date: 2026-10-24
+locales:
+  en:
+    summary: Harness 0.28.0 enables native Windows 11 x64 support on local NTFS for ordinary users, with bound reads, file-set recovery, and Job-managed process supervision.
+    changes:
+      added:
+        - Adds publishFixedSetGeneration and resolveFixedSetGeneration as candidate APIs for publishing immutable generations and pinning a complete read closure.
+      changed:
+        - Windows operations bind real handles, file identity, and protected owner/DACL observations. The process supervisor uses a Job for descendant termination, bounded streams, and cleanup error propagation. Existing POSIX behavior is preserved.
+    upgradeNotes: "Use Windows generation publication for existing nonempty sets: the old two-directory exchange remains unsupported on Windows. Old generations require an explicit cleanup decision from the caller after readers finish. Keep all four release units at 0.28.0; local installation must use independent files, such as pnpm --package-import-method=copy, because hardlinked protected inputs are rejected."
+  zh-CN:
+    summary: Harness 0.28.0 为普通用户下的 Windows 11 x64、本地 NTFS 接通原生后端，覆盖绑定读取、文件集合恢复及 Job 管理进程。
+    changes:
+      added:
+        - 新增 candidate API publishFixedSetGeneration 与 resolveFixedSetGeneration，用于发布不可变世代并固定完整读取闭包。
+      changed:
+        - Windows 操作核对真实句柄、文件身份及受保护的 owner/DACL 权限观察。进程监督以 Job 管理后代终止、有界输出及清理错误传播；既有 POSIX 行为保留。
+    upgradeNotes: Windows 上更新既有非空集合应采用世代发布，旧双目录交换仍不支持。旧世代须在读取者结束后由调用方显式决定清理。四单元保持 0.28.0；本地安装须导入独立文件，例如 pnpm --package-import-method=copy，受保护输入仍拒绝硬链接。

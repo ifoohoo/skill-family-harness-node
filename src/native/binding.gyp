@@ -18,6 +18,12 @@
         }],
         ["OS=='linux'", {
           "defines": ["PLATFORM_LINUX=1"]
+        }],
+        ["OS=='win'", {
+          "sources!": ["bound_read.c"],
+          "sources": ["windows_process.c"],
+          "defines": ["PLATFORM_WIN32=1", "WIN32_LEAN_AND_MEAN"],
+          "libraries": ["-ladvapi32"]
         }]
       ]
     }

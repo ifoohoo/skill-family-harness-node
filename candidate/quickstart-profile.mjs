@@ -121,7 +121,9 @@ export async function verifyManagedBundleIdentity({
     throw new TypeError("verifyManagedBundleIdentity: neighboring projection provenance is not valid UTF-8 JSON");
   }
   if (
-    provenance?.schemaVersion !== 1 ||
+    (process.platform === "win32"
+      ? provenance?.schemaVersion !== 2 || provenance?.platform !== "win32"
+      : provenance?.schemaVersion !== 1 || Object.hasOwn(provenance, "platform")) ||
     provenance?.kind !== "skill-family.foundation-projection" ||
     provenance?.payload?.digestAlgorithm !== "sha256" ||
     !Array.isArray(provenance.payload.files) ||

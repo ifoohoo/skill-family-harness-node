@@ -1,5 +1,24 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.28.0 locale=zh-CN baseline=sha256:0af38ec0a1d78874752abb7141a7ffd2ae190d4783b048554069529e348705be -->
+## [0.28.0] - 2026-10-24
+
+Harness 0.28.0 为普通用户下的 Windows 11 x64、本地 NTFS 接通原生后端，覆盖绑定读取、文件集合恢复及 Job 管理进程。
+
+### 新增
+
+- 新增 candidate API publishFixedSetGeneration 与 resolveFixedSetGeneration，用于发布不可变世代并固定完整读取闭包。
+
+### 变更
+
+- Windows 操作核对真实句柄、文件身份及受保护的 owner/DACL 权限观察。进程监督以 Job 管理后代终止、有界输出及清理错误传播；既有 POSIX 行为保留。
+
+### 升级说明
+
+Windows 上更新既有非空集合应采用世代发布，旧双目录交换仍不支持。旧世代须在读取者结束后由调用方显式决定清理。四单元保持 0.28.0；本地安装须导入独立文件，例如 pnpm --package-import-method=copy，受保护输入仍拒绝硬链接。
+<!-- release-skill:changelog:end version=0.28.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.27.1 locale=zh-CN baseline=sha256:2484ca823af98802716481c72390f15bfa9c4b15d93143ecac24ef16799a7fe5 -->
 ## [0.27.1] - 2026-10-21
 
