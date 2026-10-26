@@ -1,0 +1,15 @@
+version: 0.29.0
+date: 2026-10-26
+locales:
+  en:
+    summary: Harness 0.29.0 advances in lockstep with the initialization Plugin. No mechanisms or APIs are added; the capability count remains 27.
+    changes:
+      changed:
+        - Version alignment only; existing mechanism behavior is unchanged.
+    upgradeNotes: Pin all four release units to exactly 0.29.0. Existing Windows and POSIX qualification boundaries remain unchanged.
+  zh-CN:
+    summary: 0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+    changes:
+      changed:
+        - 0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+    upgradeNotes: 四个发布单元须锁步采用0.29.0。无功能变更，仅版本锁步，不影响现有能力调用。

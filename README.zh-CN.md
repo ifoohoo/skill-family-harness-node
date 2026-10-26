@@ -5,26 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.28.0 -->
+<!-- release-skill:release-version: 0.29.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.28.0** (2026-10-24)
+**0.29.0** (2026-10-26)
 
-Harness 0.28.0 为普通用户下的 Windows 11 x64、本地 NTFS 接通原生后端，覆盖绑定读取、文件集合恢复及 Job 管理进程。
-
-**新增**
-
-- 新增 candidate API publishFixedSetGeneration 与 resolveFixedSetGeneration，用于发布不可变世代并固定完整读取闭包。
+0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
 
 **变更**
 
-- Windows 操作核对真实句柄、文件身份及受保护的 owner/DACL 权限观察。进程监督以 Job 管理后代终止、有界输出及清理错误传播；既有 POSIX 行为保留。
+- 0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
 
 **升级说明**
 
-Windows 上更新既有非空集合应采用世代发布，旧双目录交换仍不支持。旧世代须在读取者结束后由调用方显式决定清理。四单元保持 0.28.0；本地安装须导入独立文件，例如 pnpm --package-import-method=copy，受保护输入仍拒绝硬链接。
+四个发布单元须锁步采用0.29.0。无功能变更，仅版本锁步，不影响现有能力调用。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -37,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-本包版本为 0.28.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+本包版本为 0.29.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -45,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.28.0.tgz" "$pack_dir/skill-family-harness-node-0.28.0.tgz" "$pack_dir/skill-family-engineering-kit-0.28.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.29.0.tgz" "$pack_dir/skill-family-harness-node-0.29.0.tgz" "$pack_dir/skill-family-engineering-kit-0.29.0.tgz")
 ```
 
-以下 registry 安装方式以精确版本 0.28.0 已正式可用为前提：
+以下 registry 安装方式以精确版本 0.29.0 已正式可用为前提：
 
 ```sh
-npm install skill-family-harness-node@0.28.0
+npm install skill-family-harness-node@0.29.0
 npm info skill-family-harness-node --help
 ```
 

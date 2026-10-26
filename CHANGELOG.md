@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.29.0 locale=en baseline=sha256:dd1a43c44358f1b959bafb826503dbddc93a1a7c80356efe272eb3037b6cbd1c -->
+## [0.29.0] - 2026-10-26
+
+Harness 0.29.0 advances in lockstep with the initialization Plugin. No mechanisms or APIs are added; the capability count remains 27.
+
+### Changed
+
+- Version alignment only; existing mechanism behavior is unchanged.
+
+### Upgrade Notes
+
+Pin all four release units to exactly 0.29.0. Existing Windows and POSIX qualification boundaries remain unchanged.
+<!-- release-skill:changelog:end version=0.29.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.28.0 locale=en baseline=sha256:23b4a96be49b60adb9485b9b16a4301f13769d3ac2b1f8db5244ccf33713d6bb -->
 ## [0.28.0] - 2026-10-24
 

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.29.0 locale=zh-CN baseline=sha256:aae86328e6ee4d80558474aa2c65d3f41620df0f8b2ca48cd213e11cba29b571 -->
+## [0.29.0] - 2026-10-26
+
+0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+
+### 变更
+
+- 0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+
+### 升级说明
+
+四个发布单元须锁步采用0.29.0。无功能变更，仅版本锁步，不影响现有能力调用。
+<!-- release-skill:changelog:end version=0.29.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.28.0 locale=zh-CN baseline=sha256:0af38ec0a1d78874752abb7141a7ffd2ae190d4783b048554069529e348705be -->
 ## [0.28.0] - 2026-10-24
 
