@@ -4,22 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.30.0 -->
+<!-- release-skill:release-version: 0.31.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.30.0** (2026-10-31)
+**0.31.0** (2026-11-01)
 
-Version-locked with other units, with no new or modified path resolution, file reading, or closure computation mechanisms.
+This release enforces version lockstep at 0.31.0 with no changes to path handling, file reading, digest computation, or closure generation. The Kit reuses readFileStrict and computeResourceClosure directly. Platform qualification scope remains unchanged.
 
 **Changed**
 
-- Version alignment only; the new Kit check reuses resolveContained, readFileStrict, and computeResourceClosure.
+- No modifications to existing path, read, digest, or closure behavior. Kit uses readFileStrict and computeResourceClosure without alteration.
 
 **Upgrade Notes**
 
-Pin all four release units to exactly 0.30.0. Existing platform qualification boundaries remain unchanged; this release does not claim fresh validation of every platform.
+All four units must upgrade to exactly 0.31.0. No expansion of platform qualification is implied. The existing platform scope is preserved.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,7 +32,7 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-This package version is 0.30.0; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
+This package version is 0.31.0; version 0.24.1 has been formally published. To verify a working tree before formal publication, build all three tarballs into one temporary directory and install those exact files:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -40,13 +40,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.30.0.tgz" "$pack_dir/skill-family-harness-node-0.30.0.tgz" "$pack_dir/skill-family-engineering-kit-0.30.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.31.0.tgz" "$pack_dir/skill-family-harness-node-0.31.0.tgz" "$pack_dir/skill-family-engineering-kit-0.31.0.tgz")
 ```
 
-The registry installation below requires exact version 0.30.0 to be formally available:
+The registry installation below requires exact version 0.31.0 to be formally available:
 
 ```sh
-npm install skill-family-harness-node@0.30.0
+npm install skill-family-harness-node@0.31.0
 npm info skill-family-harness-node --help
 ```
 

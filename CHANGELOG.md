@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.31.0 locale=en baseline=sha256:ed64819859d1ccc7c380c3fc451e2da7ab3909e817eac71135575c64ad3ee591 -->
+## [0.31.0] - 2026-11-01
+
+This release enforces version lockstep at 0.31.0 with no changes to path handling, file reading, digest computation, or closure generation. The Kit reuses readFileStrict and computeResourceClosure directly. Platform qualification scope remains unchanged.
+
+### Changed
+
+- No modifications to existing path, read, digest, or closure behavior. Kit uses readFileStrict and computeResourceClosure without alteration.
+
+### Upgrade Notes
+
+All four units must upgrade to exactly 0.31.0. No expansion of platform qualification is implied. The existing platform scope is preserved.
+<!-- release-skill:changelog:end version=0.31.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.30.0 locale=en baseline=sha256:eb39c46596d4e813aae385eb556c435934dc8520996d0de979c9b9d2d9198023 -->
 ## [0.30.0] - 2026-10-31
 

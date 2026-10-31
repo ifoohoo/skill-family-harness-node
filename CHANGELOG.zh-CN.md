@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.31.0 locale=zh-CN baseline=sha256:7de4161ac0472177bed887916b21fc0848d07486bd59a949b71a24acbc63ff17 -->
+## [0.31.0] - 2026-11-01
+
+本次发布仅执行0.31.0版本锁步，路径处理、文件读取、摘要计算及闭包生成机制均无变更。Kit直接复用readFileStrict与computeResourceClosure。平台资格范围不变。
+
+### 变更
+
+- 路径、读取、摘要、闭包机制未改动。Kit直接使用readFileStrict与computeResourceClosure。
+
+### 升级说明
+
+四单元必须精确升级至0.31.0。本轮不扩大平台资格范围，既存平台范围保持不变。
+<!-- release-skill:changelog:end version=0.31.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.30.0 locale=zh-CN baseline=sha256:12515d850ea4e50688e8ab2ee167ae1e298a46b1f37b08e1f4ff69eff0b8ff62 -->
 ## [0.30.0] - 2026-10-31
 
