@@ -1,0 +1,19 @@
+version: 0.30.0
+date: 2026-10-31
+locales:
+  en:
+    summary: Version-locked with other units, with no new or modified path
+      resolution, file reading, or closure computation mechanisms.
+    changes:
+      changed:
+        - Version alignment only; the new Kit check reuses resolveContained,
+          readFileStrict, and computeResourceClosure.
+    upgradeNotes: Pin all four release units to exactly 0.30.0. Existing platform
+      qualification boundaries remain unchanged; this release does not claim
+      fresh validation of every platform.
+  zh-CN:
+    summary: 仅随其他单元版本锁步，未新增或修改路径解析、文件读取或闭包机制。
+    changes:
+      changed:
+        - 新检查直接复用现有 resolveContained、readFileStrict、computeResourceClosure 接口。
+    upgradeNotes: 四个发布单元须精确锁步采用 0.30.0。既有平台资格边界不变，不宣称本轮重新验证所有平台。

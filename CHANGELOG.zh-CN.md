@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.30.0 locale=zh-CN baseline=sha256:12515d850ea4e50688e8ab2ee167ae1e298a46b1f37b08e1f4ff69eff0b8ff62 -->
+## [0.30.0] - 2026-10-31
+
+仅随其他单元版本锁步，未新增或修改路径解析、文件读取或闭包机制。
+
+### 变更
+
+- 新检查直接复用现有 resolveContained、readFileStrict、computeResourceClosure 接口。
+
+### 升级说明
+
+四个发布单元须精确锁步采用 0.30.0。既有平台资格边界不变，不宣称本轮重新验证所有平台。
+<!-- release-skill:changelog:end version=0.30.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.29.0 locale=zh-CN baseline=sha256:aae86328e6ee4d80558474aa2c65d3f41620df0f8b2ca48cd213e11cba29b571 -->
 ## [0.29.0] - 2026-10-26
 

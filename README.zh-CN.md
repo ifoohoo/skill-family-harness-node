@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.29.0 -->
+<!-- release-skill:release-version: 0.30.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.29.0** (2026-10-26)
+**0.30.0** (2026-10-31)
 
-0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+仅随其他单元版本锁步，未新增或修改路径解析、文件读取或闭包机制。
 
 **变更**
 
-- 0.29.0仅锁步版本，无新增能力或API，27项能力保持不变。
+- 新检查直接复用现有 resolveContained、readFileStrict、computeResourceClosure 接口。
 
 **升级说明**
 
-四个发布单元须锁步采用0.29.0。无功能变更，仅版本锁步，不影响现有能力调用。
+四个发布单元须精确锁步采用 0.30.0。既有平台资格边界不变，不宣称本轮重新验证所有平台。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-本包版本为 0.29.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+本包版本为 0.30.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.29.0.tgz" "$pack_dir/skill-family-harness-node-0.29.0.tgz" "$pack_dir/skill-family-engineering-kit-0.29.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.30.0.tgz" "$pack_dir/skill-family-harness-node-0.30.0.tgz" "$pack_dir/skill-family-engineering-kit-0.30.0.tgz")
 ```
 
-以下 registry 安装方式以精确版本 0.29.0 已正式可用为前提：
+以下 registry 安装方式以精确版本 0.30.0 已正式可用为前提：
 
 ```sh
-npm install skill-family-harness-node@0.29.0
+npm install skill-family-harness-node@0.30.0
 npm info skill-family-harness-node --help
 ```
 

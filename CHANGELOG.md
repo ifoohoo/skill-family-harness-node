@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.30.0 locale=en baseline=sha256:eb39c46596d4e813aae385eb556c435934dc8520996d0de979c9b9d2d9198023 -->
+## [0.30.0] - 2026-10-31
+
+Version-locked with other units, with no new or modified path resolution, file reading, or closure computation mechanisms.
+
+### Changed
+
+- Version alignment only; the new Kit check reuses resolveContained, readFileStrict, and computeResourceClosure.
+
+### Upgrade Notes
+
+Pin all four release units to exactly 0.30.0. Existing platform qualification boundaries remain unchanged; this release does not claim fresh validation of every platform.
+<!-- release-skill:changelog:end version=0.30.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.29.0 locale=en baseline=sha256:dd1a43c44358f1b959bafb826503dbddc93a1a7c80356efe272eb3037b6cbd1c -->
 ## [0.29.0] - 2026-10-26
 
