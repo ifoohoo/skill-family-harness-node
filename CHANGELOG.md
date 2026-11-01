@@ -1,5 +1,35 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.34.0 locale=en baseline=sha256:59fcabb8f8d190ad9cf3191412acae3a74f44a3d739d33f84d346052287c3417 -->
+## [0.34.0] - 2026-11-02
+
+This unit has no new behavior in this release. Its version and necessary derived references move in lockstep with all four release units; existing mechanism algorithms and compatible contracts remain unchanged.
+
+### Changed
+
+- This unit has no new behavior in this release.
+
+### Upgrade Notes
+
+Use Engineering Kit and foundation-adoption-review 0.34.0 for the new scopes. Existing entrypoints remain compatible, with no mandatory migration for old consumers. Contracts and Harness have no new mechanism behavior and move only in lockstep version and necessary derivations. Version 0.33.0 remains an unpublished source candidate; 0.34.0 combines both capabilities. Local candidates do not establish remote publication or authorization; the four units require formal verification before overall publication is claimed.
+<!-- release-skill:changelog:end version=0.34.0 locale=en -->
+
+
+<!-- release-skill:changelog:start version=0.33.0 locale=en baseline=sha256:d6c60cd49695cd1e03ece0b8a9a76dcc4d5943b2f142545dbf8789e1f879e017 -->
+## [0.33.0] - 2026-11-01
+
+This unit has no new behavior in this release. Its version and existing derived references move in lockstep with the four release units; mechanism algorithms and compatible contracts remain unchanged.
+
+### Changed
+
+- This unit has no new behavior in this release.
+
+### Upgrade Notes
+
+The new API requires Engineering Kit 0.33.0; the corresponding optional Skill scope requires foundation-adoption-review 0.33.0. Existing entrypoints and compatible contracts remain available. Local candidate versions do not establish remote publication or authorize external actions.
+<!-- release-skill:changelog:end version=0.33.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.32.0 locale=en baseline=sha256:13f70db9a2d311afb1d5dccc73d1d87d2c9ac75d994041d99a648121494d3433 -->
 ## [0.32.0] - 2026-11-01
 

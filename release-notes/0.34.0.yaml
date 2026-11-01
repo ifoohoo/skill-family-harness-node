@@ -1,0 +1,15 @@
+version: 0.34.0
+date: 2026-11-02
+locales:
+  en:
+    summary: "This unit has no new behavior in this release. Its version and necessary derived references move in lockstep with all four release units; existing mechanism algorithms and compatible contracts remain unchanged."
+    changes:
+      changed:
+        - "This unit has no new behavior in this release."
+    upgradeNotes: "Use Engineering Kit and foundation-adoption-review 0.34.0 for the new scopes. Existing entrypoints remain compatible, with no mandatory migration for old consumers. Contracts and Harness have no new mechanism behavior and move only in lockstep version and necessary derivations. Version 0.33.0 remains an unpublished source candidate; 0.34.0 combines both capabilities. Local candidates do not establish remote publication or authorization; the four units require formal verification before overall publication is claimed."
+  zh-CN:
+    summary: "本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。"
+    changes:
+      changed:
+        - "本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。"
+    upgradeNotes: "Contracts与Harness在本版无新增机制行为，仅进行锁步版本同步与必要派生，既有协议与算法保持不变。升级需同时满足Kit与Plugin均升级至0.34.0版本。旧有入口保持兼容，不强制旧消费者迁移。\n\n0.33.0版本仅为未发布源码候选，不具备正式发布效力；0.34.0为首次合并交付，统一包含两项公共能力。本地候选状态不构成远端发布或授权证明，四单元正式验证通过后，方可认定整体发布。"

@@ -1,5 +1,37 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.34.0 locale=zh-CN baseline=sha256:10da5f9140e88a9743cf1688d6e7c2db65545b2a99f9bad7528c11b7537bab47 -->
+## [0.34.0] - 2026-11-02
+
+本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+
+### 变更
+
+- 本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+
+### 升级说明
+
+Contracts与Harness在本版无新增机制行为，仅进行锁步版本同步与必要派生，既有协议与算法保持不变。升级需同时满足Kit与Plugin均升级至0.34.0版本。旧有入口保持兼容，不强制旧消费者迁移。
+
+0.33.0版本仅为未发布源码候选，不具备正式发布效力；0.34.0为首次合并交付，统一包含两项公共能力。本地候选状态不构成远端发布或授权证明，四单元正式验证通过后，方可认定整体发布。
+<!-- release-skill:changelog:end version=0.34.0 locale=zh-CN -->
+
+
+<!-- release-skill:changelog:start version=0.33.0 locale=zh-CN baseline=sha256:13c96c9464eac21f26cdb882b2fde0cfa1026bdd1e35e50ea55e05dedf3cb696 -->
+## [0.33.0] - 2026-11-01
+
+本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+
+### 变更
+
+- 本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+
+### 升级说明
+
+使用新入口需 Engineering Kit 0.33.0，新 Skill 范围需 `foundation-adoption-review` 0.33.0；旧消费者不强制迁移，原入口与兼容合同保留。Contracts 与 Harness 本版本无新增行为，仅同步锁步版本与必要派生。本地候选不证明远端发布完成，最终四单元载荷与外部动作仍按原流程核准。
+<!-- release-skill:changelog:end version=0.33.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.32.0 locale=zh-CN baseline=sha256:44d8f93e3aaf221acd6473d04e84c35bbc3ca967c7770e3782234c8dd219e2be -->
 ## [0.32.0] - 2026-11-01
 

@@ -1,0 +1,15 @@
+version: 0.33.0
+date: 2026-11-01
+locales:
+  en:
+    summary: This unit has no new behavior in this release. Its version and existing derived references move in lockstep with the four release units; mechanism algorithms and compatible contracts remain unchanged.
+    changes:
+      changed:
+        - This unit has no new behavior in this release.
+    upgradeNotes: The new API requires Engineering Kit 0.33.0; the corresponding optional Skill scope requires foundation-adoption-review 0.33.0. Existing entrypoints and compatible contracts remain available. Local candidate versions do not establish remote publication or authorize external actions.
+  zh-CN:
+    summary: 本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+    changes:
+      changed:
+        - 本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+    upgradeNotes: 使用新入口需 Engineering Kit 0.33.0，新 Skill 范围需 `foundation-adoption-review` 0.33.0；旧消费者不强制迁移，原入口与兼容合同保留。Contracts 与 Harness 本版本无新增行为，仅同步锁步版本与必要派生。本地候选不证明远端发布完成，最终四单元载荷与外部动作仍按原流程核准。
