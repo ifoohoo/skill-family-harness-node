@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.32.0 locale=en baseline=sha256:13f70db9a2d311afb1d5dccc73d1d87d2c9ac75d994041d99a648121494d3433 -->
+## [0.32.0] - 2026-11-01
+
+Contracts and Harness are synchronized to version 0.32.0 as part of the four-unit release cycle, with no changes to underlying mechanisms, specifications, or platform eligibility. The Contracts specification coordinate remains independent of package versioning.
+
+### Changed
+
+- Contracts and Harness are synchronized to version 0.32.0 as part of the four-unit release cycle, with no changes to underlying mechanisms, specifications, or platform eligibility
+
+### Upgrade Notes
+
+The 0.32.0 release of Contracts and Harness is strictly version-synchronized across the four-unit system. Existing public capabilities remain available under their compatible contracts, with no enforced precision upgrade gate for all users.
+<!-- release-skill:changelog:end version=0.32.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.31.0 locale=en baseline=sha256:ed64819859d1ccc7c380c3fc451e2da7ab3909e817eac71135575c64ad3ee591 -->
 ## [0.31.0] - 2026-11-01
 

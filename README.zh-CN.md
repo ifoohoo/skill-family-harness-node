@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.31.0 -->
+<!-- release-skill:release-version: 0.32.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.31.0** (2026-11-01)
+**0.32.0** (2026-11-01)
 
-本次发布仅执行0.31.0版本锁步，路径处理、文件读取、摘要计算及闭包生成机制均无变更。Kit直接复用readFileStrict与computeResourceClosure。平台资格范围不变。
+Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。Contracts 独立规格坐标不随包版本调整。
 
 **变更**
 
-- 路径、读取、摘要、闭包机制未改动。Kit直接使用readFileStrict与computeResourceClosure。
+- Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。
 
 **升级说明**
 
-四单元必须精确升级至0.31.0。本轮不扩大平台资格范围，既存平台范围保持不变。
+本次四单元发行版本实现锁步同步，仅更新发行版本号，不强制所有消费者升级。旧版本能力继续按兼容合同运行。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-本包版本为 0.31.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
+本包版本为 0.32.0；0.24.1 已正式发布。验证尚未正式发布的工作树时，先把三个包分别打入同一个临时目录，再安装这三个精确 tarball：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -41,13 +41,13 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.31.0.tgz" "$pack_dir/skill-family-harness-node-0.31.0.tgz" "$pack_dir/skill-family-engineering-kit-0.31.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.32.0.tgz" "$pack_dir/skill-family-harness-node-0.32.0.tgz" "$pack_dir/skill-family-engineering-kit-0.32.0.tgz")
 ```
 
-以下 registry 安装方式以精确版本 0.31.0 已正式可用为前提：
+以下 registry 安装方式以精确版本 0.32.0 已正式可用为前提：
 
 ```sh
-npm install skill-family-harness-node@0.31.0
+npm install skill-family-harness-node@0.32.0
 npm info skill-family-harness-node --help
 ```
 

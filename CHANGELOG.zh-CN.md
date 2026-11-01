@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.32.0 locale=zh-CN baseline=sha256:44d8f93e3aaf221acd6473d04e84c35bbc3ca967c7770e3782234c8dd219e2be -->
+## [0.32.0] - 2026-11-01
+
+Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。Contracts 独立规格坐标不随包版本调整。
+
+### 变更
+
+- Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。
+
+### 升级说明
+
+本次四单元发行版本实现锁步同步，仅更新发行版本号，不强制所有消费者升级。旧版本能力继续按兼容合同运行。
+<!-- release-skill:changelog:end version=0.32.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.31.0 locale=zh-CN baseline=sha256:7de4161ac0472177bed887916b21fc0848d07486bd59a949b71a24acbc63ff17 -->
 ## [0.31.0] - 2026-11-01
 

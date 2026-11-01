@@ -1,0 +1,15 @@
+version: 0.32.0
+date: 2026-11-01
+locales:
+  en:
+    summary: "Contracts and Harness are synchronized to version 0.32.0 as part of the four-unit release cycle, with no changes to underlying mechanisms, specifications, or platform eligibility. The Contracts specification coordinate remains independent of package versioning."
+    changes:
+      changed:
+        - "Contracts and Harness are synchronized to version 0.32.0 as part of the four-unit release cycle, with no changes to underlying mechanisms, specifications, or platform eligibility"
+    upgradeNotes: "The 0.32.0 release of Contracts and Harness is strictly version-synchronized across the four-unit system. Existing public capabilities remain available under their compatible contracts, with no enforced precision upgrade gate for all users."
+  zh-CN:
+    summary: "Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。Contracts 独立规格坐标不随包版本调整。"
+    changes:
+      changed:
+        - "Contracts 与 Harness 随四单元同步发布至 0.32.0 版本，仅更新发行版本，未引入任何机制变更、顶层合同对象、公共机制、路径读取逻辑、摘要生成、闭包算法或平台资格。"
+    upgradeNotes: "本次四单元发行版本实现锁步同步，仅更新发行版本号，不强制所有消费者升级。旧版本能力继续按兼容合同运行。"
