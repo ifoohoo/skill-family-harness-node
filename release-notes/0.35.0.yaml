@@ -1,0 +1,15 @@
+version: 0.35.0
+date: 2026-11-02
+locales:
+  en:
+    summary: "This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior."
+    changes:
+      changed:
+        - "This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior."
+    upgradeNotes: "Adopt all four units at 0.35.0. Set nodeType explicitly for the new comparison selection; existing callers need no forced migration. A candidate, local tests or a static exit code of zero do not establish publication, installation, loading or business success. The existing four-unit release contract still applies."
+  zh-CN:
+    summary: "本版仅锁步版本和必要派生，无新增机制、协议或算法行为。"
+    changes:
+      changed:
+        - "本版仅锁步版本和必要派生，无新增机制、协议或算法行为。"
+    upgradeNotes: "四单元同时采用 0.35.0；需要新比较选择时显式提供 `nodeType`，旧调用不强制改写。候选、本地测试与静态退出 0 均不等于正式发布、安装、加载或业务通过；正式发布仍按四单元原发布合同核收。"

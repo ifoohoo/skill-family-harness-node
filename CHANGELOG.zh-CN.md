@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.35.0 locale=zh-CN baseline=sha256:4606ecd1287afd2dd2bce38c99ada9b4b0c4aa01f10d60af42111d958b57d192 -->
+## [0.35.0] - 2026-11-02
+
+本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
+
+### 变更
+
+- 本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
+
+### 升级说明
+
+四单元同时采用 0.35.0；需要新比较选择时显式提供 `nodeType`，旧调用不强制改写。候选、本地测试与静态退出 0 均不等于正式发布、安装、加载或业务通过；正式发布仍按四单元原发布合同核收。
+<!-- release-skill:changelog:end version=0.35.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.34.0 locale=zh-CN baseline=sha256:10da5f9140e88a9743cf1688d6e7c2db65545b2a99f9bad7528c11b7537bab47 -->
 ## [0.34.0] - 2026-11-02
 

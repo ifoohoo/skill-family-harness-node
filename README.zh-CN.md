@@ -5,24 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.34.0 -->
+<!-- release-skill:release-version: 0.35.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.34.0** (2026-11-02)
+**0.35.0** (2026-11-02)
 
-本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
 
 **变更**
 
-- 本版本没有新增行为，仅同步四单元锁步版本与必要派生；既有机制算法和兼容合同保持不变。
+- 本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
 
 **升级说明**
 
-Contracts与Harness在本版无新增机制行为，仅进行锁步版本同步与必要派生，既有协议与算法保持不变。升级需同时满足Kit与Plugin均升级至0.34.0版本。旧有入口保持兼容，不强制旧消费者迁移。
-
-0.33.0版本仅为未发布源码候选，不具备正式发布效力；0.34.0为首次合并交付，统一包含两项公共能力。本地候选状态不构成远端发布或授权证明，四单元正式验证通过后，方可认定整体发布。
+四单元同时采用 0.35.0；需要新比较选择时显式提供 `nodeType`，旧调用不强制改写。候选、本地测试与静态退出 0 均不等于正式发布、安装、加载或业务通过；正式发布仍按四单元原发布合同核收。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -35,9 +33,9 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-本包当前为 0.34.0 工作树候选版本，尚未正式发布。请根据以下两种场景选择安装方式：
+当前 `skill-family-harness-node` 为 0.35.0 工作树候选版本，尚未正式发布。请根据以下两种场景选择安装方式：
 
-若需验证尚未正式发布的 0.34.0 候选版本，请将三个包分别打包至同一临时目录，并在新消费者环境中安装对应的精确版本 tarball 文件：
+如需验证尚未正式发布的 0.35.0 候选版本，需将三个相关包分别打包至同一临时目录，并在新建的消费者环境中安装对应的精确版本 tarball 文件：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -45,19 +43,19 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.34.0.tgz" "$pack_dir/skill-family-harness-node-0.34.0.tgz" "$pack_dir/skill-family-engineering-kit-0.34.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.35.0.tgz" "$pack_dir/skill-family-harness-node-0.35.0.tgz" "$pack_dir/skill-family-engineering-kit-0.35.0.tgz")
 ```
 
-此方式用于验证本地候选，不要求这三个 0.34.0 包已在 registry 发布；安装第三方依赖仍可能访问 registry。
+该方式适用于本地候选版本验证，不要求 0.35.0 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.34.0` 在 npm registry 中正式可用时，可直接使用以下命令进行安装与操作：
+当 `skill-family-harness-node@0.35.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
 
 ```sh
-npm install skill-family-harness-node@0.34.0
+npm install skill-family-harness-node@0.35.0
 npm info skill-family-harness-node --help
 ```
 
-历史版本说明：`skill-family-harness-node` 的 0.24.1 版本已正式发布，当前 0.34.0 为未发布候选，两者坐标独立，不互相覆盖。
+历史版本说明：`skill-family-harness-node` 的 0.24.1 版本已正式发布，当前 0.35.0 为未发布候选版本，两者版本坐标独立，互不覆盖。
 
 最小示例演示在 Node 内校验一份契约文档：
 

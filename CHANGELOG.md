@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.35.0 locale=en baseline=sha256:3344b2e0a5c01cc3251a7ea29bb5741dea7e337df856b76db29352ca82dfa6dc -->
+## [0.35.0] - 2026-11-02
+
+This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior.
+
+### Changed
+
+- This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior.
+
+### Upgrade Notes
+
+Adopt all four units at 0.35.0. Set nodeType explicitly for the new comparison selection; existing callers need no forced migration. A candidate, local tests or a static exit code of zero do not establish publication, installation, loading or business success. The existing four-unit release contract still applies.
+<!-- release-skill:changelog:end version=0.35.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.34.0 locale=en baseline=sha256:59fcabb8f8d190ad9cf3191412acae3a74f44a3d739d33f84d346052287c3417 -->
 ## [0.34.0] - 2026-11-02
 
