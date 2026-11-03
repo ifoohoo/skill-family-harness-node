@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.35.0 -->
+<!-- release-skill:release-version: 0.36.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.35.0** (2026-11-02)
+**0.36.0** (2026-11-03)
 
-本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
+Harness在0.36.0版本中保持四单元锁步，无新增能力、接口、协议或算法变更。四单元必须同版采用；不强制旧调用迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。
 
 **变更**
 
-- 本版仅锁步版本和必要派生，无新增机制、协议或算法行为。
+- Harness在0.36.0版本中保持四单元锁步，无新增能力、接口、协议或算法变更。四单元必须同版采用；不强制旧调用迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。
 
 **升级说明**
 
-四单元同时采用 0.35.0；需要新比较选择时显式提供 `nodeType`，旧调用不强制改写。候选、本地测试与静态退出 0 均不等于正式发布、安装、加载或业务通过；正式发布仍按四单元原发布合同核收。
+四单元需锁步采用0.36.0，旧调用不强制迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。正式0.35.0不包含新入口。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,9 +33,9 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-当前 `skill-family-harness-node` 为 0.35.0 工作树候选版本，尚未正式发布。请根据以下两种场景选择安装方式：
+若需在正式发布前对本地 `0.36.0` 源码候选版本进行已授权的开发验证，可使用本地打包方式。
 
-如需验证尚未正式发布的 0.35.0 候选版本，需将三个相关包分别打包至同一临时目录，并在新建的消费者环境中安装对应的精确版本 tarball 文件：
+验证流程如下：将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件：
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -43,21 +43,23 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.35.0.tgz" "$pack_dir/skill-family-harness-node-0.35.0.tgz" "$pack_dir/skill-family-engineering-kit-0.35.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.36.0.tgz" "$pack_dir/skill-family-harness-node-0.36.0.tgz" "$pack_dir/skill-family-engineering-kit-0.36.0.tgz")
 ```
 
-该方式适用于本地候选版本验证，不要求 0.35.0 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
+该方式适用于本地候选版本的验证，不要求 `0.36.0` 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.35.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
+当 `skill-family-harness-node@0.36.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
 
 ```sh
-npm install skill-family-harness-node@0.35.0
+npm install skill-family-harness-node@0.36.0
 npm info skill-family-harness-node --help
 ```
 
-历史版本说明：`skill-family-harness-node` 的 0.24.1 版本已正式发布，当前 0.35.0 为未发布候选版本，两者版本坐标独立，互不覆盖。
+此安装方式仅在 `0.36.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
 
-最小示例演示在 Node 内校验一份契约文档：
+历史版本 `0.24.1` 已作为独立版本正式发布，其发布状态与 `0.36.0` 候选验证无关联。
+
+以下为最小示例，演示在 Node 环境中校验一份契约文档：
 
 ```js
 // 发布后从已安装的消费者目录运行。
@@ -78,7 +80,7 @@ const result = validateContractDocument(document, {
 if (!result.valid) console.error(result.errorCode);
 ```
 
-以上代码展示了 `validateContractDocument` 的基本调用；它复用 Contracts 的校验器并以 schema 为键缓存实例，不重新编译。
+该代码展示了 `validateContractDocument` 的基本调用方式：它复用 Contracts 的校验器，并以 schema 为键缓存实例，避免重复编译。
 
 ## Candidate Quickstart Profile
 

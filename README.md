@@ -4,22 +4,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.35.0 -->
+<!-- release-skill:release-version: 0.36.0 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.35.0** (2026-11-02)
+**0.36.0** (2026-11-03)
 
-This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior.
+Harness remains synchronized across four units in version 0.36.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness.
 
 **Changed**
 
-- This unit advances only its lockstep version and necessary derived artifacts, with no new mechanism, protocol or algorithm behavior.
+- Harness remains synchronized across four units in version 0.36.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness.
 
 **Upgrade Notes**
 
-Adopt all four units at 0.35.0. Set nodeType explicitly for the new comparison selection; existing callers need no forced migration. A candidate, local tests or a static exit code of zero do not establish publication, installation, loading or business success. The existing four-unit release contract still applies.
+Adopt all four units at 0.36.0; existing callers need no forced migration. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. The formal 0.35.0 package does not contain the new API.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,9 +32,9 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-This working tree targets the 0.35.0 candidate. Version 0.24.1 has already been published and remains a separate historical release. Choose the installation path that matches your source.
+Before formal publication, authorized development verification of a local `0.36.0` source candidate may be required. The `0.24.1` version remains a separate, historically published release.
 
-To verify the unpublished working tree, pack all three working-tree packages into one temporary directory and install those exact 0.35.0 tarballs in a new consumer project:
+To verify the local working tree, pack all three working-tree packages into a single temporary directory and install those exact `0.36.0` tarballs in a new consumer project:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -42,19 +42,19 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.35.0.tgz" "$pack_dir/skill-family-harness-node-0.35.0.tgz" "$pack_dir/skill-family-engineering-kit-0.35.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.36.0.tgz" "$pack_dir/skill-family-harness-node-0.36.0.tgz" "$pack_dir/skill-family-engineering-kit-0.36.0.tgz")
 ```
 
-This verifies the local candidate without requiring these three 0.35.0 packages to be published in the registry. Installing third-party dependencies may still contact the registry.
+This process verifies the local candidate without requiring the three `0.36.0` packages to be published in the registry. Installing third-party dependencies may still contact the registry.
 
-Only after exact version 0.35.0 is formally available in the registry do the following installation and help commands apply:
+Only after the exact version `0.36.0` is formally available in the registry do the following installation and help commands apply:
 
 ```sh
-npm install skill-family-harness-node@0.35.0
+npm install skill-family-harness-node@0.36.0
 npm info skill-family-harness-node --help
 ```
 
-The minimal example shows validating a contract document inside Node:
+The minimal example demonstrates validating a contract document inside Node:
 
 ```js
 // Run from an installed consumer directory after publication.
