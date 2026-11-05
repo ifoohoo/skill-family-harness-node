@@ -1,0 +1,15 @@
+version: 0.37.0
+date: 2026-11-05
+locales:
+  en:
+    summary: Harness remains synchronized across four units in version 0.37.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+    changes:
+      changed:
+        - Harness remains synchronized across four units in version 0.37.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+    upgradeNotes: Adopt all four units at 0.37.0; existing callers need no forced migration. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+  zh-CN:
+    summary: skill-family-harness-node 0.37.0 版本中，四单元保持锁步，无新增能力、接口、协议或算法变更。四单元必须同版本采用，旧调用不强制迁移。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能作为正式渠道、安装加载或业务可用性的证明。
+    changes:
+      changed:
+        - skill-family-harness-node 0.37.0 版本中，四单元保持锁步，无新增能力、接口、协议或算法变更。四单元必须同版本采用，旧调用不强制迁移。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能作为正式渠道、安装加载或业务可用性的证明。
+    upgradeNotes: 四单元需同步升级至 0.37.0 版本，不强制迁移旧调用。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能证明正式渠道、安装加载或业务可用性。

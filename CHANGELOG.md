@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.37.0 locale=en baseline=sha256:4e6d01a013acf281030812a57248b0cddeb90ee06bf52fe019ccfad610c40a22 -->
+## [0.37.0] - 2026-11-05
+
+Harness remains synchronized across four units in version 0.37.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+
+### Changed
+
+- Harness remains synchronized across four units in version 0.37.0 with no new capabilities, interfaces, protocols, or algorithmic changes. All four units must be adopted at the same version; migration from old invocations is not mandatory. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+
+### Upgrade Notes
+
+Adopt all four units at 0.37.0; existing callers need no forced migration. Source candidates, local testing, or static exits cannot validate formal channels, installation, loading, or business readiness. Source verification is limited to authorized scope; formal consumption requires the actual exact published payload and public entry points.
+<!-- release-skill:changelog:end version=0.37.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.36.0 locale=en baseline=sha256:52b5bc641d37f07efa9abdf83e65052f1354ee6533d07c2152612898f238b773 -->
 ## [0.36.0] - 2026-11-03
 

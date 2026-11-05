@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.36.0 -->
+<!-- release-skill:release-version: 0.37.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.36.0** (2026-11-03)
+**0.37.0** (2026-11-05)
 
-Harness在0.36.0版本中保持四单元锁步，无新增能力、接口、协议或算法变更。四单元必须同版采用；不强制旧调用迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。
+skill-family-harness-node 0.37.0 版本中，四单元保持锁步，无新增能力、接口、协议或算法变更。四单元必须同版本采用，旧调用不强制迁移。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能作为正式渠道、安装加载或业务可用性的证明。
 
 **变更**
 
-- Harness在0.36.0版本中保持四单元锁步，无新增能力、接口、协议或算法变更。四单元必须同版采用；不强制旧调用迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。
+- skill-family-harness-node 0.37.0 版本中，四单元保持锁步，无新增能力、接口、协议或算法变更。四单元必须同版本采用，旧调用不强制迁移。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能作为正式渠道、安装加载或业务可用性的证明。
 
 **升级说明**
 
-四单元需锁步采用0.36.0，旧调用不强制迁移。源候选、本地测试、静态退出均不能证明正式渠道、安装加载或业务可用性。正式0.35.0不包含新入口。
+四单元需同步升级至 0.37.0 版本，不强制迁移旧调用。源码验证仅限获准范围，正式消费须基于实际精确已发布的载荷与API入口；源候选、本地测试、静态退出结果均不能证明正式渠道、安装加载或业务可用性。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +33,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-若需在正式发布前对本地 `0.36.0` 源码候选版本进行已授权的开发验证，可使用本地打包方式。
+若需在正式发布前对本地 `0.37.0` 源码候选版本进行已授权的开发验证，可使用本地打包方式。
 
 验证流程如下：将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件：
 
@@ -43,21 +43,21 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.36.0.tgz" "$pack_dir/skill-family-harness-node-0.36.0.tgz" "$pack_dir/skill-family-engineering-kit-0.36.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.37.0.tgz" "$pack_dir/skill-family-harness-node-0.37.0.tgz" "$pack_dir/skill-family-engineering-kit-0.37.0.tgz")
 ```
 
-该方式适用于本地候选版本的验证，不要求 `0.36.0` 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
+该方式适用于本地候选版本的验证，不要求 `0.37.0` 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.36.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
+当 `skill-family-harness-node@0.37.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
 
 ```sh
-npm install skill-family-harness-node@0.36.0
+npm install skill-family-harness-node@0.37.0
 npm info skill-family-harness-node --help
 ```
 
-此安装方式仅在 `0.36.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
+此安装方式仅在 `0.37.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
 
-历史版本 `0.24.1` 已作为独立版本正式发布，其发布状态与 `0.36.0` 候选验证无关联。
+历史版本 `0.36.0` 已作为独立版本正式发布，其发布状态与 `0.37.0` 候选验证无关联。
 
 以下为最小示例，演示在 Node 环境中校验一份契约文档：
 
