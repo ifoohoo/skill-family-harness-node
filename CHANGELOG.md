@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.39.0 locale=en baseline=sha256:04563321d2ce20870eea6a0403add4028e62c75020442e1872be7403dcd5f65b -->
+## [0.39.0] - 2026-11-06
+
+No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.
+
+### Changed
+
+- No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.
+
+### Upgrade Notes
+
+Adopt all four 0.39.0 release units together and verify new entries in the exact published package. Existing default registration, MIT and Apache behavior is retained.
+<!-- release-skill:changelog:end version=0.39.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.38.0 locale=en baseline=sha256:9eddecb6cb0b69e1a098c21ccad600949ef3a376d22a952694a86cee2fb8b606 -->
 ## [0.38.0] - 2026-11-06
 

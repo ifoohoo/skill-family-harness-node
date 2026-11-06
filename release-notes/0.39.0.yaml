@@ -1,0 +1,15 @@
+version: 0.39.0
+date: 2026-11-06
+locales:
+  zh-CN:
+    summary: Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+    upgradeNotes: 四个发行单元同步采用0.39.0。新入口须核实精确正式包；旧默认登记、MIT及Apache路径保持兼容。
+    changes:
+      changed:
+        - Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+  en:
+    summary: No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.
+    upgradeNotes: Adopt all four 0.39.0 release units together and verify new entries in the exact published package. Existing default registration, MIT and Apache behavior is retained.
+    changes:
+      changed:
+        - No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.

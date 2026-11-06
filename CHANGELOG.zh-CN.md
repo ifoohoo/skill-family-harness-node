@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.39.0 locale=zh-CN baseline=sha256:c3846f0c4749ff56a1c831a0433a4859e072f6c73b11c34f96711f9f5b5abdd9 -->
+## [0.39.0] - 2026-11-06
+
+Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+
+### 变更
+
+- Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+
+### 升级说明
+
+四个发行单元同步采用0.39.0。新入口须核实精确正式包；旧默认登记、MIT及Apache路径保持兼容。
+<!-- release-skill:changelog:end version=0.39.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.38.0 locale=zh-CN baseline=sha256:4f20cbac30135f444b514e219a154d8d2ec16b0015c407f6a18037b72014cf5f -->
 ## [0.38.0] - 2026-11-06
 

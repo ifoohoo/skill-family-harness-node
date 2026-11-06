@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.38.0 -->
+<!-- release-skill:release-version: 0.39.0 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.38.0** (2026-11-06)
+**0.39.0** (2026-11-06)
 
-沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
 
 **变更**
 
-- 沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+- Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
 
 **升级说明**
 
-四单元同步采用0.38.0版本，旧调用保持不变，无需接口或配置变更。机制稳定性与行为一致性不受影响。
+四个发行单元同步采用0.39.0。新入口须核实精确正式包；旧默认登记、MIT及Apache路径保持兼容。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,9 +33,9 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-若需在正式发布前对本地 `0.38.0` 源码候选版本进行已授权的开发验证，可使用本地打包方式。
+在正式发布前对本地 `0.39.0` 源码候选版本进行已授权开发验证时，可采用本地打包方式。
 
-验证流程如下：将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件：
+将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件。
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -43,21 +43,21 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.38.0.tgz" "$pack_dir/skill-family-harness-node-0.38.0.tgz" "$pack_dir/skill-family-engineering-kit-0.38.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.0.tgz" "$pack_dir/skill-family-harness-node-0.39.0.tgz" "$pack_dir/skill-family-engineering-kit-0.39.0.tgz")
 ```
 
-该方式适用于本地候选版本的验证，不要求 `0.38.0` 版本的三个包已在 npm registry 发布；但安装过程中仍可能访问 registry 以获取第三方依赖。
+该方式适用于本地候选版本的验证，不要求 `0.39.0` 版本的三个包已在 npm registry 发布。但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.38.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作：
+当 `skill-family-harness-node@0.39.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作。
 
 ```sh
-npm install skill-family-harness-node@0.38.0
+npm install skill-family-harness-node@0.39.0
 npm info skill-family-harness-node --help
 ```
 
-此安装方式仅在 `0.38.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
+此安装方式仅在 `0.39.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
 
-历史版本 `0.37.0` 已作为独立版本正式发布，其发布状态与 `0.38.0` 候选验证无关联。
+历史版本 `0.38.0` 已作为独立版本正式发布，其发布状态与 `0.39.0` 候选验证无关联。
 
 以下为最小示例，演示在 Node 环境中校验一份契约文档：
 
@@ -80,7 +80,7 @@ const result = validateContractDocument(document, {
 if (!result.valid) console.error(result.errorCode);
 ```
 
-该代码展示了 `validateContractDocument` 的基本调用方式：它复用 Contracts 的校验器，并以 schema 为键缓存实例，避免重复编译。
+该代码展示了 `validateContractDocument` 的基本调用方式，它复用 Contracts 的校验器，并以 schema 为键缓存实例，避免重复编译。
 
 ## Candidate Quickstart Profile
 
