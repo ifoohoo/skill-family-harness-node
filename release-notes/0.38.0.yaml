@@ -1,0 +1,15 @@
+version: 0.38.0
+date: 2026-11-06
+locales:
+  zh-CN:
+    summary: 沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+    upgradeNotes: 四单元同步采用0.38.0版本，旧调用保持不变，无需接口或配置变更。机制稳定性与行为一致性不受影响。
+    changes:
+      changed:
+        - 沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+  en:
+    summary: Retains existing strict read, path containment, and resource closure mechanisms. Package version synchronized to 0.38.0. No new capabilities or algorithms added. All four units adopt 0.38.0 in sync, with no migration required for existing calls.
+    upgradeNotes: All four units adopt 0.38.0 in sync. Existing calls remain unchanged; no interface or configuration changes are required. Mechanism stability and behavioral consistency are preserved.
+    changes:
+      changed:
+        - Retains existing strict read, path containment, and resource closure mechanisms. Package version synchronized to 0.38.0. No new capabilities or algorithms added. All four units adopt 0.38.0 in sync, with no migration required for existing calls.

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.38.0 locale=zh-CN baseline=sha256:4f20cbac30135f444b514e219a154d8d2ec16b0015c407f6a18037b72014cf5f -->
+## [0.38.0] - 2026-11-06
+
+沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+
+### 变更
+
+- 沿用现有严格读取、路径收容与资源闭包机制，包版本同步至0.38.0。无新增能力或算法，四单元同步采用0.38.0，旧调用无需迁移。
+
+### 升级说明
+
+四单元同步采用0.38.0版本，旧调用保持不变，无需接口或配置变更。机制稳定性与行为一致性不受影响。
+<!-- release-skill:changelog:end version=0.38.0 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.37.0 locale=zh-CN baseline=sha256:6c657d3d0f05fdb12659c2bf681e9538f0474385ae5f269816dff77e68009306 -->
 ## [0.37.0] - 2026-11-05
 

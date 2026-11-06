@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.38.0 locale=en baseline=sha256:9eddecb6cb0b69e1a098c21ccad600949ef3a376d22a952694a86cee2fb8b606 -->
+## [0.38.0] - 2026-11-06
+
+Retains existing strict read, path containment, and resource closure mechanisms. Package version synchronized to 0.38.0. No new capabilities or algorithms added. All four units adopt 0.38.0 in sync, with no migration required for existing calls.
+
+### Changed
+
+- Retains existing strict read, path containment, and resource closure mechanisms. Package version synchronized to 0.38.0. No new capabilities or algorithms added. All four units adopt 0.38.0 in sync, with no migration required for existing calls.
+
+### Upgrade Notes
+
+All four units adopt 0.38.0 in sync. Existing calls remain unchanged; no interface or configuration changes are required. Mechanism stability and behavioral consistency are preserved.
+<!-- release-skill:changelog:end version=0.38.0 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.37.0 locale=en baseline=sha256:4e6d01a013acf281030812a57248b0cddeb90ee06bf52fe019ccfad610c40a22 -->
 ## [0.37.0] - 2026-11-05
 
