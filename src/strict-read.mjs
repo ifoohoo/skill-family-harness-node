@@ -1,3 +1,8 @@
+// @feature FND-FR-025
+// @feature FND-FR-029
+// @decision FND-ADR-033
+// @design FND-DES-033
+// @design FND-DES-039
 import { constants as FS_CONSTANTS } from "node:fs";
 import { lstat, open } from "node:fs/promises";
 import process from "node:process";
@@ -122,6 +127,13 @@ export async function readFileStrict(root, relPath, { encoding, expectedSha256, 
       { input: relPath, actual: before.isDirectory() ? "directory" : "special" },
     );
   }
+  if (before.nlink !== 1) {
+    throw mechanismError(
+      HARNESS_ERROR_KINDS.UNSAFE_STATE_ENTRY,
+      "strict read refuses a hard-linked target (single link required)",
+      { input: relPath, nlink: before.nlink },
+    );
+  }
 
   const noFollow = FS_CONSTANTS.O_NOFOLLOW ?? 0;
   let handle;
@@ -150,7 +162,7 @@ export async function readFileStrict(root, relPath, { encoding, expectedSha256, 
   }
   try {
     const opened = await handle.stat();
-    if (!sameIdentity(before, opened) || !opened.isFile()) {
+    if (!sameIdentity(before, opened) || !opened.isFile() || opened.nlink !== 1) {
       throw mechanismError(
         HARNESS_ERROR_KINDS.UNSAFE_STATE_ENTRY,
         "strict read target identity changed during inspection",

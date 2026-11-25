@@ -1,3 +1,6 @@
+// @feature FND-FR-017
+// @decision FND-ADR-026
+// @design FND-DES-021
 import { createHash } from "node:crypto";
 import { constants as FS_CONSTANTS } from "node:fs";
 import { lstat, open, readdir, realpath, rename, unlink } from "node:fs/promises";

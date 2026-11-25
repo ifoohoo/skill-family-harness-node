@@ -1,0 +1,15 @@
+version: 0.39.1
+date: 2026-11-25
+locales:
+  zh-CN:
+    summary: 随 Foundation 0.39.1 锁步补丁发布：运行时机制与算法边界保持不变，同步更新版本常量至 0.39.1，并将包主页与双语 README 在线文档入口统一切换至独立公开文档站 ifoohoo/skill-family-foundation-site。
+    upgradeNotes: 五个发布单元同步采用 0.39.1；升级时须与 skill-family-contracts 及 skill-family-engineering-kit 保持完全相同的精确版本，既有 27 项 Harness 机制保持兼容。
+    changes:
+      changed:
+        - 锁步更新版本坐标至 0.39.1，包主页与双语 README 在线文档入口统一切换至 https://ifoohoo.github.io/skill-family-foundation-site/。
+  en:
+    summary: Lockstep 0.39.1 patch release keeping runtime mechanisms and algorithmic boundaries unchanged while advancing the shared version coordinate to 0.39.1 and pointing package homepage and README documentation links to ifoohoo/skill-family-foundation-site.
+    upgradeNotes: Adopt all 0.39.1 release units in lockstep with exact matching versions across Contracts, Harness, and Engineering Kit.
+    changes:
+      changed:
+        - Advances package coordinate to 0.39.1 in lockstep and updates homepage and bilingual README documentation links to https://ifoohoo.github.io/skill-family-foundation-site/.

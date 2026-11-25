@@ -1,3 +1,7 @@
+// @feature FND-FR-003
+// @feature FND-FR-027
+// @decision FND-ADR-034
+// @design FND-DES-037
 import fsPromises from "node:fs/promises";
 import { randomBytes } from "node:crypto";
 import { loadWindowsNativeAddon } from "./native/loader.mjs";

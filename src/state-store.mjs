@@ -1,3 +1,6 @@
+// @feature FND-FR-003
+// @decision FND-ADR-004
+// @design FND-DES-003
 import { constants as FS_CONSTANTS } from "node:fs";
 import {
   link,

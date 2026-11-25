@@ -1,3 +1,6 @@
+// @decision FND-ADR-007
+// @decision FND-ADR-009
+// @design FND-DES-001
 /**
  * skill-family-harness-node: the default Node mechanism runtime for Skill
  * Family engineering contracts.

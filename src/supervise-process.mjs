@@ -1,3 +1,4 @@
+// @decision FND-ADR-012
 /**
  * supervise-process: bounded subprocess lifecycle supervision (FND-ADR-012).
  *

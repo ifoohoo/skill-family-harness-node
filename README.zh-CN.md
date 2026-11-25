@@ -2,25 +2,26 @@
 <!-- release-skill:external-write-boundary -->
 
 > English version: [README.md](./README.md)
+> 在线文档站：<https://ifoohoo.github.io/skill-family-foundation-site/>
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.39.0 -->
+<!-- release-skill:release-version: 0.39.1 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.39.0** (2026-11-06)
+**0.39.1** (2026-11-25)
 
-Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+随 Foundation 0.39.1 锁步补丁发布：运行时机制与算法边界保持不变，同步更新版本常量至 0.39.1，并将包主页与双语 README 在线文档入口统一切换至独立公开文档站 ifoohoo/skill-family-foundation-site。
 
 **变更**
 
-- Contracts 和 Harness 本轮未引入新能力或算法变更，随 Engineering Kit 及独立 Plugin 一同采用 0.39.0 版本。四个发行单元版本必须保持一致，Contracts 规格版本仍作为独立协议坐标。在使用新功能前，需核对精确已发布包中的实际入口，确保调用正确。
+- 锁步更新版本坐标至 0.39.1，包主页与双语 README 在线文档入口统一切换至 https://ifoohoo.github.io/skill-family-foundation-site/。
 
 **升级说明**
 
-四个发行单元同步采用0.39.0。新入口须核实精确正式包；旧默认登记、MIT及Apache路径保持兼容。
+五个发布单元同步采用 0.39.1；升级时须与 skill-family-contracts 及 skill-family-engineering-kit 保持完全相同的精确版本，既有 27 项 Harness 机制保持兼容。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -33,7 +34,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-在正式发布前对本地 `0.39.0` 源码候选版本进行已授权开发验证时，可采用本地打包方式。
+在正式发布前对本地 `0.39.1` 源码候选版本进行已授权开发验证时，可采用本地打包方式。
 
 将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件。
 
@@ -43,21 +44,21 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.0.tgz" "$pack_dir/skill-family-harness-node-0.39.0.tgz" "$pack_dir/skill-family-engineering-kit-0.39.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.1.tgz" "$pack_dir/skill-family-harness-node-0.39.1.tgz" "$pack_dir/skill-family-engineering-kit-0.39.1.tgz")
 ```
 
-该方式适用于本地候选版本的验证，不要求 `0.39.0` 版本的三个包已在 npm registry 发布。但安装过程中仍可能访问 registry 以获取第三方依赖。
+该方式适用于本地候选版本的验证，不要求 `0.39.1` 版本的三个包已在 npm registry 发布。但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.39.0` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作。
+当 `skill-family-harness-node@0.39.1` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作。
 
 ```sh
-npm install skill-family-harness-node@0.39.0
+npm install skill-family-harness-node@0.39.1
 npm info skill-family-harness-node --help
 ```
 
-此安装方式仅在 `0.39.0` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
+此安装方式仅在 `0.39.1` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
 
-历史版本 `0.38.0` 已作为独立版本正式发布，其发布状态与 `0.39.0` 候选验证无关联。
+历史版本 `0.39.0` 已作为独立版本正式发布，其发布状态与 `0.39.1` 候选验证无关联。
 
 以下为最小示例，演示在 Node 环境中校验一份契约文档：
 
@@ -205,9 +206,9 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 ## 深入文档入口
 
-- 架构边界与路由：[架构说明](https://ifoohoo.github.io/skill-family-engineering-kit/architecture/)、[智能体架构路由](https://ifoohoo.github.io/skill-family-engineering-kit/agents/architecture-routing/)
-- 能力目录：[capability-catalog.json](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json)
-- 副作用矩阵：[失败与副作用矩阵](https://ifoohoo.github.io/skill-family-engineering-kit/reference/failure-and-side-effect-matrix/)
+- 在线文档站：[Skill Family Foundation 公开文档站](https://ifoohoo.github.io/skill-family-foundation-site/)
+- 能力与机制总览：[能力总览](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html)、[五分钟上手](https://ifoohoo.github.io/skill-family-foundation-site/quickstart.html)
+- 排障指南：[常见故障排查](https://ifoohoo.github.io/skill-family-foundation-site/troubleshooting.html)
 
 <!-- agent-quick-reference:start -->
 ## Agent Quick Reference
@@ -276,7 +277,7 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 ### Machine-readable sources
 
-- 公开能力目录：[`capability-catalog.json`](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json)（`foundation.harness.*` 条目）。
+- 公开能力目录：`skill-family-engineering-kit/data/capability-catalog/capability-catalog.json`（`foundation.harness.*` 条目；在线浏览见[能力总览](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html)）。
 - 包内源：`src/*.mjs`。
 - 包内 Candidate 源：`candidate/quickstart-profile.mjs`；规范公共导入：`skill-family-harness-node/quickstart-profile`；历史迁移别名：`skill-family-harness-node/candidate/quickstart-profile`。
 <!-- agent-quick-reference:end -->
@@ -299,4 +300,4 @@ const store = await recoverStateStoreLock(stateStoreRoot, {
 
 Windows 分支适用于 Windows 11 x64、本地 NTFS、普通用户。精确版本的远端可用性由正式发布凭据核实，与 API 成熟度及真实宿主资格分别判断。
 
-`foundation.harness.fixed-set-generation` 为 candidate 能力，自包坐标 0.28.0 起提供 `publishFixedSetGeneration` 与 `resolveFixedSetGeneration`。原生 Windows 环境下，路径为本地 NTFS，权限为普通用户，不依赖 WSL。发布写入指针并保留旧世代，`resolve` 为只读操作，文件集合按结果报告恢复或冲突；Job Object 清理需零活动进程、双流刷盘关闭与全部句柄关闭。详见 [API 文档](https://ifoohoo.github.io/skill-family-engineering-kit/reference/api/harness/)。
+`foundation.harness.fixed-set-generation` 为 candidate 能力，自包坐标 0.28.0 起提供 `publishFixedSetGeneration` 与 `resolveFixedSetGeneration`。原生 Windows 环境下，路径为本地 NTFS，权限为普通用户，不依赖 WSL。发布写入指针并保留旧世代，`resolve` 为只读操作，文件集合按结果报告恢复或冲突；Job Object 清理需零活动进程、双流刷盘关闭与全部句柄关闭。详见 [能力总览](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html) 与 [宿主支持矩阵](https://ifoohoo.github.io/skill-family-foundation-site/host-matrix.html)。

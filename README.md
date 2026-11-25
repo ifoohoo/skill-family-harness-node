@@ -1,25 +1,26 @@
 <!-- release-skill:safe-first-command -->
 <!-- release-skill:external-write-boundary -->
 > 简体中文版：[README.zh-CN.md](./README.zh-CN.md)
+> Documentation site: <https://ifoohoo.github.io/skill-family-foundation-site/>
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.39.0 -->
+<!-- release-skill:release-version: 0.39.1 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.39.0** (2026-11-06)
+**0.39.1** (2026-11-25)
 
-No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.
+Lockstep 0.39.1 patch release keeping runtime mechanisms and algorithmic boundaries unchanged while advancing the shared version coordinate to 0.39.1 and pointing package homepage and README documentation links to ifoohoo/skill-family-foundation-site.
 
 **Changed**
 
-- No new capability or algorithm changes. This unit adopts 0.39.0 in lockstep with the Engineering Kit and independent Plugin. The Contracts specification remains a separate protocol coordinate.
+- Advances package coordinate to 0.39.1 in lockstep and updates homepage and bilingual README documentation links to https://ifoohoo.github.io/skill-family-foundation-site/.
 
 **Upgrade Notes**
 
-Adopt all four 0.39.0 release units together and verify new entries in the exact published package. Existing default registration, MIT and Apache behavior is retained.
+Adopt all 0.39.1 release units in lockstep with exact matching versions across Contracts, Harness, and Engineering Kit.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -32,9 +33,9 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Before formal publication, authorized development verification of a local `0.39.0` source candidate may be required. The `0.38.0` version remains the published four-unit release.
+Before formal publication, authorized development verification of a local `0.39.1` source candidate may be required. The `0.39.0` version remains the published four-unit release.
 
-To verify the local working tree, pack all three working-tree packages into a single temporary directory and install those exact `0.39.0` tarballs in a new consumer project:
+To verify the local working tree, pack all three working-tree packages into a single temporary directory and install those exact `0.39.1` tarballs in a new consumer project:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -42,15 +43,15 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.0.tgz" "$pack_dir/skill-family-harness-node-0.39.0.tgz" "$pack_dir/skill-family-engineering-kit-0.39.0.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.1.tgz" "$pack_dir/skill-family-harness-node-0.39.1.tgz" "$pack_dir/skill-family-engineering-kit-0.39.1.tgz")
 ```
 
-This process verifies the local candidate without requiring the three `0.39.0` packages to be published in the registry. Installing third-party dependencies may still contact the registry.
+This process verifies the local candidate without requiring the three `0.39.1` packages to be published in the registry. Installing third-party dependencies may still contact the registry.
 
-Only after the exact version `0.39.0` is formally available in the registry do the following installation and help commands apply:
+Only after the exact version `0.39.1` is formally available in the registry do the following installation and help commands apply:
 
 ```sh
-npm install skill-family-harness-node@0.39.0
+npm install skill-family-harness-node@0.39.1
 npm info skill-family-harness-node --help
 ```
 
@@ -201,9 +202,9 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 ## Further Documentation
 
-- Architecture boundaries and routing: [Architecture](https://ifoohoo.github.io/skill-family-engineering-kit/architecture/), [Agent architecture routing](https://ifoohoo.github.io/skill-family-engineering-kit/agents/architecture-routing/)
-- Capability catalog: [capability-catalog.json](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json)
-- Side-effect matrix: [Failure and side-effect matrix](https://ifoohoo.github.io/skill-family-engineering-kit/reference/failure-and-side-effect-matrix/)
+- Online documentation site: [Skill Family Foundation Docs](https://ifoohoo.github.io/skill-family-foundation-site/)
+- Capabilities and mechanisms: [Capabilities](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html), [Quickstart](https://ifoohoo.github.io/skill-family-foundation-site/quickstart.html)
+- Diagnostics and troubleshooting: [Troubleshooting](https://ifoohoo.github.io/skill-family-foundation-site/troubleshooting.html)
 
 <!-- agent-quick-reference:start -->
 ## Agent Quick Reference
@@ -273,7 +274,7 @@ Mechanism failures uniformly throw `SFC2004` (EXECUTION_FAILED), with `details.k
 
 ### Machine-readable sources
 
-- Public capability catalog: [`capability-catalog.json`](https://ifoohoo.github.io/skill-family-engineering-kit/agents/capability-catalog.json) (`foundation.harness.*` entries).
+- Public capability catalog: `skill-family-engineering-kit/data/capability-catalog/capability-catalog.json` (`foundation.harness.*` entries; rendered overview at [Capabilities](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html)).
 - Package-local source: `src/*.mjs`.
 - Package-local candidate source: `candidate/quickstart-profile.mjs`; canonical public import: `skill-family-harness-node/quickstart-profile`; historical migration alias: `skill-family-harness-node/candidate/quickstart-profile`.
 <!-- agent-quick-reference:end -->
@@ -296,4 +297,4 @@ Remote availability of an exact package version must be established by the corre
 
 This Windows branch applies to Windows 11 x64, local NTFS, and ordinary users. Exact remote availability requires formal release evidence; it is separate from API maturity and real-host qualification.
 
-`foundation.harness.fixed-set-generation` is a candidate capability available from package coordinate 0.28.0, supporting `publishFixedSetGeneration` and `resolveFixedSetGeneration`. Runs on native Windows with local NTFS paths and standard user permissions, not WSL. Publishing writes a pointer and retains all generations; `resolve` is read-only. File sets report restoration or conflicts; Job cleanup requires zero active processes, both streams flushed and closed, and all handles closed. See [API reference](https://ifoohoo.github.io/skill-family-engineering-kit/reference/api/harness/).
+`foundation.harness.fixed-set-generation` is a candidate capability available from package coordinate 0.28.0, supporting `publishFixedSetGeneration` and `resolveFixedSetGeneration`. Runs on native Windows with local NTFS paths and standard user permissions, not WSL. Publishing writes a pointer and retains all generations; `resolve` is read-only. File sets report restoration or conflicts; Job cleanup requires zero active processes, both streams flushed and closed, and all handles closed. See [capabilities](https://ifoohoo.github.io/skill-family-foundation-site/capabilities.html) and [host matrix](https://ifoohoo.github.io/skill-family-foundation-site/host-matrix.html).

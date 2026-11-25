@@ -1,3 +1,6 @@
+// @feature FND-FR-014
+// @decision FND-ADR-024
+// @design FND-DES-018
 import path from "node:path";
 import process from "node:process";
 import { lstat, readdir, readlink } from "node:fs/promises";

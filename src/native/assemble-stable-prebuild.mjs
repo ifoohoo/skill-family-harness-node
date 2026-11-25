@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// @feature FND-FR-027
+// @decision FND-ADR-034
+// @design FND-DES-037
 import { createHash } from "node:crypto";
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";

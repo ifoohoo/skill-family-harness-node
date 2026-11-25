@@ -1,3 +1,6 @@
+// @feature FND-FR-027
+// @decision FND-ADR-034
+// @design FND-DES-037
 /**
  * Shared receipt-driven prebuild assembler core.
  *

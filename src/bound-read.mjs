@@ -1,3 +1,8 @@
+// @feature FND-FR-026
+// @feature FND-FR-027
+// @decision FND-ADR-034
+// @design FND-DES-035
+// @design FND-DES-037
 import { constants as FS_CONSTANTS } from "node:fs";
 import { lstat, open, readdir, realpath } from "node:fs/promises";
 import path from "node:path";

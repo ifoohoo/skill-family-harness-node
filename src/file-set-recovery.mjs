@@ -1,3 +1,6 @@
+// @feature FND-FR-024
+// @decision FND-ADR-032
+// @design FND-DES-032
 import { constants as FS_CONSTANTS } from "node:fs";
 import { createHash, randomBytes } from "node:crypto";
 import { lstat, mkdir, open, readdir, rmdir, unlink } from "node:fs/promises";

@@ -1,3 +1,6 @@
+// @feature FND-FR-027
+// @decision FND-ADR-034
+// @design FND-DES-037
 import { createHash } from "node:crypto";
 import { constants as FS_CONSTANTS } from "node:fs";
 import { lstatSync, readFileSync, readdirSync, realpathSync } from "node:fs";

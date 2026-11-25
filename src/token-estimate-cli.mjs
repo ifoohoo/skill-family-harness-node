@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @decision FND-ADR-009
 /**
  * skill-family-token-estimate — CLI entry of the authoritative deterministic
  * token estimator (audit remediation C1).

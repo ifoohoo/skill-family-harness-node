@@ -1,3 +1,6 @@
+// @feature FND-FR-018
+// @decision FND-ADR-023
+// @design FND-DES-015
 import { createHash } from "node:crypto";
 import path from "node:path";
 import {

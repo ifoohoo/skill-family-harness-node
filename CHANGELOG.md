@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.39.1 locale=en baseline=sha256:4d135b514e75cfe1940f25f6a4b8297bb147ba803efaa9c2c219bc47d4deb7ac -->
+## [0.39.1] - 2026-11-25
+
+Lockstep 0.39.1 patch release keeping runtime mechanisms and algorithmic boundaries unchanged while advancing the shared version coordinate to 0.39.1 and pointing package homepage and README documentation links to ifoohoo/skill-family-foundation-site.
+
+### Changed
+
+- Advances package coordinate to 0.39.1 in lockstep and updates homepage and bilingual README documentation links to https://ifoohoo.github.io/skill-family-foundation-site/.
+
+### Upgrade Notes
+
+Adopt all 0.39.1 release units in lockstep with exact matching versions across Contracts, Harness, and Engineering Kit.
+<!-- release-skill:changelog:end version=0.39.1 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.39.0 locale=en baseline=sha256:04563321d2ce20870eea6a0403add4028e62c75020442e1872be7403dcd5f65b -->
 ## [0.39.0] - 2026-11-06
 

@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.39.1 locale=zh-CN baseline=sha256:d10ab10fbf3405ebf4bae5d32b241d5a986722d2af64e3bc1c8b7d9272a76a7f -->
+## [0.39.1] - 2026-11-25
+
+随 Foundation 0.39.1 锁步补丁发布：运行时机制与算法边界保持不变，同步更新版本常量至 0.39.1，并将包主页与双语 README 在线文档入口统一切换至独立公开文档站 ifoohoo/skill-family-foundation-site。
+
+### 变更
+
+- 锁步更新版本坐标至 0.39.1，包主页与双语 README 在线文档入口统一切换至 https://ifoohoo.github.io/skill-family-foundation-site/。
+
+### 升级说明
+
+五个发布单元同步采用 0.39.1；升级时须与 skill-family-contracts 及 skill-family-engineering-kit 保持完全相同的精确版本，既有 27 项 Harness 机制保持兼容。
+<!-- release-skill:changelog:end version=0.39.1 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.39.0 locale=zh-CN baseline=sha256:c3846f0c4749ff56a1c831a0433a4859e072f6c73b11c34f96711f9f5b5abdd9 -->
 ## [0.39.0] - 2026-11-06
 
