@@ -1,5 +1,20 @@
 # Changelog
 
+<!-- release-skill:changelog:start version=0.39.2 locale=en baseline=sha256:ea39f6c1915fa2047fd6ed0ea646457c06247f998aa9afda25aa3f2f5a817f68 -->
+## [0.39.2] - 2026-11-26
+
+Lockstep 0.39.2 version alignment preserving all existing safe filesystem, process supervision, tree observation, and durable state store APIs.
+
+### Changed
+
+- Advances FOUNDATION_PACKAGE_VERSION to 0.39.2 in lockstep with Contracts 1.23.0.
+
+### Upgrade Notes
+
+Upgrade in lockstep with skill-family-contracts@0.39.2 and skill-family-engineering-kit@0.39.2.
+<!-- release-skill:changelog:end version=0.39.2 locale=en -->
+
+
 <!-- release-skill:changelog:start version=0.39.1 locale=en baseline=sha256:4d135b514e75cfe1940f25f6a4b8297bb147ba803efaa9c2c219bc47d4deb7ac -->
 ## [0.39.1] - 2026-11-25
 

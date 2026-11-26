@@ -5,22 +5,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.39.1 -->
+<!-- release-skill:release-version: 0.39.2 -->
 
 The **single default Node implementation** of the Contracts mechanism protocol. This is a thin runtime: it only implements the mechanism protocol, introduces no business semantics, and does not provide a second-language implementation.
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.39.1** (2026-11-25)
+**0.39.2** (2026-11-26)
 
-Lockstep 0.39.1 patch release keeping runtime mechanisms and algorithmic boundaries unchanged while advancing the shared version coordinate to 0.39.1 and pointing package homepage and README documentation links to ifoohoo/skill-family-foundation-site.
+Lockstep 0.39.2 version alignment preserving all existing safe filesystem, process supervision, tree observation, and durable state store APIs.
 
 **Changed**
 
-- Advances package coordinate to 0.39.1 in lockstep and updates homepage and bilingual README documentation links to https://ifoohoo.github.io/skill-family-foundation-site/.
+- Advances FOUNDATION_PACKAGE_VERSION to 0.39.2 in lockstep with Contracts 1.23.0.
 
 **Upgrade Notes**
 
-Adopt all 0.39.1 release units in lockstep with exact matching versions across Contracts, Harness, and Engineering Kit.
+Upgrade in lockstep with skill-family-contracts@0.39.2 and skill-family-engineering-kit@0.39.2.
 <!-- release-skill:managed:end id=latest-release -->
 
 ## Problem It Solves
@@ -33,9 +33,9 @@ The Harness consumes `skill-family-contracts` (a workspace dependency), reusing 
 
 ## Installation and Minimal Example
 
-Before formal publication, authorized development verification of a local `0.39.1` source candidate may be required. The `0.39.0` version remains the published four-unit release.
+Before formal publication, authorized development verification of a local `0.39.2` source candidate may be required. The `0.39.0` version remains the published four-unit release.
 
-To verify the local working tree, pack all three working-tree packages into a single temporary directory and install those exact `0.39.1` tarballs in a new consumer project:
+To verify the local working tree, pack all three working-tree packages into a single temporary directory and install those exact `0.39.2` tarballs in a new consumer project:
 
 ```sh
 pack_dir="$(mktemp -d)"
@@ -43,15 +43,15 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.1.tgz" "$pack_dir/skill-family-harness-node-0.39.1.tgz" "$pack_dir/skill-family-engineering-kit-0.39.1.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.2.tgz" "$pack_dir/skill-family-harness-node-0.39.2.tgz" "$pack_dir/skill-family-engineering-kit-0.39.2.tgz")
 ```
 
-This process verifies the local candidate without requiring the three `0.39.1` packages to be published in the registry. Installing third-party dependencies may still contact the registry.
+This process verifies the local candidate without requiring the three `0.39.2` packages to be published in the registry. Installing third-party dependencies may still contact the registry.
 
-Only after the exact version `0.39.1` is formally available in the registry do the following installation and help commands apply:
+Only after the exact version `0.39.2` is formally available in the registry do the following installation and help commands apply:
 
 ```sh
-npm install skill-family-harness-node@0.39.1
+npm install skill-family-harness-node@0.39.2
 npm info skill-family-harness-node --help
 ```
 

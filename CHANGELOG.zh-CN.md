@@ -1,5 +1,20 @@
 # 变更日志
 
+<!-- release-skill:changelog:start version=0.39.2 locale=zh-CN baseline=sha256:1f9250ee510807c7c66954024577f41ea3346b0cd4dc6f874593a510ba6b8a81 -->
+## [0.39.2] - 2026-11-26
+
+随 Foundation 0.39.2 锁步版本前移，保持全部既有安全运行时、进程监督、文件树观察与持久状态账本接口兼容。
+
+### 变更
+
+- 锁步前移 FOUNDATION_PACKAGE_VERSION 至 0.39.2，对齐 Contracts 1.23.0 契约底座。
+
+### 升级说明
+
+请与 skill-family-contracts@0.39.2 与 skill-family-engineering-kit@0.39.2 锁步升级。
+<!-- release-skill:changelog:end version=0.39.2 locale=zh-CN -->
+
+
 <!-- release-skill:changelog:start version=0.39.1 locale=zh-CN baseline=sha256:d10ab10fbf3405ebf4bae5d32b241d5a986722d2af64e3bc1c8b7d9272a76a7f -->
 ## [0.39.1] - 2026-11-25
 

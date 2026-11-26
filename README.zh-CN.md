@@ -6,22 +6,22 @@
 
 # skill-family-harness-node
 
-<!-- release-skill:release-version: 0.39.1 -->
+<!-- release-skill:release-version: 0.39.2 -->
 
 Contracts 机制协议的**唯一默认 Node 实现**。这是一个薄运行时（thin runtime）：只实现机制协议，不引入业务语义，不做第二语言实现。
 
 <!-- release-skill:managed:start id=latest-release -->
-**0.39.1** (2026-11-25)
+**0.39.2** (2026-11-26)
 
-随 Foundation 0.39.1 锁步补丁发布：运行时机制与算法边界保持不变，同步更新版本常量至 0.39.1，并将包主页与双语 README 在线文档入口统一切换至独立公开文档站 ifoohoo/skill-family-foundation-site。
+随 Foundation 0.39.2 锁步版本前移，保持全部既有安全运行时、进程监督、文件树观察与持久状态账本接口兼容。
 
 **变更**
 
-- 锁步更新版本坐标至 0.39.1，包主页与双语 README 在线文档入口统一切换至 https://ifoohoo.github.io/skill-family-foundation-site/。
+- 锁步前移 FOUNDATION_PACKAGE_VERSION 至 0.39.2，对齐 Contracts 1.23.0 契约底座。
 
 **升级说明**
 
-五个发布单元同步采用 0.39.1；升级时须与 skill-family-contracts 及 skill-family-engineering-kit 保持完全相同的精确版本，既有 27 项 Harness 机制保持兼容。
+请与 skill-family-contracts@0.39.2 与 skill-family-engineering-kit@0.39.2 锁步升级。
 <!-- release-skill:managed:end id=latest-release -->
 
 ## 解决的问题
@@ -34,7 +34,7 @@ Harness 消费 `skill-family-contracts`（工作区依赖），复用其方言�
 
 ## 安装和最小示例
 
-在正式发布前对本地 `0.39.1` 源码候选版本进行已授权开发验证时，可采用本地打包方式。
+在正式发布前对本地 `0.39.2` 源码候选版本进行已授权开发验证时，可采用本地打包方式。
 
 将 `skill-family-contracts`、`skill-family-harness-node` 和 `skill-family-engineering-kit` 三个包分别打包至同一临时目录，并在新建的消费者项目中安装对应的精确版本 tarball 文件。
 
@@ -44,21 +44,21 @@ pack_dir="$(mktemp -d)"
 (cd packages/skill-family-harness-node && pnpm pack --pack-destination "$pack_dir")
 (cd packages/skill-family-engineering-kit && pnpm pack --pack-destination "$pack_dir")
 mkdir "$pack_dir/consumer" && (cd "$pack_dir/consumer" && npm init -y)
-(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.1.tgz" "$pack_dir/skill-family-harness-node-0.39.1.tgz" "$pack_dir/skill-family-engineering-kit-0.39.1.tgz")
+(cd "$pack_dir/consumer" && npm install "$pack_dir/skill-family-contracts-0.39.2.tgz" "$pack_dir/skill-family-harness-node-0.39.2.tgz" "$pack_dir/skill-family-engineering-kit-0.39.2.tgz")
 ```
 
-该方式适用于本地候选版本的验证，不要求 `0.39.1` 版本的三个包已在 npm registry 发布。但安装过程中仍可能访问 registry 以获取第三方依赖。
+该方式适用于本地候选版本的验证，不要求 `0.39.2` 版本的三个包已在 npm registry 发布。但安装过程中仍可能访问 registry 以获取第三方依赖。
 
-当 `skill-family-harness-node@0.39.1` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作。
+当 `skill-family-harness-node@0.39.2` 在 npm registry 中正式发布后，可直接通过以下命令完成安装与操作。
 
 ```sh
-npm install skill-family-harness-node@0.39.1
+npm install skill-family-harness-node@0.39.2
 npm info skill-family-harness-node --help
 ```
 
-此安装方式仅在 `0.39.1` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
+此安装方式仅在 `0.39.2` 版本已实际公开发布后适用。本地源码候选验证与已发布版本的精确安装属于不同场景，不可互相覆盖。
 
-历史版本 `0.39.0` 已作为独立版本正式发布，其发布状态与 `0.39.1` 候选验证无关联。
+历史版本 `0.39.0` 已作为独立版本正式发布，其发布状态与 `0.39.2` 候选验证无关联。
 
 以下为最小示例，演示在 Node 环境中校验一份契约文档：
 

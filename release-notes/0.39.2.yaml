@@ -1,0 +1,15 @@
+version: 0.39.2
+date: 2026-11-26
+locales:
+  zh-CN:
+    summary: 随 Foundation 0.39.2 锁步版本前移，保持全部既有安全运行时、进程监督、文件树观察与持久状态账本接口兼容。
+    upgradeNotes: 请与 skill-family-contracts@0.39.2 与 skill-family-engineering-kit@0.39.2 锁步升级。
+    changes:
+      changed:
+        - 锁步前移 FOUNDATION_PACKAGE_VERSION 至 0.39.2，对齐 Contracts 1.23.0 契约底座。
+  en:
+    summary: Lockstep 0.39.2 version alignment preserving all existing safe filesystem, process supervision, tree observation, and durable state store APIs.
+    upgradeNotes: Upgrade in lockstep with skill-family-contracts@0.39.2 and skill-family-engineering-kit@0.39.2.
+    changes:
+      changed:
+        - Advances FOUNDATION_PACKAGE_VERSION to 0.39.2 in lockstep with Contracts 1.23.0.
